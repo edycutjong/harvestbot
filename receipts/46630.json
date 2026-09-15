@@ -1,0 +1,35 @@
+{
+  "beat1": {
+    "tx": "0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123",
+    "status": "0x1",
+    "block": "119852570",
+    "gas": "1096548",
+    "lotIds": "63,62,61,60,59,58,57,56,55",
+    "realizedLoss": "-24531251",
+    "sellQty": "638501157098660213",
+    "nonce": "1789468670"
+  },
+  "beat2": {
+    "tx": "0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10",
+    "status": "0x0",
+    "block": "119852786",
+    "gas": "133328",
+    "expected": "WashSaleViolation",
+    "nonce": "1789468710"
+  },
+  "beat3_attempt": {
+    "tx": "0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6",
+    "status": "0x0",
+    "block": "119852971",
+    "expected": "OffMapSubstitute"
+  },
+  "beat3_slash": {
+    "tx": "0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493",
+    "status": "0x1",
+    "block": "119853005",
+    "gas": "170719",
+    "bondBefore": "1000000000",
+    "bondAfter": "800000000",
+    "slashed": "200000000"
+  }
+}

@@ -25,3 +25,6 @@ contracts/lcov.info
 contracts/coverage.txt
 contracts/report/
 stylus/**/target/
+# forge script artefacts: keep run-latest only
+contracts/broadcast/**/run-1*.json
+contracts/cache/**/run-*.json
