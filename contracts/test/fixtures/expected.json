@@ -1,0 +1,15 @@
+{
+  "_comment": "Pinned Beat-1 outcome for the seed portfolio (specs/seed-data.md §2.1b). Integer math identical to TaxLotLedger.",
+  "lots": 64,
+  "lotQty": "10000000000000000000",
+  "basisPerShareLo": "380000000",
+  "basisPerShareHi": "455000000",
+  "markPrice": "412300000",
+  "sellQty": "81728148108628507367",
+  "expectedLotIds": [63, 62, 61, 60, 59, 58, 57, 56, 55],
+  "expectedRealizedLoss": "-3140000000",
+  "bond": "13200000000",
+  "slash": "2640000000",
+  "bounty": "264000000",
+  "restitution": "2376000000"
+}
