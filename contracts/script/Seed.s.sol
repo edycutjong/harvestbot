@@ -19,7 +19,8 @@ contract SeedScript is Script {
     uint256 constant SHARE = 1e18;
 
     function run() external {
-        string memory d = vm.readFile(string.concat("../deployments/", vm.toString(block.chainid), ".json"));
+        string memory d =
+            vm.readFile(string.concat("../deployments/", vm.toString(block.chainid), ".json"));
         address mandateAddr = vm.parseJsonAddress(d, ".mandate");
         address bondAddr = vm.parseJsonAddress(d, ".bond");
         address usdcAddr = vm.parseJsonAddress(d, ".usdc");

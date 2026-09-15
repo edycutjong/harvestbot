@@ -11,7 +11,8 @@ import {HarvestMandate} from "../src/HarvestMandate.sol";
 /// env: AGENT_PK, SELL, BUY, SELL_QTY, LOT_IDS (comma list), NONCE, DEADLINE, RATIONALE (string), ENVELOPE_OUT
 contract EnvelopeScript is Script {
     function run() external {
-        string memory d = vm.readFile(string.concat("../deployments/", vm.toString(block.chainid), ".json"));
+        string memory d =
+            vm.readFile(string.concat("../deployments/", vm.toString(block.chainid), ".json"));
         HarvestMandate mandate = HarvestMandate(vm.parseJsonAddress(d, ".mandate"));
         address owner = vm.parseJsonAddress(d, ".owner");
 

@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img"
+     aria-label="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days">
+<!-- STORYBOARD (dur 8s — must equal this file's single master dur)
+  0-10%   steady state: plate, grid, mini mark, outlined wordmark, tagline, pulsing metric, tech line;
+          the 64-lot ledger, the rail to wIVV with a dashed placeholder where the wall will stand (poster rule satisfied)
+  10-25%  trigger:      the mark drops to $412.30 — the chip lands and the nine highest-basis lots light up in the ledger   data-story="beat-2"
+  25-55%  mechanism:    nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days   data-story="beat-3"
+  55-80%  resolution:   a rebuy of wVOO heads back from wIVV, meets the wall and is refused — BLOCKED seals, then the
+          SLASHED echo: a rogue off-map attempt is cut from the bond. Wall, BLOCKED and banked label persist         data-story="beat-4"
+  80-100% breathe + seam fade (all story opacity is 0 by 97%)
+-->
+  <style>
+    .aur1 { animation: drift1 16s ease-in-out infinite alternate; }
+    .aur2 { animation: drift2 19s ease-in-out infinite alternate; }
+    .beam { animation: beamSweep 8s linear infinite; }
+    .metric { animation: metricPulse 8s ease-in-out infinite; }
+    .pop-bank { animation: popBank 8s ease infinite; transform-box: fill-box; transform-origin: center; }
+    .pop-block { animation: popBlock 8s ease infinite; transform-box: fill-box; transform-origin: center; }
+    .pop-slash { animation: popSlash 8s ease infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes drift1 { from { transform: translate(0, 0); } to { transform: translate(70px, 24px); } }
+    @keyframes drift2 { from { transform: translate(0, 0); } to { transform: translate(-80px, -20px); } }
+    @keyframes beamSweep { 0%, 12% { transform: translateX(-300px) skewX(-18deg); } 38%, 100% { transform: translateX(1700px) skewX(-18deg); } }
+    @keyframes metricPulse { 0%, 100% { opacity: 0.72; } 50% { opacity: 1; } }
+    @keyframes popBank  { 0%, 48% { transform: scale(0.6); } 52% { transform: scale(1.14); } 55%, 100% { transform: scale(1); } }
+    @keyframes popBlock { 0%, 66% { transform: scale(0.6); } 70% { transform: scale(1.14); } 73%, 100% { transform: scale(1); } }
+    @keyframes popSlash { 0%, 76% { transform: scale(0.6); } 80% { transform: scale(1.12); } 83%, 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.55)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <linearGradient id="wmGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2ED573"/>
+      <stop offset="100%" stop-color="#7BE8A5"/>
+    </linearGradient>
+    <linearGradient id="banked" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2ED573"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="walled" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB020"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="auroraBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="46"/>
+    </filter>
+    <filter id="packetGlow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="wallGlow" x="-200%" y="-30%" width="500%" height="160%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <clipPath id="wmclip"><use href="#wm1"/></clipPath>
+  </defs>
+
+  <!-- ===== backdrop (brand plate: mandatory, opaque — survives white AND dark GitHub) ===== -->
+  <rect x="0" y="0" width="1280" height="320" rx="22" fill="#12161B"/>
+  <rect x="1" y="1" width="1278" height="318" rx="21" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+  <rect x="0" y="0" width="1280" height="320" rx="22" fill="url(#grid)"/>
+  <g filter="url(#auroraBlur)">
+    <circle class="aur1" cx="230" cy="50" r="160" fill="#2ED573" opacity="0.10"/>
+    <circle class="aur2" cx="1080" cy="290" r="180" fill="#FFB020" opacity="0.07"/>
+  </g>
+  <g class="beam" opacity="0.05"><rect x="0" y="-40" width="160" height="400" fill="url(#beamGrad)"/></g>
+
+  <!-- ===== left: brand (all visible at t=0 — frame-0 poster) ===== -->
+  <g transform="translate(56,36) scale(0.135)">
+    <rect x="32" y="32" width="448" height="448" rx="100" fill="#1B2129"/>
+    <rect x="34" y="34" width="444" height="444" rx="98" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="6"/>
+    <rect x="96" y="144" width="136" height="36" rx="18" fill="none" stroke="#5E6B78" stroke-width="6" stroke-dasharray="10 12"/>
+    <rect x="96" y="200" width="136" height="36" rx="18" fill="#9AA7B4"/>
+    <rect x="96" y="256" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.82"/>
+    <rect x="96" y="312" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.64"/>
+    <rect x="96" y="368" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.46"/>
+    <rect x="258" y="116" width="28" height="316" rx="14" fill="url(#walled)"/>
+    <rect x="312" y="144" width="136" height="36" rx="18" fill="url(#banked)"/>
+  </g>
+
+  <g transform="translate(56,178)">
+    <path id="wm1" d="M16.8 0L5.1 0L5.1 -56.7L16.8 -56.7L16.8 -33.8L41.5 -33.8L41.5 -56.7L53.1 -56.7L53.1 0L41.5 0L41.5 -24.2L16.8 -24.2L16.8 0M75 0.8L75 0.8Q71 0.8 67.8 -0.6Q64.6 -2 62.7 -4.9Q60.9 -7.7 60.9 -11.9L60.9 -11.9Q60.9 -15.5 62.2 -17.9Q63.5 -20.3 65.8 -21.7Q68 -23.2 70.9 -23.9Q73.8 -24.7 76.9 -25L76.9 -25Q80.6 -25.4 82.9 -25.7Q85.2 -26 86.2 -26.7Q87.3 -27.4 87.3 -28.8L87.3 -28.8L87.3 -29Q87.3 -30.8 86.5 -32.1Q85.7 -33.3 84.2 -34Q82.7 -34.7 80.6 -34.7L80.6 -34.7Q78.4 -34.7 76.7 -34Q75.1 -33.3 74.1 -32.2Q73 -31.1 72.6 -29.7L72.6 -29.7L62.1 -31.5Q63.2 -35.2 65.7 -37.8Q68.3 -40.4 72.1 -41.7Q75.9 -43.1 80.6 -43.1L80.6 -43.1Q84.1 -43.1 87.3 -42.3Q90.5 -41.5 93.1 -39.8Q95.7 -38 97.2 -35.3Q98.7 -32.5 98.7 -28.7L98.7 -28.7L98.7 0L87.9 0L87.9 -5.9L87.5 -5.9Q86.5 -3.9 84.7 -2.4Q83 -0.9 80.6 0Q78.2 0.8 75 0.8M78.3 -7.2L78.3 -7.2Q81 -7.2 83 -8.3Q85 -9.3 86.2 -11.2Q87.3 -13 87.3 -15.2L87.3 -15.2L87.3 -19.8Q86.8 -19.5 85.8 -19.2Q84.8 -18.9 83.5 -18.6Q82.3 -18.4 81 -18.2Q79.8 -18 78.9 -17.9L78.9 -17.9Q76.8 -17.6 75.2 -16.9Q73.6 -16.2 72.7 -15.1Q71.8 -14 71.8 -12.2L71.8 -12.2Q71.8 -10.6 72.7 -9.5Q73.5 -8.3 75 -7.8Q76.4 -7.2 78.3 -7.2M119.9 0L108.4 0L108.4 -42.6L119.5 -42.6L119.5 -35.2L119.9 -35.2Q121.1 -39.1 123.9 -41.1Q126.6 -43.2 130.2 -43.2L130.2 -43.2Q131.1 -43.2 132.1 -43.1Q133.1 -43 133.9 -42.8L133.9 -42.8L133.9 -32.6Q133.1 -32.8 131.7 -33Q130.3 -33.1 129 -33.1L129 -33.1Q126.4 -33.1 124.3 -32Q122.2 -30.9 121 -28.9Q119.9 -26.9 119.9 -24.2L119.9 -24.2L119.9 0M165.2 0L152.2 0L136.5 -42.6L148.6 -42.6L155.8 -20.5Q157.1 -16.3 158.1 -12.1L158.1 -12.1Q158.4 -10.5 158.8 -8.8L158.8 -8.8Q159.2 -10.5 159.6 -12.1L159.6 -12.1Q160.5 -16.3 161.8 -20.5L161.8 -20.5L168.9 -42.6L180.9 -42.6L165.2 0M206.2 0.8L206.2 0.8Q199.7 0.8 195 -1.8Q190.2 -4.5 187.7 -9.4Q185.2 -14.3 185.2 -21.1L185.2 -21.1Q185.2 -27.7 187.7 -32.6Q190.2 -37.6 194.8 -40.3Q199.4 -43.1 205.6 -43.1L205.6 -43.1Q209.8 -43.1 213.4 -41.8Q217.1 -40.4 219.8 -37.8Q222.5 -35.1 224.1 -31Q225.6 -27 225.6 -21.5L225.6 -21.5L225.6 -18.3L196.5 -18.3Q196.6 -15.1 197.7 -12.8L197.7 -12.8Q199 -10.3 201.2 -9Q203.4 -7.8 206.4 -7.8L206.4 -7.8Q208.4 -7.8 210 -8.3Q211.7 -8.9 212.8 -10Q214 -11.2 214.6 -12.8L214.6 -12.8L225 -10.9Q223.9 -7.4 221.4 -4.7Q218.8 -2.1 215 -0.6Q211.2 0.8 206.2 0.8M196.6 -25.5L196.6 -25.5L214.6 -25.5Q214.4 -27.6 213.7 -29.4L213.7 -29.4Q212.7 -31.8 210.7 -33.2Q208.7 -34.5 205.7 -34.5L205.7 -34.5Q202.8 -34.5 200.7 -33.1Q198.6 -31.8 197.6 -29.4L197.6 -29.4Q196.8 -27.7 196.6 -25.5M250.3 0.8L250.3 0.8Q245.2 0.8 241.2 -0.6Q237.3 -2.1 234.8 -4.9Q232.2 -7.7 231.5 -11.7L231.5 -11.7L242.2 -13.5Q243 -10.5 245.1 -9Q247.2 -7.5 250.7 -7.5L250.7 -7.5Q254 -7.5 255.8 -8.8Q257.7 -10 257.7 -11.9L257.7 -11.9Q257.7 -13.6 256.4 -14.7Q255 -15.7 252.2 -16.3L252.2 -16.3L244.9 -17.8Q238.7 -19.1 235.7 -22.1Q232.6 -25.1 232.6 -29.9L232.6 -29.9Q232.6 -34 234.9 -37Q237.1 -39.9 241.1 -41.5Q245.1 -43.1 250.5 -43.1L250.5 -43.1Q255.6 -43.1 259.3 -41.7Q262.9 -40.3 265.2 -37.8Q267.5 -35.2 268.3 -31.8L268.3 -31.8L258.1 -30Q257.5 -32.1 255.7 -33.5Q253.8 -34.9 250.7 -34.9L250.7 -34.9Q247.9 -34.9 246 -33.7Q244.1 -32.6 244.1 -30.6L244.1 -30.6Q244.1 -29 245.3 -27.9Q246.5 -26.8 249.5 -26.2L249.5 -26.2L257.2 -24.6Q263.4 -23.4 266.4 -20.5Q269.4 -17.7 269.4 -13.1L269.4 -13.1Q269.4 -9 266.9 -5.8Q264.5 -2.7 260.2 -0.9Q255.9 0.8 250.3 0.8M290.3 -42.6L298.3 -42.6L298.3 -33.9L290.3 -33.9L290.3 -12.5Q290.3 -10.4 291.2 -9.5Q292.1 -8.5 294.2 -8.5L294.2 -8.5Q294.8 -8.5 296 -8.7Q297.2 -8.8 297.8 -9L297.8 -9L299.4 -0.4Q297.5 0.2 295.6 0.4Q293.8 0.6 292 0.6L292 0.6Q285.6 0.6 282.3 -2.5Q278.9 -5.6 278.9 -11.5L278.9 -11.5L278.9 -33.9L273 -33.9L273 -42.6L278.9 -42.6L278.9 -52.7L290.3 -52.7L290.3 -42.6" fill="url(#wmGrad)"/>
+    <path d="M29.1 0L5.1 0L5.1 -56.7L27.7 -56.7Q33.9 -56.7 38.1 -54.9Q42.2 -53 44.3 -49.7Q46.4 -46.4 46.4 -42.2L46.4 -42.2Q46.4 -38.8 45.1 -36.3Q43.7 -33.8 41.4 -32.2Q39.1 -30.7 36.2 -30L36.2 -30L36.2 -29.4Q39.4 -29.3 42.2 -27.6Q45.1 -25.9 46.8 -22.9Q48.6 -19.8 48.6 -15.7L48.6 -15.7Q48.6 -11.2 46.4 -7.6Q44.2 -4.1 39.9 -2Q35.5 0 29.1 0L29.1 0M16.8 -24.9L16.8 -9.6L26.8 -9.6Q31.9 -9.6 34.3 -11.5Q36.6 -13.5 36.6 -16.8L36.6 -16.8Q36.6 -19.2 35.5 -21Q34.3 -22.9 32.2 -23.9Q30 -24.9 27.1 -24.9L27.1 -24.9L16.8 -24.9M16.8 -47.3L16.8 -32.9L25.9 -32.9Q28.4 -32.9 30.4 -33.8Q32.4 -34.7 33.5 -36.4Q34.6 -38 34.6 -40.3L34.6 -40.3Q34.6 -43.4 32.4 -45.3Q30.2 -47.3 26.2 -47.3L26.2 -47.3L16.8 -47.3M75.5 0.8L75.5 0.8Q69.1 0.8 64.4 -1.9Q59.8 -4.7 57.2 -9.6Q54.7 -14.5 54.7 -21.1L54.7 -21.1Q54.7 -27.7 57.2 -32.7Q59.8 -37.6 64.4 -40.4Q69.1 -43.1 75.5 -43.1L75.5 -43.1Q82 -43.1 86.6 -40.4Q91.3 -37.6 93.8 -32.7Q96.4 -27.7 96.4 -21.1L96.4 -21.1Q96.4 -14.5 93.8 -9.6Q91.3 -4.7 86.6 -1.9Q82 0.8 75.5 0.8M75.5 -8.2L75.5 -8.2Q78.6 -8.2 80.6 -9.8Q82.7 -11.5 83.7 -14.5Q84.7 -17.4 84.7 -21.1L84.7 -21.1Q84.7 -24.9 83.7 -27.8Q82.7 -30.8 80.6 -32.4Q78.6 -34.1 75.5 -34.1L75.5 -34.1Q72.5 -34.1 70.4 -32.4Q68.4 -30.8 67.4 -27.8Q66.3 -24.9 66.3 -21.1L66.3 -21.1Q66.3 -17.4 67.4 -14.5Q68.4 -11.5 70.4 -9.8Q72.5 -8.2 75.5 -8.2M117.5 -42.6L125.5 -42.6L125.5 -33.9L117.5 -33.9L117.5 -12.5Q117.5 -10.4 118.4 -9.5Q119.3 -8.5 121.4 -8.5L121.4 -8.5Q122 -8.5 123.2 -8.7Q124.4 -8.8 125 -9L125 -9L126.6 -0.4Q124.7 0.2 122.8 0.4Q121 0.6 119.2 0.6L119.2 0.6Q112.8 0.6 109.5 -2.5Q106.1 -5.6 106.1 -11.5L106.1 -11.5L106.1 -33.9L100.2 -33.9L100.2 -42.6L106.1 -42.6L106.1 -52.7L117.5 -52.7L117.5 -42.6" transform="translate(306.8,0)" fill="#EAF0F6"/>
+    <g clip-path="url(#wmclip)">
+      <g transform="skewX(-18)">
+        <rect x="0" y="-70" width="72" height="90" fill="url(#shine)" opacity="0.55">
+          <animateTransform attributeName="transform" type="translate" dur="8s" repeatCount="indefinite"
+                            calcMode="linear" values="-200 0;-200 0;460 0;460 0" keyTimes="0;0.04;0.30;1"/>
+        </rect>
+      </g>
+    </g>
+  </g>
+
+  <text x="56" y="214" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="17" fill="#9AA7B4">Autonomous tax-loss harvesting for tokenized equities —</text>
+  <text x="56" y="237" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="17" fill="#9AA7B4">bounded by a mandate it physically cannot exceed.</text>
+  <text class="metric" x="56" y="268" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" font-weight="600" fill="#2ED573">~54.1k vs ~420.3k gas · 64-lot HIFO · ~8× on Stylus</text>
+  <text x="56" y="293" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12.5" fill="#9AA7B4" opacity="0.85">Stylus · Rust/WASM · Solidity · Foundry · Robinhood Chain · Next.js</text>
+
+  <!-- ===== right: the product story (steady-state scenery visible at t=0) ===== -->
+  <!-- the ledger: 64 lots, ranked, highest basis on top -->
+  <text x="600" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#9AA7B4" letter-spacing="1">TaxLotLedger · 64 lots · HIFO</text>
+  <g fill="#9AA7B4">
+    <rect x="600" y="68" width="150" height="12" rx="6" opacity="0.95"/>
+    <rect x="600" y="88" width="150" height="12" rx="6" opacity="0.85"/>
+    <rect x="600" y="108" width="150" height="12" rx="6" opacity="0.75"/>
+    <rect x="600" y="128" width="150" height="12" rx="6" opacity="0.6"/>
+    <rect x="600" y="148" width="150" height="12" rx="6" opacity="0.48"/>
+    <rect x="600" y="168" width="150" height="12" rx="6" opacity="0.38"/>
+    <rect x="600" y="188" width="150" height="12" rx="6" opacity="0.28"/>
+    <rect x="600" y="208" width="150" height="12" rx="6" opacity="0.2"/>
+  </g>
+  <text x="600" y="242" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">basis $380–$455 · 10 sh/lot</text>
+  <!-- the rail from the ledger to wIVV, and the dashed placeholder where the wall will stand -->
+  <line x1="756" y1="74" x2="1124" y2="74" stroke="#3A4450" stroke-width="2"/>
+  <path d="M1118 68 L1128 74 L1118 80" fill="none" stroke="#3A4450" stroke-width="2"/>
+  <!-- placeholder + label are brand layer (visible at t=0); they yield to the amber wall while it stands -->
+  <line x1="990" y1="40" x2="990" y2="200" stroke="#5E6B78" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round">
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="1;1;0;0;1;1" keyTimes="0;0.42;0.50;0.93;0.97;1"/>
+  </line>
+  <text x="990" y="222" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">WashSaleGuard
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="1;1;0;0;1;1" keyTimes="0;0.46;0.50;0.93;0.97;1"/>
+  </text>
+  <!-- wIVV node -->
+  <rect x="1132" y="46" width="92" height="56" rx="12" fill="#1B2129" stroke="rgba(255,255,255,0.12)"/>
+  <text x="1178" y="70" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="600" fill="#EAF0F6">wIVV</text>
+  <rect x="1160" y="78" width="36" height="14" rx="3" fill="#7C4DEB"/>
+  <text x="1178" y="89" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" font-weight="600" fill="#ffffff" letter-spacing="1">MOCK</text>
+  <text x="1178" y="120" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">stay invested</text>
+
+  <!-- ===== story layer (fades to 0 by 97% — loop seam) ===== -->
+  <!-- beat 2: the mark drops — chip lands, the nine highest-basis lots light up -->
+  <g opacity="0" data-story="beat-2">
+    <rect x="600" y="252" width="176" height="24" rx="12" fill="#1B2129" stroke="#9AA7B4"/>
+    <text x="688" y="268" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#EAF0F6">mark ↓ $412.30 · 9 lots</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.10;0.14;0.93;0.97;1"/>
+  </g>
+  <g fill="#2ED573" opacity="0" data-story="beat-2">
+    <rect x="600" y="68" width="150" height="12" rx="6"/>
+    <rect x="600" y="88" width="150" height="12" rx="6" opacity="0.85"/>
+    <rect x="600" y="108" width="150" height="12" rx="6" opacity="0.7"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0.35;0.35;0;0" keyTimes="0;0.15;0.22;0.30;0.40;0.93;0.97;1"/>
+  </g>
+  <!-- beat 3: the nine lots leave the ledger along the rail, green, out past the wall's line -->
+  <rect x="700" y="68" width="50" height="12" rx="6" fill="url(#banked)" opacity="0" data-story="beat-3" filter="url(#packetGlow)">
+    <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" path="M0 0 L380 0" keyPoints="0;0;1;1" keyTimes="0;0.28;0.46;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.26;0.29;0.46;0.50;1"/>
+  </rect>
+  <line x1="756" y1="74" x2="1124" y2="74" stroke="#2ED573" stroke-width="2" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" opacity="0" data-story="beat-3">
+    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.28;0.46;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.8;0.8;0;0" keyTimes="0;0.27;0.30;0.93;0.97;1"/>
+  </line>
+  <!-- beat 3: the way back goes amber — the wall draws in behind the lots that left -->
+  <!-- NOTE: the wall is a <rect>, never a vertical <line> — a zero-width bounding box makes both a
+       gradient stroke and a blur filter region collapse to nothing (caught by measured frame QA). -->
+  <rect x="983" y="40" width="14" height="0" rx="7" fill="url(#walled)" opacity="0" data-story="beat-3">
+    <animate attributeName="height" dur="8s" repeatCount="indefinite" values="0;0;160;160" keyTimes="0;0.42;0.50;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.41;0.43;0.93;0.97;1"/>
+  </rect>
+  <rect x="981" y="40" width="18" height="160" rx="9" fill="#FFB020" opacity="0" data-story="beat-3" filter="url(#wallGlow)">
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.7;0.35;0.8;0.4;0.6;0;0" keyTimes="0;0.44;0.52;0.62;0.70;0.82;0.90;0.96;1"/>
+  </rect>
+  <g opacity="0" data-story="beat-3">
+    <text x="990" y="222" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FFB020">window 30 days</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.48;0.52;0.93;0.97;1"/>
+  </g>
+  <!-- beat 3: the banked label pops as the lots arrive -->
+  <g class="pop-bank" opacity="0" data-story="beat-3">
+    <rect x="800" y="86" width="160" height="26" rx="13" fill="#123B24" stroke="#2ED573"/>
+    <text x="880" y="103" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#2ED573">−$3,140.00 banked</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.47;0.50;0.93;0.97;1"/>
+  </g>
+  <!-- beat 4: a rebuy heads back from wIVV toward the ledger and is refused at the wall -->
+  <g opacity="0" data-story="beat-4">
+    <text x="1178" y="160" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#9AA7B4">rebuy wVOO</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.55;0.58;0.93;0.97;1"/>
+  </g>
+  <circle cx="1132" cy="140" r="7" fill="#9AA7B4" opacity="0" data-story="beat-4" filter="url(#packetGlow)">
+    <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" path="M0 0 L-128 0" keyPoints="0;0;1;1" keyTimes="0;0.57;0.66;1"/>
+    <animate attributeName="fill" dur="8s" repeatCount="indefinite" values="#9AA7B4;#9AA7B4;#FFB020;#FFB020" keyTimes="0;0.65;0.67;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.56;0.59;0.93;0.97;1"/>
+  </circle>
+  <line x1="1132" y1="140" x2="1004" y2="140" stroke="#9AA7B4" stroke-width="2" stroke-dasharray="5 5" pathLength="100" stroke-dashoffset="100" opacity="0" data-story="beat-4">
+    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.57;0.66;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.7;0.7;0;0" keyTimes="0;0.56;0.59;0.93;0.97;1"/>
+  </line>
+  <g opacity="0" data-story="beat-4" stroke="#FFB020" stroke-width="3" stroke-linecap="round">
+    <line x1="998" y1="134" x2="1010" y2="146"/>
+    <line x1="1010" y1="134" x2="998" y2="146"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;0.2;1;1;0;0" keyTimes="0;0.66;0.675;0.69;0.705;0.93;0.97;1"/>
+  </g>
+  <g class="pop-block" opacity="0" data-story="beat-4">
+    <rect x="790" y="127" width="190" height="26" rx="13" fill="#3A2C0A" stroke="#FFB020"/>
+    <text x="885" y="144" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FFB020" letter-spacing="0.5">BLOCKED · WashSaleViolation</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.66;0.69;0.93;0.97;1"/>
+  </g>
+  <!-- beat 4 echo: the rogue off-map attempt (wVOO → wTSLA) is refused and the bond is cut -->
+  <line x1="756" y1="182" x2="978" y2="182" stroke="#FF4757" stroke-width="2" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" opacity="0" data-story="beat-4">
+    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.72;0.78;1"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.6;0.6;0;0;0" keyTimes="0;0.71;0.73;0.77;0.79;0.97;1"/>
+  </line>
+  <!-- the rogue line stops at the wall (x=997) and retracts as the chip lands, so the chip never sits on a line -->
+  <g opacity="0" data-story="beat-4" stroke="#FF4757" stroke-width="3" stroke-linecap="round">
+    <line x1="984" y1="176" x2="996" y2="188"/>
+    <line x1="996" y1="176" x2="984" y2="188"/>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.77;0.785;0.93;0.97;1"/>
+  </g>
+  <g class="pop-slash" opacity="0" data-story="beat-4">
+    <rect x="770" y="168" width="200" height="26" rx="13" fill="#3A1216" stroke="#FF4757"/>
+    <text x="870" y="185" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FF4757" letter-spacing="0.5">SLASHED · bond −$2,640.00</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.76;0.79;0.93;0.97;1"/>
+  </g>
+  <g opacity="0" data-story="beat-4">
+    <text x="1124" y="204" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#FF4757">rogue wVOO → wTSLA (off-map)</text>
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.72;0.75;0.93;0.97;1"/>
+  </g>
+</svg>

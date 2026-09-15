@@ -1,4 +1,4 @@
-.PHONY: help build test fmt lint coverage slither stylus-check stylus-test ci
+.PHONY: help build test fmt lint coverage slither stylus-check ci seed beats bench readiness
 help:
 	@echo "build         forge build + stylus wasm build"
 	@echo "test          forge test + cargo test"
@@ -7,7 +7,11 @@ help:
 	@echo "coverage      forge coverage summary (excludes script/ test/)"
 	@echo "slither       static analysis on contracts/"
 	@echo "stylus-check  cargo stylus check against Robinhood Chain testnet"
-	@echo "ci            lint + test + coverage + slither"
+	@echo "ci            lint + test + coverage + slither + readiness"
+	@echo "seed          scripts/seed.sh   (needs RPC, PRIVATE_KEY, AGENT_PK, SEED_TOTAL_QTY, SWAP_LIQ_QTY, BOND_AMOUNT)"
+	@echo "beats         scripts/beats.sh  (needs RPC, AGENT_PK, CHALLENGER_PK)"
+	@echo "bench         scripts/bench.py  (needs RPC, PRIVATE_KEY)"
+	@echo "readiness     scripts/check_submission_readiness.py"
 
 build:
 	cd contracts && forge build --sizes
@@ -27,4 +31,12 @@ slither:
 	cd contracts && slither . --filter-paths "lib/" --exclude-dependencies
 stylus-check:
 	cd stylus/ledger && cargo stylus check --endpoint https://rpc.testnet.chain.robinhood.com
-ci: lint test coverage slither
+seed:
+	./scripts/seed.sh
+beats:
+	./scripts/beats.sh
+bench:
+	python3 scripts/bench.py
+readiness:
+	python3 scripts/check_submission_readiness.py
+ci: lint test coverage slither readiness

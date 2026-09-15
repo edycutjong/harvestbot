@@ -92,7 +92,11 @@ contract DeployScript is Script {
         oracle.setPrice(offmap, vm.envUint("MARK_OFFMAP"));
         mandate.setAgentKey(agent);
         router.setPolicy(
-            agent, address(mandate), HarvestMandate.proposeHarvest.selector, uint64(block.timestamp + 90 days), 20
+            agent,
+            address(mandate),
+            HarvestMandate.proposeHarvest.selector,
+            uint64(block.timestamp + 90 days),
+            20
         );
 
         vm.stopBroadcast();

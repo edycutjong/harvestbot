@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img"
+     aria-label="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days">
+  <!-- The mark: a ranked ledger of lots (left), its top slice cut away and banked green (right),
+       and the amber wash-sale wall standing where the slice used to sit. At 16px it is three shapes:
+       the grey stack, the amber wall, the green slice. The plate makes it self-sufficient on
+       GitHub light AND dark (green on white alone is 1.9:1). -->
+  <defs>
+    <linearGradient id="hb-banked" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="var(--primary, #2ED573)"/>
+      <stop offset="100%" stop-color="var(--color-success, #22C55E)"/>
+    </linearGradient>
+    <linearGradient id="hb-walled" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--accent, #FFB020)"/>
+      <stop offset="100%" stop-color="var(--color-warning, #F59E0B)"/>
+    </linearGradient>
+    <filter id="hb-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- plate (dual-background safety) -->
+  <rect x="32" y="32" width="448" height="448" rx="100" fill="var(--plate, #12161B)"/>
+  <rect x="34" y="34" width="444" height="444" rx="98" fill="none"
+        stroke="rgba(255,255,255,0.16)" stroke-width="4"/>
+
+  <!-- the ledger: four lots still open, ranked; the top slot is vacant (dashed) -->
+  <rect x="96" y="144" width="136" height="36" rx="18" fill="none"
+        stroke="var(--text-low, #5E6B78)" stroke-width="4" stroke-dasharray="10 12"/>
+  <rect x="96" y="200" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)"/>
+  <rect x="96" y="256" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.82"/>
+  <rect x="96" y="312" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.64"/>
+  <rect x="96" y="368" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.46"/>
+
+  <!-- the wash-sale wall: amber, full height of the ledger, the way back is shut -->
+  <rect x="258" y="116" width="28" height="316" rx="14" fill="url(#hb-walled)"/>
+
+  <!-- the banked slice: the nine highest-basis lots, out past the wall, green -->
+  <rect x="312" y="144" width="136" height="36" rx="18" fill="url(#hb-banked)" filter="url(#hb-glow)"/>
+</svg>

@@ -1,0 +1,150 @@
+{
+  "chainId": 46630,
+  "ledgers": {
+    "solidity": "0xa220D5B0b6E944266acd76288678e91a6BcfAAca",
+    "stylus": "0x1a337c6d48bc0d19f913d16074d362d065564f86"
+  },
+  "writer": "0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b",
+  "sizes": [
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "runs": 50,
+  "markPrice": 412300000,
+  "note": "gas = eth_estimateGas of computeHarvest (HIFO over all open lots, 9 picks); latency = eth_call wall-clock incl. network",
+  "results": {
+    "8": {
+      "solidity": {
+        "lots": 8,
+        "gas": 146757,
+        "lotIds": "[7, 6, 5, 4]",
+        "realizedLoss": "-1065142840",
+        "p50_ms": 865.0,
+        "p95_ms": 925.6,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 132362
+      },
+      "stylus": {
+        "lots": 8,
+        "gas": 140254,
+        "lotIds": "[7, 6, 5, 4]",
+        "realizedLoss": "-1065142840",
+        "p50_ms": 876.5,
+        "p95_ms": 916.9,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 125859
+      },
+      "ratio": 1.05,
+      "ratioL2": 1.05
+    },
+    "16": {
+      "solidity": {
+        "lots": 16,
+        "gas": 366590,
+        "lotIds": "[15, 14, 13, 12, 11, 10, 9, 8, 7]",
+        "realizedLoss": "-2020666000",
+        "p50_ms": 864.4,
+        "p95_ms": 933.2,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 352195
+      },
+      "stylus": {
+        "lots": 16,
+        "gas": 194412,
+        "lotIds": "[15, 14, 13, 12, 11, 10, 9, 8, 7]",
+        "realizedLoss": "-2020666000",
+        "p50_ms": 875.1,
+        "p95_ms": 936.4,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 180017
+      },
+      "ratio": 1.89,
+      "ratioL2": 1.96
+    },
+    "32": {
+      "solidity": {
+        "lots": 32,
+        "gas": 734826,
+        "lotIds": "[31, 30, 29, 28, 27, 26, 25, 24, 23]",
+        "realizedLoss": "-2778924506",
+        "p50_ms": 890.6,
+        "p95_ms": 970.5,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 720431
+      },
+      "stylus": {
+        "lots": 32,
+        "gas": 303408,
+        "lotIds": "[31, 30, 29, 28, 27, 26, 25, 24, 23]",
+        "realizedLoss": "-2778924506",
+        "p50_ms": 879.7,
+        "p95_ms": 946.3,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 289013
+      },
+      "ratio": 2.42,
+      "ratioL2": 2.49
+    },
+    "64": {
+      "solidity": {
+        "lots": 64,
+        "gas": 1471300,
+        "lotIds": "[63, 62, 61, 60, 59, 58, 57, 56, 55]",
+        "realizedLoss": "-3140000000",
+        "p50_ms": 880.2,
+        "p95_ms": 928.8,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 1456905
+      },
+      "stylus": {
+        "lots": 64,
+        "gas": 522388,
+        "lotIds": "[63, 62, 61, 60, 59, 58, 57, 56, 55]",
+        "realizedLoss": "-3140000000",
+        "p50_ms": 883.2,
+        "p95_ms": 951.2,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 507993
+      },
+      "ratio": 2.82,
+      "ratioL2": 2.87
+    },
+    "128": {
+      "solidity": {
+        "lots": 128,
+        "gas": 2944333,
+        "lotIds": "[127, 126, 125, 124, 123, 122, 121, 120, 119]",
+        "realizedLoss": "-3316273074",
+        "p50_ms": 879.5,
+        "p95_ms": 973.7,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 2929938
+      },
+      "stylus": {
+        "lots": 128,
+        "gas": 960384,
+        "lotIds": "[127, 126, 125, 124, 123, 122, 121, 120, 119]",
+        "realizedLoss": "-3316273074",
+        "p50_ms": 885.6,
+        "p95_ms": 931.7,
+        "runs": 50,
+        "gasL1": 14395,
+        "gasL2": 945989
+      },
+      "ratio": 3.07,
+      "ratioL2": 3.1
+    }
+  }
+}

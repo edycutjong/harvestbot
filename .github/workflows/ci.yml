@@ -114,10 +114,20 @@ jobs:
         with:
           extra_args: --only-verified
 
+  readiness:
+    name: "Stage 2 · Submission readiness (judged surfaces vs receipts)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/check_submission_readiness.py
+
   # ── STAGE 3: Gate ───────────────────────────────────────────────────────────
   gate:
     name: "Stage 3 · All gates"
-    needs: [solidity, stylus, slither, secret-scan]
+    needs: [solidity, stylus, slither, secret-scan, readiness]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
@@ -126,3 +136,4 @@ jobs:
           echo "✅ Stylus:   fmt · clippy · tests · wasm build"
           echo "✅ Slither:  no medium+ findings"
           echo "✅ Secrets:  none verified in history"
+          echo "✅ Ready:    judged surfaces match receipts"
