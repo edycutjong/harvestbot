@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        crate: [stylus-spike]
+        crate: [stylus/spike, stylus/ledger]
     defaults:
       run:
         working-directory: ${{ matrix.crate }}

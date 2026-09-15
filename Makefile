@@ -11,20 +11,20 @@ help:
 
 build:
 	cd contracts && forge build --sizes
-	cd stylus-spike && cargo build --release --target wasm32-unknown-unknown
+	cd stylus/ledger && cargo build --release --target wasm32-unknown-unknown
 test:
 	cd contracts && forge test
-	cd stylus-spike && cargo test
+	cd stylus/ledger && cargo test
 fmt:
 	cd contracts && forge fmt
-	cd stylus-spike && cargo fmt
+	cd stylus/ledger && cargo fmt
 lint:
 	cd contracts && forge fmt --check
-	cd stylus-spike && cargo fmt --check && cargo clippy --all-targets -- -D warnings
+	cd stylus/ledger && cargo fmt --check && cargo clippy --all-targets -- -D warnings
 coverage:
 	cd contracts && forge coverage --report summary --no-match-coverage "(script|test)"
 slither:
 	cd contracts && slither . --filter-paths "lib/" --exclude-dependencies
 stylus-check:
-	cd stylus-spike && cargo stylus check --endpoint https://rpc.testnet.chain.robinhood.com
+	cd stylus/ledger && cargo stylus check --endpoint https://rpc.testnet.chain.robinhood.com
 ci: lint test coverage slither

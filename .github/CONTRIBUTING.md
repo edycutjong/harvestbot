@@ -10,7 +10,7 @@ Thanks for your interest in improving HarvestBot! 🎉
 
 ## Before You Open a PR
 - `cd contracts && forge fmt --check && forge test` passes.
-- `cd stylus-spike && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test` passes.
+- `cd stylus/ledger && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test` passes.
 - Add or update tests for any behavior change. Name regression tests after the defect they pin.
 - Keep commits conventional (`feat:`, `fix:`, `docs:`, `chore:`, `test:`) — releases are cut from them.
 
