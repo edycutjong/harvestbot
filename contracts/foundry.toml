@@ -19,3 +19,7 @@ arb_sepolia = { key = "${ARBISCAN_API_KEY}", chain = 421614 }
 
 [fmt]
 line_length = 100
+
+[profile.ci]
+fuzz = { runs = 1000 }
+verbosity = 3

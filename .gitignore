@@ -17,3 +17,10 @@ target/
 # local
 *.key
 .env.local
+
+# never commit env
+!.env.example
+# Foundry coverage / reports
+contracts/lcov.info
+contracts/coverage.txt
+contracts/report/

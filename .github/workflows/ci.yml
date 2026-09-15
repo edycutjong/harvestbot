@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  # ── STAGE 1: Solidity quality (fmt · build · tests · coverage) ──────────────
+  solidity:
+    name: "Stage 1 · Solidity (Foundry)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Format check
+        run: forge fmt --check
+      - name: Build (with sizes)
+        run: forge build --sizes
+      - name: Tests
+        run: forge test -vvv
+      - name: Coverage
+        run: forge coverage --report summary --report lcov --no-match-coverage "(script|test)" | tee coverage.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solidity-coverage
+          path: |
+            contracts/coverage.txt
+            contracts/lcov.info
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ── STAGE 1: Stylus quality (fmt · clippy · WASM build · unit tests) ────────
+  stylus:
+    name: "Stage 1 · Stylus (Rust → WASM) · ${{ matrix.crate }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [stylus-spike]
+    defaults:
+      run:
+        working-directory: ${{ matrix.crate }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.91.0"
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.crate }}
+      - name: Format check
+        run: cargo fmt --check
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Unit tests (native)
+        run: cargo test
+      - name: WASM release build
+        run: cargo build --release --target wasm32-unknown-unknown
+      - name: Install cargo-stylus
+        run: cargo install cargo-stylus --version 0.10.7 --locked
+      - name: cargo stylus check (activation dry-run against Arbitrum Sepolia)
+        run: cargo stylus check --endpoint https://sepolia-rollup.arbitrum.io/rpc
+        continue-on-error: true # public RPC; advisory in CI, gating locally
+
+  # ── STAGE 2: Security (parallel) ────────────────────────────────────────────
+  slither:
+    name: "Stage 2 · Slither (SAST)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          target: contracts/
+          slither-args: --filter-paths "lib/" --exclude-dependencies
+          sarif: results.sarif
+          fail-on: medium
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.slither.outputs.sarif != ''
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
+
+  secret-scan:
+    name: "Stage 2 · Secret scan (TruffleHog, verified only)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  # ── STAGE 3: Gate ───────────────────────────────────────────────────────────
+  gate:
+    name: "Stage 3 · All gates"
+    needs: [solidity, stylus, slither, secret-scan]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - run: |
+          echo "✅ Solidity: fmt · build · tests · coverage"
+          echo "✅ Stylus:   fmt · clippy · tests · wasm build"
+          echo "✅ Slither:  no medium+ findings"
+          echo "✅ Secrets:  none verified in history"
