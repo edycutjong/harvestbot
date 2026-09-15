@@ -27,12 +27,12 @@ contract SubstituteMap is ISubstituteMap, Ownable {
 
     function substitutesOf(address asset) external view returns (address[] memory out) {
         address[] storage all = _subs[asset];
-        uint256 n;
+        uint256 n = 0;
         for (uint256 i = 0; i < all.length; i++) {
             if (_pair[asset][all[i]]) n++;
         }
         out = new address[](n);
-        uint256 j;
+        uint256 j = 0;
         for (uint256 i = 0; i < all.length; i++) {
             if (_pair[asset][all[i]]) out[j++] = all[i];
         }

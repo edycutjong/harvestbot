@@ -20,6 +20,7 @@ contract TaxLotLedger is ITaxLotLedger, Ownable {
         bool open;
     }
 
+    // slither-disable-next-line uninitialized-state -- mapping of dynamic arrays; populated by push() in recordLot
     mapping(address owner => mapping(address asset => Lot[])) internal _lots;
     mapping(address owner => mapping(address asset => uint256)) internal _openCount;
     mapping(address owner => mapping(address asset => uint256)) internal _openQty;
@@ -138,7 +139,7 @@ contract TaxLotLedger is ITaxLotLedger, Ownable {
         qty = new uint256[](n);
         basis = new uint256[](n);
         acquiredAt = new uint256[](n);
-        uint256 j;
+        uint256 j = 0;
         for (uint256 i = 0; i < lots.length; i++) {
             if (!lots[i].open) continue;
             ids[j] = uint64(i);
@@ -182,7 +183,7 @@ contract TaxLotLedger is ITaxLotLedger, Ownable {
         uint256 n = lots.length;
         bool[] memory taken = new bool[](n);
         uint64[] memory picks = new uint64[](_openCount[owner][asset]);
-        uint256 k;
+        uint256 k = 0;
         uint256 remaining = sellQty;
 
         while (remaining > 0) {

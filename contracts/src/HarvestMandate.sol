@@ -207,6 +207,7 @@ contract HarvestMandate is Ownable, ReentrancyGuard, EIP712 {
         if (d.maxSellQty > have) revert InsufficientHoldings(d.sellAsset, have, d.maxSellQty);
         holdings[d.sellAsset] = have - d.maxSellQty;
         IERC20(d.sellAsset).forceApprove(address(swap), d.maxSellQty);
+        // slither-disable-next-line reentrancy-no-eth,reentrancy-benign -- proposeHarvest is nonReentrant; deposit/withdraw too
         bought = swap.swapExactIn(d.sellAsset, d.buyAsset, d.maxSellQty, address(this));
         holdings[d.buyAsset] += bought;
         _track(d.buyAsset);
