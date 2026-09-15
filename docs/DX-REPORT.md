@@ -31,5 +31,32 @@ Time from "unknown" to "answered": ~15 minutes, of which ~60 s was the first WAS
   `foundry.toml` was the path since `build/` is already the git root and the Foundry project
   lives in `contracts/`.
 
-**Next:** fund `0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b` on both chains → `Hello` deploy
-(real tx) → `cargo stylus deploy` the counter → both hashes into README "Verification".
+## 2026-09-15 — Day 0, later: spike CLOSED (Stylus deployed + activated + called on Robinhood Chain)
+
+| Step | Result | Gas / cost |
+|---|---|---|
+| Faucet (`faucet.testnet.chain.robinhood.com`) | 0.01 ETH + 5× TSLA/AMZN/PLTR/NFLX/AMD Stock Tokens | — |
+| `forge script … --broadcast` `Hello.sol` | `0x9cdc…4601`, tx `0x8cde…4026` | 352,104 gas @ 0.02 gwei ≈ 0.0000076 ETH |
+| `cargo stylus deploy` Counter | code `0x3763…7498`, deploy tx `0xbb7a…7e524`, activation tx `0x685c…4fc4` | wasm data fee 0.000071 ETH |
+| `cast send increment()` on the Stylus contract | 0 → 1, tx `0xeead…2e02` | 76,762 gas |
+
+Whole spike: **0.00011 ETH**. Fallback trigger (Solidity ledger on Robinhood, Stylus mirror on Sepolia)
+is retired — the Stylus ledger goes on the app chain.
+
+**Friction:**
+- The official faucet is behind Cloudflare Turnstile + a Vercel challenge: a human in a browser,
+  30 seconds; not scriptable (and not something to script around). Claim daily — 0.01 ETH/24 h is
+  plenty at 0.02 gwei but the Stock Tokens accumulate.
+- The faucet also mints **real Robinhood testnet Stock Tokens** (plain ERC-20, 18 decimals). The
+  docs never mention them. This changes the plan: the ledger can hold TSLA/AMZN/… instead of MOCK
+  wrappers — logged as a deviation for the human to approve.
+- The public RPC timed out once while `forge script` set up its broadcast fork ("operation timed
+  out"). `--slow --timeout 120` fixed it on the retry. Alchemy's endpoint is the docs' recommendation.
+- `forge install` exits 0 even when `git submodule add` fails (code 128, `fetch-pack: invalid
+  index-pack output` on the full OpenZeppelin history). `git submodule add --depth 1` + checkout
+  tag `v5.4.0` worked.
+- `cargo stylus deploy` prints a cache-bid hint (`cargo stylus cache bid <addr> 0`); skipping for
+  the spike, relevant for the ledger's gas benchmark later.
+
+**Next (day 1, Wed 09-16):** Stylus `TaxLotLedger` skeleton (`record_lot`, `compute_harvest`) on
+Robinhood Chain; decide MOCK-vs-real Stock Tokens with the human.
