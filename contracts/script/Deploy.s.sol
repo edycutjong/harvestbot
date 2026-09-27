@@ -49,72 +49,62 @@ contract DeployScript is Script {
     }
 
     function _deploy() internal returns (Out memory o) {
-        address owner = msg.sender;
-        address agent = vm.envAddress("AGENT_ADDRESS");
-        address sell = vm.envAddress("ASSET_SELL");
-        address buy = vm.envAddress("ASSET_BUY");
-        address offmap = vm.envAddress("ASSET_OFFMAP");
-        address ledgerAddr = vm.envOr("LEDGER", address(0));
+        // Every handle is written straight into `o` (memory) rather than held as a local: the legacy
+        // (non-IR) pipeline used by `forge build` / `forge coverage` otherwise runs out of stack.
+        o.owner = msg.sender;
+        o.agent = vm.envAddress("AGENT_ADDRESS");
+        o.ledger = vm.envOr("LEDGER", address(0));
+        o.stylus = o.ledger != address(0);
 
         vm.startBroadcast();
 
-        MockUSDC usdc = new MockUSDC();
-        MockOracle oracle = new MockOracle(owner);
-        MockSwap swap = new MockSwap(IPriceOracle(address(oracle)));
-        SubstituteMap subMap = new SubstituteMap(owner);
-        WashSaleGuard guard = new WashSaleGuard(owner, subMap);
-        ExecutionRouter router = new ExecutionRouter(owner);
+        o.usdc = address(new MockUSDC());
+        o.oracle = address(new MockOracle(o.owner));
+        o.swap = address(new MockSwap(IPriceOracle(o.oracle)));
+        o.subMap = address(new SubstituteMap(o.owner));
+        o.guard = address(new WashSaleGuard(o.owner, SubstituteMap(o.subMap)));
+        o.router = address(new ExecutionRouter(o.owner));
+        if (!o.stylus) o.ledger = address(new TaxLotLedger(o.owner));
 
-        bool stylus = ledgerAddr != address(0);
-        if (!stylus) {
-            ledgerAddr = address(new TaxLotLedger(owner));
-        }
-
-        HarvestMandate mandate = new HarvestMandate(
-            owner,
-            ITaxLotLedger(ledgerAddr),
-            guard,
-            subMap,
-            IPriceOracle(address(oracle)),
-            ISwap(address(swap)),
-            address(router)
+        o.mandate = address(
+            new HarvestMandate(
+                o.owner,
+                ITaxLotLedger(o.ledger),
+                WashSaleGuard(o.guard),
+                SubstituteMap(o.subMap),
+                IPriceOracle(o.oracle),
+                ISwap(o.swap),
+                o.router
+            )
         );
-        AgentBond bond = new AgentBond(IERC20(address(usdc)));
+        o.bond = address(new AgentBond(IERC20(o.usdc)));
 
-        // wiring — identical ABI whether the ledger is Stylus or Solidity. Forge's local EVM cannot
-        // simulate a Stylus (WASM) call, so for the Stylus ledger `setMandate` is sent with `cast`
-        // right after this script (see Makefile `deploy-robinhood`).
-        if (!stylus) ITaxLotLedgerAdmin(ledgerAddr).setMandate(address(mandate));
-        guard.setMandate(address(mandate));
-        subMap.setPair(sell, buy, true);
-        oracle.setPrice(sell, vm.envUint("MARK_SELL"));
-        oracle.setPrice(buy, vm.envUint("MARK_BUY"));
-        oracle.setPrice(offmap, vm.envUint("MARK_OFFMAP"));
-        mandate.setAgentKey(agent);
-        router.setPolicy(
-            agent,
-            address(mandate),
-            HarvestMandate.proposeHarvest.selector,
-            uint64(block.timestamp + 90 days),
-            20
-        );
+        _wire(o);
 
         vm.stopBroadcast();
+    }
 
-        o = Out({
-            owner: owner,
-            agent: agent,
-            ledger: ledgerAddr,
-            stylus: stylus,
-            subMap: address(subMap),
-            guard: address(guard),
-            router: address(router),
-            mandate: address(mandate),
-            bond: address(bond),
-            usdc: address(usdc),
-            oracle: address(oracle),
-            swap: address(swap)
-        });
+    /// @dev Wiring — identical ABI whether the ledger is Stylus or Solidity. Forge's local EVM cannot
+    ///      simulate a Stylus (WASM) call, so for the Stylus ledger `setMandate` is sent with `cast`
+    ///      right after this script.
+    function _wire(Out memory o) internal {
+        address sell = vm.envAddress("ASSET_SELL");
+        address buy = vm.envAddress("ASSET_BUY");
+        if (!o.stylus) ITaxLotLedgerAdmin(o.ledger).setMandate(o.mandate);
+        WashSaleGuard(o.guard).setMandate(o.mandate);
+        SubstituteMap(o.subMap).setPair(sell, buy, true);
+        MockOracle(o.oracle).setPrice(sell, vm.envUint("MARK_SELL"));
+        MockOracle(o.oracle).setPrice(buy, vm.envUint("MARK_BUY"));
+        MockOracle(o.oracle).setPrice(vm.envAddress("ASSET_OFFMAP"), vm.envUint("MARK_OFFMAP"));
+        HarvestMandate(o.mandate).setAgentKey(o.agent);
+        ExecutionRouter(o.router)
+            .setPolicy(
+                o.agent,
+                o.mandate,
+                HarvestMandate.proposeHarvest.selector,
+                uint64(block.timestamp + 90 days),
+                20
+            );
     }
 
     function _write(Out memory o) internal {
