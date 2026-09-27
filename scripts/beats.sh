@@ -10,7 +10,7 @@ set -euo pipefail
 : "${RPC:?}" "${AGENT_PK:?}" "${CHALLENGER_PK:?}"
 D=${DEPLOYMENTS:-deployments/46630.json}; OUT=${RECEIPTS:-receipts/46630.json}; mkdir -p "$(dirname "$OUT")" receipts/envelopes
 j() { python3 -c "import json;print(json.load(open('$D'))['$1'])"; }
-CHAIN=$(j chainId); LEDGER=$(j ledger); MANDATE=$(j mandate); ROUTER=$(j router); BOND=$(j bond); GUARD=$(j guard)
+LEDGER=$(j ledger); MANDATE=$(j mandate); ROUTER=$(j router); BOND=$(j bond); GUARD=$(j guard)
 OWNER=$(j owner); SELL=$(j assetSell); BUY=$(j assetBuy); OFFMAP=$(j assetOffmap)
 MARK=${MARK_SELL:-412300000}
 NOW=$(date +%s); DEADLINE=$((NOW + 3600))
