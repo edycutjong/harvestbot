@@ -84,12 +84,21 @@ never touch a token).
 
 ## Deployed build vs. source
 
-Everything on chain 46630 was deployed from commit `4fca49e`. A 2026-09-27 audit hardened
-`AgentBond` in source (commits `478019e` + follow-up, 8 regression tests in `Bond.t.sol`): live-envelope-only
-challenges, `WashSaleViolation`-only offence (b), and no bond exit while the agent key is active. The
-**deployed** `AgentBond` (`0x822f…0736`) is the pre-hardening build; every other deployed contract is
-unchanged in source. The three beats are unaffected — the beat-3 envelope was live (unused nonce,
-deadline ahead) when it was challenged, so the hardened contract accepts the same proof.
+Everything on chain 46630 was deployed from commit `4fca49e`, except `AgentBond`. A 2026-09-27 audit
+hardened `AgentBond` in source (commits `478019e` + `03365c5`, 8 regression tests in `Bond.t.sol`):
+live-envelope-only challenges (owner-bound, nonce unused, at most 1 day past the deadline),
+`WashSaleViolation`-only offence (b), and no bond exit while the agent key is active. The hardened build
+was deployed the same day at [`0xBA92…e273`](https://explorer.testnet.chain.robinhood.com/address/0xBA9257cbE8Aff6c5FD091295a175DB904931e273) (source-verified on the explorer), the
+agent staked 1,000 mUSDC, and beat 3 was re-run against it with a third-party challenger. Every other
+deployed contract is unchanged in source.
+
+On-chain proof of the fix (`receipts/46630.json` → `fix_proof`): the expired beat-2 envelope and the
+executed beat-1 envelope both revert `EnvelopeNotLive` on the new bond
+([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51), [`0xbbf04002…c049`](https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049)).
+
+**Retired V1** — the pre-fix bond `0x822f…0736` still holds the first run's slash (1,000 → 800) and is not
+read by any live surface. It still accepts the stale beat-2 envelope (a read-only `eth_call` confirms it),
+so its balance may drop further; that exposure is exactly what V2 closes.
 
 ## Known limitations (by design or deferred)
 

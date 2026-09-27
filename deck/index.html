@@ -30,7 +30,7 @@ window.NOTES = [
   "The whole product is one loop. Agent signs, contracts recompute, execute or revert. Three real transactions on chain 46630, one agent key, different from the owner key.",
   "Frozen slide. These are the real lot ids from the LotsRealized log of beat 1. Faucet scale: 0.078125 AMZN per lot, so the loss is 24.53 dollars. Same code, 10-share lots, gives exactly 3,140.",
   "Beat 2. Forty seconds after the harvest, the same agent tries to buy AMZN back. The WashSaleGuard reverts with the window end: 15 October 2026. Scope: the 30 days after a sale; the look-back is not enforced yet.",
-  "Beat 3. The agent signs a rotation into PLTR, which the substitute map never sanctioned. It reverts, and the signature itself is the evidence: challenge slashes 20 percent. Here the challenger was the owner's own key; it is permissionless and tested from a third party.",
+  "Beat 3. The agent signs a rotation into PLTR, which the substitute map never sanctioned. It reverts, and the signature itself is the evidence: challenge slashes 20 percent. The challenger was a third-party key, neither owner nor agent: challenge is permissionless.",
   "Why Stylus. HIFO over 64 lots is a compute loop, and WASM is cheaper per instruction. Measured with NodeInterface on chain 46630. Uncached program, so worst case. We guessed 8x in the spec; the chain says 2.87, and we report the chain.",
   "Contract quality is criterion one. 81 Foundry tests, 6 Stylus native, 3 fuzz properties, Slither with zero high and zero medium; the rest triaged in docs/SLITHER.md.",
   "Why only here. The assets are Robinhood's faucet Stock Tokens; the ledger is a Stylus program on Robinhood Chain; the reserved Robinhood slot is what we target.",
@@ -252,7 +252,7 @@ HarvestBot</div>
   <div class="cols" style="margin-top:80px">
     <div><div class="n">Beat 1</div><h3 class="g">Harvest</h3><div class="tx">0x689c…6123</div></div>
     <div><div class="n">Beat 2</div><h3 class="w" style="font-weight:600">Refuse</h3><div class="tx">0xd486…cf10</div></div>
-    <div><div class="n">Beat 3</div><h3 class="r">Slash</h3><div class="tx">0xcceb…6493</div></div>
+    <div><div class="n">Beat 3</div><h3 class="r">Slash</h3><div class="tx">0x6b89…7dcb</div></div>
   </div>
   <div class="foot"><span>Robinhood Chain testnet 46630</span><span>HarvestBot · 04/12</span></div>
 </section>
@@ -298,7 +298,7 @@ HarvestBot</div>
   <h2>The rogue trade became <em class="r">evidence</em>.</h2>
   <p class="mono" style="font-size:112px;margin:70px 0 0;line-height:1.1">bond <s class="r" style="text-decoration-thickness:4px">1,000</s> → <b>800</b> mUSDC <span class="chip mock">mock</span></p>
   <p style="margin-top:40px">challenge() · 20 bounty · 180 to the owner</p>
-  <div class="foot"><span>Slashed event · tx 0xcceb…6493</span><span>HarvestBot · 07/12</span></div>
+  <div class="foot"><span>Slashed event · tx 0x6b89…7dcb</span><span>HarvestBot · 07/12</span></div>
 </section>
 
 <section class="slide" aria-label="Slide 8: Stylus vs Solidity">
