@@ -117,7 +117,7 @@ else:
 
 os.makedirs("bench", exist_ok=True)
 json.dump(results, open("bench/results.json", "w"), indent=2)
-lines = ["# Benchmark — Stylus vs Solidity `computeHarvest` (HIFO, 9 picks)", "",
+lines = ["# Benchmark — Stylus vs Solidity `computeHarvest` (HIFO, up to 9 picks — 4 at 8 lots)", "",
          f"Chain {D['chainId']} (Robinhood Chain testnet) · Solidity `{LEDGERS['solidity']}` · Stylus `{LEDGERS['stylus']}` · mark $412.30 · {N_RUNS} eth_call samples per cell", "",
          "| Open lots | Solidity gas (L2 compute) | Stylus gas (L2 compute) | **Solidity ÷ Stylus (L2)** | total incl. L1 calldata | Sol p50 / p95 (ms) | Stylus p50 / p95 (ms) | Identical output |", "|---|---|---|---|---|---|---|---|"]
 for n in SIZES:
@@ -126,6 +126,6 @@ for n in SIZES:
 lines += ["", "Reproduce: `RPC=... PRIVATE_KEY=... python3 scripts/bench.py` (seeds are idempotent; ~500 recordLot txs on first run; `--components-only` refreshes the gas split without re-seeding).",
           "Gas is Arbitrum's own `NodeInterface.gasEstimateComponents` for the view call: **L2 compute** is what the two engines actually differ on; the L1 calldata share (identical calldata, ~14k) is shown in the total. Latency is `eth_call` wall-clock through the public RPC and is network-bound, not engine-bound.",
           "",
-          "**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor (visible at 8 lots, where the two are near parity). Both engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). `cargo stylus cache bid` would remove the init floor; it is not applied here, so these are worst-case Stylus numbers."]
+          "**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor (visible at 8 lots, where the two are near parity). Both engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). Caching the program (`cargo stylus cache bid`) would remove the init floor, but this testnet has no ArbOS cache manager (`ArbWasmCache.allCacheManagers()` returns `[]` on chain 46630), so these are worst-case Stylus numbers."]
 open("bench/RESULTS.md", "w").write("\n".join(lines) + "\n")
 print("\n".join(lines))

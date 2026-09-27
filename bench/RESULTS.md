@@ -1,4 +1,4 @@
-# Benchmark — Stylus vs Solidity `computeHarvest` (HIFO, 9 picks)
+# Benchmark — Stylus vs Solidity `computeHarvest` (HIFO, up to 9 picks — 4 at 8 lots)
 
 Chain 46630 (Robinhood Chain testnet) · Solidity `0xa220D5B0b6E944266acd76288678e91a6BcfAAca` · Stylus `0x1a337c6d48bc0d19f913d16074d362d065564f86` · mark $412.30 · 50 eth_call samples per cell
 
@@ -13,4 +13,4 @@ Chain 46630 (Robinhood Chain testnet) · Solidity `0xa220D5B0b6E944266acd7628867
 Reproduce: `RPC=... PRIVATE_KEY=... python3 scripts/bench.py` (seeds are idempotent; ~500 recordLot txs on first run; `--components-only` refreshes the gas split without re-seeding).
 Gas is Arbitrum's own `NodeInterface.gasEstimateComponents` for the view call: **L2 compute** is what the two engines actually differ on; the L1 calldata share (identical calldata, ~14k) is shown in the total. Latency is `eth_call` wall-clock through the public RPC and is network-bound, not engine-bound.
 
-**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor (visible at 8 lots, where the two are near parity). Both engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). `cargo stylus cache bid` would remove the init floor; it is not applied here, so these are worst-case Stylus numbers.
+**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor (visible at 8 lots, where the two are near parity). Both engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). Caching the program (`cargo stylus cache bid`) would remove the init floor, but this testnet has no ArbOS cache manager (`ArbWasmCache.allCacheManagers()` returns `[]` on chain 46630), so these are worst-case Stylus numbers.
