@@ -46,6 +46,6 @@ Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.de
 
 ## Links
 
-Live site: https://harvestbot.edycu.dev · Verify in your browser, no wallet: https://harvestbot.edycu.dev/verify/ · Judge page: https://harvestbot.edycu.dev/judge/ · Deck: https://harvestbot.edycu.dev/deck/
+Live site: https://harvestbot.edycu.dev · Verify in your browser, no wallet: https://harvestbot.edycu.dev/verify/ · Judge page: https://harvestbot.edycu.dev/judge/ · Deck: https://harvestbot.edycu.dev/deck/ · Demo video (2:39): https://youtu.be/Q9FVTu7iuCM
 
 Repo: this one · Live contracts: `deployments/46630.json` · Explorer: https://explorer.testnet.chain.robinhood.com

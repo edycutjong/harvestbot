@@ -10,6 +10,7 @@
   [![Verify on chain](https://img.shields.io/badge/🔎_Verify-live_on_chain-1F4E9C?style=for-the-badge)](https://harvestbot.edycu.dev/verify/)
   [![Judge page](https://img.shields.io/badge/⚖️_Judge-live_page-06b6d4?style=for-the-badge)](https://harvestbot.edycu.dev/judge/)
   [![Deck](https://img.shields.io/badge/🗂️_Pitch-deck-363636?style=for-the-badge)](https://harvestbot.edycu.dev/deck/)
+  [![Demo video](https://img.shields.io/badge/▶_Demo-video_2:39-B3261E?style=for-the-badge)](https://youtu.be/Q9FVTu7iuCM)
   [![Judge in 30s](https://img.shields.io/badge/👩‍⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![Demo receipts](https://img.shields.io/badge/🧾_Demo-receipts-ef4444?style=for-the-badge)](DEMO.md)
   [![Benchmark](https://img.shields.io/badge/📊_Stylus_vs_Solidity-bench-f59e0b?style=for-the-badge)](bench/RESULTS.md)
