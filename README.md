@@ -14,7 +14,7 @@
   [![Judge in 30s](https://img.shields.io/badge/👩‍⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![Demo receipts](https://img.shields.io/badge/🧾_Demo-receipts-ef4444?style=for-the-badge)](DEMO.md)
   [![Benchmark](https://img.shields.io/badge/📊_Stylus_vs_Solidity-bench-f59e0b?style=for-the-badge)](bench/RESULTS.md)
-  [![Arbitrum Open House](https://img.shields.io/badge/HackQuest-Arbitrum_Open_House_Singapore-8b5cf6?style=for-the-badge)](https://www.hackquest.io/hackathons/Arbitrum-Open-House-Singapore-Online-Buildathon)
+  [![Arbitrum Open House](https://img.shields.io/badge/HackQuest-Arbitrum_Open_House_Singapore-8b5cf6?style=for-the-badge)](https://www.hackquest.io/projects/HarvestBot)
 
   ![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-testnet_46630-1E7A46?style=flat)
   ![Stylus](https://img.shields.io/badge/Arbitrum_Stylus-Rust→WASM-1F4E9C?style=flat&logo=rust&logoColor=white)
