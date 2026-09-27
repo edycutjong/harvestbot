@@ -14,7 +14,8 @@
     router: "0x2a121714bEA2B69154521aEba9C5039C500c19aE",
     guard:  "0x1A98594aA8dC627b34b586756833bbe508B0A29C",
     subMap: "0x1e8Df64A7B17490dcDd4E03E695Cb1E766A37CfE",
-    bond:   "0x822fAC45a881801955b3130076A58790bBb40736",
+    bond:   "0xBA9257cbE8Aff6c5FD091295a175DB904931e273",   /* hardened V2, 2026-09-27 */
+    bondV1: "0x822fAC45a881801955b3130076A58790bBb40736",   /* retired pre-fix build — not read */
     oracle: "0xBaDD49e6f6665Bdc90AE21EC2AAA22fD8cf52598",
     swap:   "0xFd7f7A2beE5F1DC47A59691bF023948567969E6a",
     usdc:   "0x0E8A996DBD141352fA10940ae8045C323dC03f89",
@@ -25,8 +26,9 @@
   var TX = {
     beat1:  "0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123",
     beat2:  "0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10",
-    beat3a: "0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6",
-    beat3s: "0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493"
+    beat3a: "0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8",
+    beat3s: "0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb",
+    stale:  "0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51"   /* expired beat-2 envelope → EnvelopeNotLive on the V2 bond */
   };
   var TOPIC = {
     LotsRealized: "0xc0c2a4f66f0394cd998efa4ab6c34fca5259e4e5fb6e824abd6b1a269f848ed4",
@@ -37,12 +39,12 @@
     isSubstitute: "0x287759d2", computeHarvest: "0x25d8385a", openLotCount: "0xf2e78fe3",
     WashSaleViolation: "0x581b60e1"
   };
-  /* receipts/46630.json, committed 2026-09-15 — the fallback, labeled as such wherever it is shown */
+  /* receipts/46630.json (beats 1–2 committed 2026-09-15, beat 3 re-run 2026-09-27 on the V2 bond) — the fallback, labeled as such wherever it is shown */
   var COMMITTED = {
     beat1:  { status: 1, block: 119852570, gas: 1096548, lotIds: [63,62,61,60,59,58,57,56,55], sellQty: "638501157098660213", realizedLoss: "-24531251" },
     beat2:  { status: 0, block: 119852786, gas: 133328, windowEnd: 1792060681 },
-    beat3a: { status: 0, block: 119852971 },
-    beat3s: { status: 1, block: 119853005, gas: 170719, S: "200000000", bounty: "20000000", restitution: "180000000", bondBefore: "1000000000", bondAfter: "800000000" }
+    beat3a: { status: 0, block: 125092578 },
+    beat3s: { status: 1, block: 125092624, gas: 151053, S: "200000000", bounty: "20000000", restitution: "180000000", bondBefore: "1000000000", bondAfter: "800000000" }
   };
 
   function pad(x) { return String(x).replace(/^0x/, "").toLowerCase().padStart(64, "0"); }

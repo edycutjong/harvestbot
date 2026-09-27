@@ -178,9 +178,10 @@
     <div>
       <div class="label">Beat 3 · slashed</div>
       <h2 id="b3h">The rogue trade, <em>slashed</em>.</h2>
-      <p class="say">The agent signed AMZN → PLTR, which the substitute map never sanctioned. It reverted <code>OffMapSubstitute</code>; then <code>challenge()</code> used the signed envelope as proof. In this run the challenger was the owner's own key; <code>challenge</code> is permissionless.</p>
-      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6">attempt 0x7dca0680…0bf6 ↗</a><br>
-      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493">challenge 0xcceb12a7…6493 ↗</a>
+      <p class="say">The agent signed AMZN → PLTR, which the substitute map never sanctioned. It reverted <code>OffMapSubstitute</code>; then <code>challenge()</code> used the signed envelope as proof, called by a third-party key that is neither owner nor agent. The hardened bond refuses stale proof: the expired beat-2 envelope reverts <code>EnvelopeNotLive</code>.</p>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8">attempt 0xd8b6e577…94c8 ↗</a><br>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb">challenge 0x6b896b6e…7dcb ↗</a><br>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51">stale envelope refused 0x673f8459…ed51 ↗</a>
     </div>
     <div class="grid">
       <div class="box no"><div class="k"><i>1</i>Attempt status</div><div class="v" data-f="b3.astatus"><span class="skel">…</span></div></div>
@@ -248,7 +249,7 @@
 
   var rows = [
     ["TaxLotLedger", A.ledger, "Stylus (Rust → WASM)"], ["HarvestMandate", A.mandate, "Solidity"], ["ExecutionRouter", A.router, "Solidity"],
-    ["WashSaleGuard", A.guard, "Solidity"], ["SubstituteMap", A.subMap, "Solidity"], ["AgentBond", A.bond, "Solidity"],
+    ["WashSaleGuard", A.guard, "Solidity"], ["SubstituteMap", A.subMap, "Solidity"], ["AgentBond", A.bond, "Solidity · hardened, redeployed 2026-09-27"], ["AgentBond V1", A.bondV1, "retired pre-fix build · not read"],
     ["MockOracle", A.oracle, '<span class="chip mock">mock</span>'], ["MockSwap", A.swap, '<span class="chip mock">mock</span>'], ["MockUSDC", A.usdc, '<span class="chip mock">mock</span>'],
     ["AMZN Stock Token", A.AMZN, '<span class="chip real">real faucet token</span>'], ["NFLX Stock Token", A.NFLX, '<span class="chip real">real faucet token</span>'], ["PLTR Stock Token", A.PLTR, '<span class="chip real">real faucet token</span>']
   ];
@@ -294,9 +295,9 @@
     set("b3.astatus", status(a3.status, L) + "<small>OffMapSubstitute</small>");
     set("b3.map", o.pltrOnMap == null ? "false<small>per the deployed map</small>" + tag(false) : (o.pltrOnMap ? "true" : "<b style=\"color:var(--slash)\">false</b>") + NOW + (o.nflxOnMap ? "<small>isSubstitute(AMZN, NFLX) = true</small>" : ""));
     set("b3.cstatus", status(s3.status, L) + "<small>block " + fmt(s3.block) + "</small>");
-    if (s3.S) set("b3.slash", "bond <s style=\"color:var(--slash)\">1,000.00</s> → <b>" + HB.units(1000000000n - BigInt(s3.S), 6, 2) + "</b> mUSDC · slashed <b>" + HB.units(s3.S, 6, 2) + "</b>" + (L ? tag(true) : tag(false)) + "<small>slashed amount read from the Slashed event of tx 0xcceb…6493; the bond before it was 1,000.00 (DEMO.md)</small>");
+    if (s3.S) set("b3.slash", "bond <s style=\"color:var(--slash)\">1,000.00</s> → <b>" + HB.units(1000000000n - BigInt(s3.S), 6, 2) + "</b> mUSDC · slashed <b>" + HB.units(s3.S, 6, 2) + "</b>" + (L ? tag(true) : tag(false)) + "<small>slashed amount read from the Slashed event of tx 0x6b89…7dcb; the bond before it was 1,000.00 (DEMO.md)</small>");
     if (s3.bounty) set("b3.split", HB.units(s3.bounty, 6, 2) + " · " + HB.units(s3.restitution, 6, 2) + "<small>mUSDC <span class=\"chip mock\">mock</span></small>");
-    if (L && o.bondNow != null) set("b3.now", HB.units(o.bondNow, 6, 2) + " mUSDC" + NOW + "<small>A live balance, not a claim: it can differ from the post-slash figure above. The deployed AgentBond predates a 2026-09-27 hardening that lives in source (JUDGE.md, Honest limitations).</small>");
+    if (L && o.bondNow != null) set("b3.now", HB.units(o.bondNow, 6, 2) + " mUSDC" + NOW + "<small>A live balance, not a claim, read from the hardened AgentBond 0xBA92…e273 (redeployed 2026-09-27). The retired pre-fix V1 0x822f…0736 is not read here.</small>");
     else set("b3.now", "not read (offline)" + tag(false));
 
     if (L) {
