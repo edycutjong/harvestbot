@@ -103,6 +103,11 @@
   .status { flex-direction: column; align-items: flex-start; }
   .nav-links { gap: 10px; }
 }
+/* No color-mix() (Chrome <111, Safari <16.2, Firefox <113): a var() inside an unsupported function voids the whole
+   declaration at computed time, so the bars/nav would render transparent. Re-state them with flat tokens. */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .status[data-state="fallback"] { background: var(--wall-fill); }
+}
 </style>
 </head>
 <body>
@@ -289,7 +294,7 @@
     set("b3.astatus", status(a3.status, L) + "<small>OffMapSubstitute</small>");
     set("b3.map", o.pltrOnMap == null ? "false<small>per the deployed map</small>" + tag(false) : (o.pltrOnMap ? "true" : "<b style=\"color:var(--slash)\">false</b>") + NOW + (o.nflxOnMap ? "<small>isSubstitute(AMZN, NFLX) = true</small>" : ""));
     set("b3.cstatus", status(s3.status, L) + "<small>block " + fmt(s3.block) + "</small>");
-    if (s3.S) set("b3.slash", "bond <s style=\"color:var(--slash)\">1,000.00</s> → <b>" + HB.units(1000000000n - BigInt(s3.S), 6, 2) + "</b> mUSDC · slashed <b>" + HB.units(s3.S, 6, 2) + "</b>" + (L ? tag(true) : tag(false)) + "<small>S from the Slashed event of tx 0xcceb…6493; the bond before it was 1,000.00 (DEMO.md)</small>");
+    if (s3.S) set("b3.slash", "bond <s style=\"color:var(--slash)\">1,000.00</s> → <b>" + HB.units(1000000000n - BigInt(s3.S), 6, 2) + "</b> mUSDC · slashed <b>" + HB.units(s3.S, 6, 2) + "</b>" + (L ? tag(true) : tag(false)) + "<small>slashed amount read from the Slashed event of tx 0xcceb…6493; the bond before it was 1,000.00 (DEMO.md)</small>");
     if (s3.bounty) set("b3.split", HB.units(s3.bounty, 6, 2) + " · " + HB.units(s3.restitution, 6, 2) + "<small>mUSDC <span class=\"chip mock\">mock</span></small>");
     if (L && o.bondNow != null) set("b3.now", HB.units(o.bondNow, 6, 2) + " mUSDC" + NOW + "<small>A live balance, not a claim: it can differ from the post-slash figure above. The deployed AgentBond predates a 2026-09-27 hardening that lives in source (JUDGE.md, Honest limitations).</small>");
     else set("b3.now", "not read (offline)" + tag(false));

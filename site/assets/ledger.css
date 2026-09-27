@@ -140,3 +140,14 @@ code, .mono { font-family: var(--font-data); font-size: .88em; overflow-wrap: an
   .nav, .skip { display: none; }
   body { background-image: none; }
 }
+
+/* No color-mix() (Chrome <111, Safari <16.2, Firefox <113): a var() inside an unsupported function voids the whole
+   declaration at computed time, so the bars/nav would render transparent. Re-state them with flat tokens. */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  body { background-image:
+    linear-gradient(to right, transparent 26px, var(--margin) 26px, var(--margin) 27.5px, transparent 27.5px,
+                    transparent 31px, var(--margin) 31px, var(--margin) 32.5px, transparent 32.5px),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--row) - 1px), var(--paper-2) calc(var(--row) - 1px) var(--row)); }
+  .nav { background: var(--bg); }
+  .ledger tr:nth-child(8n) td { border-bottom-color: var(--rule); }
+}

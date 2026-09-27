@@ -209,6 +209,14 @@
   .receipts > div { border-right: 0; }
   .nav-links { gap: 12px; }
 }
+/* No color-mix() (Chrome <111, Safari <16.2, Firefox <113): a var() inside an unsupported function voids the whole
+   declaration at computed time, so the bars/nav would render transparent. Re-state them with flat tokens. */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .bar.sol, .legend .ls { background: repeating-linear-gradient(135deg, var(--before) 0 2px, var(--paper-2) 2px 5px); }
+  .bar-row.key, .cell.lead { background: var(--paper-2); }
+  .term-bar, .term-foot { color: var(--rule); }
+  .term .dim { color: var(--rule); opacity: .8; }
+}
 </style>
 </head>
 <body>
@@ -229,13 +237,13 @@
   <div>
     <div class="label">Statement of harvested lots · Robinhood Chain testnet 46630</div>
     <h1 id="h1">The ledger that books your losses — and <span class="hl">refuses the rebuy.</span></h1>
-    <p class="sub">Every December, Maya leaves a paper loss on the table: banking it means picking which of <b>64 tax lots</b> to sell, then policing a <b>30-day</b> wash-sale calendar. HarvestBot's agent does it on Robinhood Chain, under a mandate it cannot exceed: <b>9 lots</b> harvested, the rebuy <b>reverted by the contract</b>, the lying agent <b>slashed 200 mUSDC</b>.</p>
+    <p class="sub">Every December, Maya leaves a paper loss on the table: banking it means picking which of <b>64 tax lots</b> to sell, then policing a <b>30-day</b> wash-sale calendar. HarvestBot's agent does it on Robinhood Chain, with the ledger in Rust on <b>Arbitrum Stylus</b>, under a mandate it cannot exceed: <b>9 lots</b> harvested, the rebuy <b>reverted by the contract</b>, the lying agent <b>slashed 200 mUSDC</b>.</p>
     <div class="ctas">
       <a class="btn ink" href="verify/">Verify the three transactions <svg class="arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
       <a class="btn" href="deck/">Pitch deck</a>
       <a class="btn" href="https://github.com/edycutjong/harvestbot">GitHub</a>
     </div>
-    <div class="proof"><span>no wallet needed</span><span>real AMZN, NFLX, PLTR Stock Tokens</span><span>81 + 6 tests</span></div>
+    <div class="proof"><span>no wallet needed</span><span>real AMZN, NFLX, PLTR Stock Tokens</span><span>Stylus ledger: 2.87× less gas</span><span>81 + 6 tests</span></div>
   </div>
 
   <div class="sheet-wrap">
