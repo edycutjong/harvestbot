@@ -8,6 +8,7 @@
 
   [![Live site](https://img.shields.io/badge/🌐_Live-harvestbot.edycu.dev-1E7A46?style=for-the-badge)](https://harvestbot.edycu.dev)
   [![Verify on chain](https://img.shields.io/badge/🔎_Verify-live_on_chain-1F4E9C?style=for-the-badge)](https://harvestbot.edycu.dev/verify/)
+  [![Judge page](https://img.shields.io/badge/⚖️_Judge-live_page-06b6d4?style=for-the-badge)](https://harvestbot.edycu.dev/judge/)
   [![Deck](https://img.shields.io/badge/🗂️_Pitch-deck-363636?style=for-the-badge)](https://harvestbot.edycu.dev/deck/)
   [![Judge in 30s](https://img.shields.io/badge/👩‍⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![Demo receipts](https://img.shields.io/badge/🧾_Demo-receipts-ef4444?style=for-the-badge)](DEMO.md)
