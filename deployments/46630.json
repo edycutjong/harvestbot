@@ -3,7 +3,12 @@
   "assetBuy": "0x3b8262A63d25f0477c4DDE23F83cfe22Cb768C93",
   "assetOffmap": "0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0",
   "assetSell": "0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02",
-  "bond": "0x822fAC45a881801955b3130076A58790bBb40736",
+  "bond": "0xBA9257cbE8Aff6c5FD091295a175DB904931e273",
+  "bondDeployTx": "0x295a72bf1352dcedb03442d86b39ba0f7cbe0877a354553a3fde72172bce69ef",
+  "bondV1": {
+    "address": "0x822fAC45a881801955b3130076A58790bBb40736",
+    "status": "retired 2026-09-27 — pre-fix build (challenge() accepted executed/expired envelopes; agent could withdraw while active). Holds the historical beat-3 slash; not used by any live surface."
+  },
   "chainId": 46630,
   "guard": "0x1A98594aA8dC627b34b586756833bbe508B0A29C",
   "ledger": "0xEff7B46049fC677F58264e0ebb19dF1a39195a21",

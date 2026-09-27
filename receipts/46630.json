@@ -18,18 +18,73 @@
     "nonce": "1789468710"
   },
   "beat3_attempt": {
+    "tx": "0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8",
+    "status": "0x0",
+    "block": "125092578",
+    "expected": "OffMapSubstitute",
+    "gas": "97116",
+    "bond": "0xBA9257cbE8Aff6c5FD091295a175DB904931e273",
+    "revert": "OffMapSubstitute(AMZN 0x5884…9E02, PLTR 0x1FBE…98d0)"
+  },
+  "beat3_slash": {
+    "tx": "0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb",
+    "status": "0x1",
+    "block": "125092624",
+    "gas": "151053",
+    "bondBefore": "1000000000",
+    "bondAfter": "800000000",
+    "slashed": "200000000",
+    "bond": "0xBA9257cbE8Aff6c5FD091295a175DB904931e273",
+    "challenger": "0x0Feca08dECA807b8adF412b3DCA608eDEb4428e2",
+    "challengerRole": "third-party key (not owner, not agent)",
+    "bounty": "20000000",
+    "restitution": "180000000"
+  },
+  "fix_proof": {
+    "stale_beat2_envelope": {
+      "tx": "0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51",
+      "status": "0x0",
+      "block": "125093006",
+      "gas": "66812",
+      "envelope": "receipts/envelopes/beat2.hex",
+      "revert": "EnvelopeNotLive",
+      "note": "expired envelope (past deadline + 1 day grace); the retired V1 bond still accepts it (eth_call, not sent)"
+    },
+    "executed_beat1_envelope": {
+      "tx": "0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049",
+      "status": "0x0",
+      "block": "125093035",
+      "gas": "69943",
+      "envelope": "receipts/envelopes/beat1.hex",
+      "revert": "EnvelopeNotLive",
+      "note": "nonce already used by the executed beat-1 harvest"
+    }
+  },
+  "bond_v2_setup": {
+    "deployTx": "0x295a72bf1352dcedb03442d86b39ba0f7cbe0877a354553a3fde72172bce69ef",
+    "mintTx": "0x8b9a7e604b4d79224162f4ac7bee65394b3ce5d8d35c8a02a9b4e4fddffd005a",
+    "approveTx": "0xc924991e148e0afc7fdb8005e3bf04c3a1b8c3a25460f87ac4fe39a94489d6e8",
+    "stakeTx": "0xcb5cc14aa9f6b35ebb03cc8ec6d855e8d65a367189bb4189934366836b9d98ca",
+    "staked": "1000000000",
+    "challengerFundTx": "0xdee0bbda880197a3b2dc47e7c3ab368b27c8f1555c996986381231e5c45e209a"
+  },
+  "beat3_v1_attempt": {
     "tx": "0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6",
     "status": "0x0",
     "block": "119852971",
-    "expected": "OffMapSubstitute"
+    "expected": "OffMapSubstitute",
+    "bond": "0x822fAC45a881801955b3130076A58790bBb40736",
+    "note": "retired V1 bond (pre-fix); challenger was the owner key"
   },
-  "beat3_slash": {
+  "beat3_v1_slash": {
     "tx": "0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493",
     "status": "0x1",
     "block": "119853005",
     "gas": "170719",
     "bondBefore": "1000000000",
     "bondAfter": "800000000",
-    "slashed": "200000000"
+    "slashed": "200000000",
+    "bond": "0x822fAC45a881801955b3130076A58790bBb40736",
+    "note": "retired V1 bond (pre-fix); challenger was the owner key"
   }
 }
