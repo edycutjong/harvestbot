@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: contracts
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: foundry-rs/foundry-toolchain@v1
@@ -36,7 +36,7 @@ jobs:
         run: forge test -vvv
       - name: Coverage
         run: forge coverage --report summary --report lcov --no-match-coverage "(script|test)" | tee coverage.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: solidity-coverage
           path: |
@@ -57,7 +57,7 @@ jobs:
       run:
         working-directory: ${{ matrix.crate }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.91.0"
@@ -88,17 +88,17 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: crytic/slither-action@v0.4.0
+      - uses: crytic/slither-action@v0.4.2
         id: slither
         with:
           target: contracts/
           slither-args: --filter-paths "lib/" --exclude-dependencies
           sarif: results.sarif
           fail-on: medium
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         if: always() && steps.slither.outputs.sarif != ''
         with:
           sarif_file: ${{ steps.slither.outputs.sarif }}
@@ -107,7 +107,7 @@ jobs:
     name: "Stage 2 · Secret scan (TruffleHog, verified only)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: trufflesecurity/trufflehog@main
@@ -118,8 +118,8 @@ jobs:
     name: "Stage 2 · Submission readiness (judged surfaces vs receipts)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python3 scripts/check_submission_readiness.py
