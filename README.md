@@ -32,6 +32,7 @@
 ## ✅ Verification
 
 Every row is on chain **46630 (Robinhood Chain testnet)** and every hash is a live explorer link. The agent key and the owner key are different keys.
+Check it live, no wallet: [site](https://harvestbot.edycu.dev) · [/verify](https://harvestbot.edycu.dev/verify/) (your browser reads these receipts from chain) · [/judge](https://harvestbot.edycu.dev/judge/) (the 30-second path) · [deck](https://harvestbot.edycu.dev/deck/).
 
 | | |
 |---|---|
@@ -40,7 +41,7 @@ Every row is on chain **46630 (Robinhood Chain testnet)** and every hash is a li
 | **Killer number** | 64-lot HIFO harvest: **Solidity 1,456,905 gas → Stylus 507,993 gas — 2.87× less L2 compute** (3.1× at 128 lots; grows with portfolio size), same chain, same inputs, identical output ([bench](bench/RESULTS.md)) |
 | **Beat 1 · HARVEST** | [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123) — agent-signed, router-gated, HIFO recomputed on the Stylus ledger, **−$24.531251** realized on 9 lots, real AMZN → real NFLX |
 | **Beat 2 · BLOCKED REBUY** | [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10) — **reverted on chain**, `WashSaleViolation` |
-| **Beat 3 · SLASHED** | attempt [`0xd8b6e577…94c8`](https://explorer.testnet.chain.robinhood.com/tx/0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8) reverted `OffMapSubstitute` → challenge [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb) — bond **1,000 → 800 mUSDC**, challenged by a third-party key (`0x0Fec…28e2`, neither owner nor agent). The hardened bond also refuses stale proof: the expired beat-2 envelope reverts `EnvelopeNotLive` ([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51)) |
+| **Beat 3 · SLASHED** | attempt [`0xd8b6e577…94c8`](https://explorer.testnet.chain.robinhood.com/tx/0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8) reverted `OffMapSubstitute` → challenge [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb) — bond **1,000 → 800 mUSDC**, challenged by a third-party key (`0x0Fec…28e2`, neither owner nor agent). The hardened bond also refuses stale proof: the expired beat-2 envelope ([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51)) and the already-executed beat-1 envelope ([`0xbbf04002…c049`](https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049)) both revert `EnvelopeNotLive` |
 
 | Contract | Address | Kind |
 |---|---|---|

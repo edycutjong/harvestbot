@@ -9,7 +9,7 @@ Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.de
 
 1. **The harvest happened** — [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123): agent-signed, router-gated, HIFO recomputed by the Stylus ledger, 9 lots, real AMZN → real NFLX.
 2. **The chain refused the rebuy** — [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10): status 0, `WashSaleViolation`. Same agent, same key, 40 seconds later.
-3. **The rogue trade got the agent slashed** — [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb): `Slashed(agent, mandate, 200000000, 20000000, 180000000, …)`, called by a third-party key. The same bond refuses stale proof: [`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51) reverts `EnvelopeNotLive`.
+3. **The rogue trade got the agent slashed** — [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb): `Slashed(agent, mandate, 200000000, 20000000, 180000000, …)`, called by a third-party key. The same bond refuses stale proof: the expired beat-2 envelope ([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51)) and the executed beat-1 envelope ([`0xbbf04002…c049`](https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049)) both revert `EnvelopeNotLive`.
 4. **The Stylus ledger is real WASM on Robinhood Chain** — [`0xEff7…5a21`](https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21) (`ArbWasm.stylusVersion() = 3` on chain 46630; deployed and activated in one `cargo stylus deploy` tx, [`0x5cc682a7…77ed`](https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed)).
 5. **The numbers** — [`bench/RESULTS.md`](bench/RESULTS.md): Stylus vs Solidity `computeHarvest` on the same chain, same inputs, identical outputs — **2.87× less L2 gas at 64 lots, 3.1× at 128**, with the WASM program uncached (worst case).
 
@@ -46,6 +46,6 @@ Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.de
 
 ## Links
 
-Live site: https://harvestbot.edycu.dev · Verify in your browser, no wallet: https://harvestbot.edycu.dev/verify/ · Deck: https://harvestbot.edycu.dev/deck/
+Live site: https://harvestbot.edycu.dev · Verify in your browser, no wallet: https://harvestbot.edycu.dev/verify/ · Judge page: https://harvestbot.edycu.dev/judge/ · Deck: https://harvestbot.edycu.dev/deck/
 
 Repo: this one · Live contracts: `deployments/46630.json` · Explorer: https://explorer.testnet.chain.robinhood.com
