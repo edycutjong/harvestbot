@@ -15,7 +15,7 @@ onchain mandate it physically cannot exceed, and gets it slashed when it lies.**
 
 | | |
 |---|---|
-| Tests | 80 Foundry (100 % line · 100 % function · 98.3 % statement · 89.2 % branch on `src/`, 3 fuzz properties) + 6 Stylus native |
+| Tests | 81 Foundry (100 % line · 100 % function · 98.3 % statement · 89.2 % branch on `src/`, 3 fuzz properties) + 6 Stylus native |
 | Static analysis | Slither: 0 high, 0 medium — `docs/SLITHER.md` triages all 10 remaining (Low / Info / Optimization) |
 | Deployed | 6 system contracts (1 Stylus + 5 Solidity) + 3 labeled MOCKs + 2 bench ledgers on Robinhood Chain testnet — `deployments/` |
 | Real-run cost | whole demo incl. deploy < 0.002 ETH |
@@ -35,7 +35,7 @@ onchain mandate it physically cannot exceed, and gets it slashed when it lies.**
 - **Wash-sale scope:** re-buys are walled for the 30 days *after* a harvest; the 30-day look-back before
   the sale is not enforced yet.
 - **The deployed `AgentBond` predates a 2026-09-27 hardening** that lives in source (live-envelope-only
-  challenges, no bond exit while the agent key is active; 7 regression tests). The beats are unaffected —
+  challenges, no bond exit while the agent key is active; 8 regression tests). The beats are unaffected —
   details and the rest of the known limits in `docs/ARCHITECTURE.md`.
 - **The agent is `rule-v1`** (deterministic HIFO + first allowed substitute). No LLM in the loop; the
   rationale hash commits to a plain-text rationale string. We say "agent", not "AI".

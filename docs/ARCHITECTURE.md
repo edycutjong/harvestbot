@@ -60,8 +60,9 @@ twin (same ABI, same integer rounding, same tie-break: lowest lot id wins), used
 
 `AgentBond.challenge(mandate, envelope)` is permissionless. It recovers the signer through the mandate's
 own EIP-712 domain and accepts only a **live** envelope — addressed to the mandate's owner, nonce unused,
-deadline not passed — so an executed or expired envelope can never be re-read against today's map and
-windows to slash an honest agent. It then checks the substitute map and the wash-sale guard (only the
+at most `CHALLENGE_GRACE` (1 day) past its deadline — so an executed or long-dead envelope can never be
+re-read against today's map and windows to slash an honest agent, while a same-block deadline cannot make
+a rogue signature unchallengeable. It then checks the substitute map and the wash-sale guard (only the
 guard's own `WashSaleViolation` counts) and — if the mandate would reject it — slashes
 `S = min(B, L_owner + 0.2·B)` (`L_owner = 0` for a reverted attempt), pays `0.1·S` to the challenger and
 `0.9·S` to the owner, and resets the agent's withdrawal cooldown. The same proof cannot be used twice.
@@ -84,7 +85,7 @@ never touch a token).
 ## Deployed build vs. source
 
 Everything on chain 46630 was deployed from commit `4fca49e`. A 2026-09-27 audit hardened
-`AgentBond` in source (commit `478019e`, 7 regression tests in `Bond.t.sol`): live-envelope-only
+`AgentBond` in source (commits `478019e` + follow-up, 8 regression tests in `Bond.t.sol`): live-envelope-only
 challenges, `WashSaleViolation`-only offence (b), and no bond exit while the agent key is active. The
 **deployed** `AgentBond` (`0x822f…0736`) is the pre-hardening build; every other deployed contract is
 unchanged in source. The three beats are unaffected — the beat-3 envelope was live (unused nonce,
@@ -103,6 +104,11 @@ deadline ahead) when it was challenged, so the hardened contract accepts the sam
 - **The mandate does not read the bond.** Bonding is an economic layer beside the mandate: the bond is
   sized `max(1,000 USDC, 5 % AUM)` at stake time and is not re-checked as AUM grows, and
   `proposeHarvest` does not require a live bond.
+- **Slashing keys on the nonce, not the envelope hash.** The mandate records used nonces, not executed
+  decision hashes, so an unexecuted rogue envelope stops being proof once the agent consumes the same
+  nonce with a valid harvest. The robust fix is a mandate-side `executed[hash]` record (v2, needs a
+  mandate redeploy). Conversely, an honest agent's *failed* attempt stays proof material for its
+  deadline + 1 day if the map or windows change in that time.
 - **No minimum-out on the rotation.** The MOCK venue fills at the oracle mark; a real venue needs a
   `minOut` bound in the envelope.
 - **`maxSellQty` is the exact quantity sold**, not an upper bound (the name is kept for ABI stability).

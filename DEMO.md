@@ -35,7 +35,7 @@ big number in the deterministic test — never the other way round.
 
 ```bash
 git clone --recurse-submodules <repo> && cd harvestbot
-cd contracts && forge test            # 80 tests, incl. the -3,140.00 scenario and 3 fuzz properties
+cd contracts && forge test            # 81 tests, incl. the -3,140.00 scenario and 3 fuzz properties
 cd ../stylus/ledger && cargo test     # 6 native tests on the WASM engine
 
 # live (read-only, no wallet): ask the deployed Stylus ledger for the HIFO selection

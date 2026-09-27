@@ -28,7 +28,7 @@ Every row is on chain **46630 (Robinhood Chain testnet)** and every hash is a li
 
 | | |
 |---|---|
-| **Tests** | **80** Foundry (`forge test`) — 100 % line · 100 % function · 98.3 % statement · 89.2 % branch coverage on `src/` (`make coverage`), 3 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
+| **Tests** | **81** Foundry (`forge test`) — 100 % line · 100 % function · 98.3 % statement · 89.2 % branch coverage on `src/` (`make coverage`), 3 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
 | **Static analysis** | Slither **0 high · 0 medium** — every remaining finding triaged in [`docs/SLITHER.md`](docs/SLITHER.md) · `forge fmt` · `cargo clippy -D warnings` |
 | **Killer number** | 64-lot HIFO harvest: **Solidity 1,456,905 gas → Stylus 507,993 gas — 2.87× less L2 compute** (3.1× at 128 lots; grows with portfolio size), same chain, same inputs, identical output ([bench](bench/RESULTS.md)) |
 | **Beat 1 · HARVEST** | [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123) — agent-signed, router-gated, HIFO recomputed on the Stylus ledger, **−$24.531251** realized on 9 lots, real AMZN → real NFLX |
@@ -106,7 +106,7 @@ Seven invariants (INV-1 custody … INV-7 determinism) each have a named test �
 
 ```bash
 git clone --recurse-submodules https://github.com/edycutjong/harvestbot && cd harvestbot
-cd contracts && forge test                     # 80 tests, incl. exactly −$3,140.000000 on the seed scenario
+cd contracts && forge test                     # 81 tests, incl. exactly −$3,140.000000 on the seed scenario
 cd ../stylus/ledger && cargo test              # 6 native tests on the WASM engine
 
 # live, read-only, no wallet — ask the deployed Stylus ledger for Maya's HIFO picks
@@ -135,7 +135,7 @@ Your own deploy (testnet key + faucet ETH, see [`.env.example`](.env.example)): 
 ## 📁 Layout
 
 ```
-contracts/      Foundry — src/ (6 contracts + 4 labeled mocks), test/ (80), script/ (Deploy, Seed, Envelope)
+contracts/      Foundry — src/ (6 contracts + 4 labeled mocks), test/ (81), script/ (Deploy, Seed, Envelope)
 stylus/ledger/  Rust — the Stylus TaxLotLedger (+ stylus/spike, the day-0 activation receipt)
 scripts/        seed.sh · beats.sh · bench.py · check_submission_readiness.py   (cast-driven: forge cannot simulate WASM)
 deployments/    46630.json (the system) · 46630-bench.json (bench ledgers)
