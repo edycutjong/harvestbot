@@ -10,7 +10,7 @@ Zero clicks into code: [harvestbot.vercel.app/verify](https://harvestbot.vercel.
 1. **The harvest happened** — [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123): agent-signed, router-gated, HIFO recomputed by the Stylus ledger, 9 lots, real AMZN → real NFLX.
 2. **The chain refused the rebuy** — [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10): status 0, `WashSaleViolation`. Same agent, same key, 40 seconds later.
 3. **The rogue trade got the agent slashed** — [`0xcceb12a7…6493`](https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493): `Slashed(agent, mandate, 200000000, 20000000, 180000000, …)`.
-4. **The Stylus ledger is real WASM on Robinhood Chain** — [`0xEff7…5a21`](https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21) (`ArbWasm.stylusVersion() = 3` on chain 46630; deploy + activation txs in the README).
+4. **The Stylus ledger is real WASM on Robinhood Chain** — [`0xEff7…5a21`](https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21) (`ArbWasm.stylusVersion() = 3` on chain 46630; deployed and activated in one `cargo stylus deploy` tx, [`0x5cc682a7…77ed`](https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed)).
 5. **The numbers** — [`bench/RESULTS.md`](bench/RESULTS.md): Stylus vs Solidity `computeHarvest` on the same chain, same inputs, identical outputs — **2.87× less L2 gas at 64 lots, 3.1× at 128**, with the WASM program uncached (worst case).
 
 ## Receipt block
