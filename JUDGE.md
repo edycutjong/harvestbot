@@ -3,7 +3,7 @@
 **HarvestBot lets an autonomous agent harvest tax losses on Robinhood tokenized equities, bounded by an
 onchain mandate it physically cannot exceed, and gets it slashed when it lies.**
 
-Zero clicks into code: [harvestbot.vercel.app/verify](https://harvestbot.vercel.app/verify/) — your browser reads the receipts below from chain 46630 live, no wallet.
+Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.dev/verify/) — your browser reads the receipts below from chain 46630 live, no wallet.
 
 ## Click these, in order
 
@@ -46,6 +46,6 @@ Zero clicks into code: [harvestbot.vercel.app/verify](https://harvestbot.vercel.
 
 ## Links
 
-Live site: https://harvestbot.vercel.app · Verify in your browser, no wallet: https://harvestbot.vercel.app/verify/ · Deck: https://harvestbot.vercel.app/deck/
+Live site: https://harvestbot.edycu.dev · Verify in your browser, no wallet: https://harvestbot.edycu.dev/verify/ · Deck: https://harvestbot.edycu.dev/deck/
 
 Repo: this one · Live contracts: `deployments/46630.json` · Explorer: https://explorer.testnet.chain.robinhood.com

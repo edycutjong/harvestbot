@@ -6,9 +6,9 @@
     <img src="docs/assets/readme-hero-animated.svg" alt="HarvestBot — nine high-basis lots struck through in green ink; an amber stamp walls the way back until 15 Oct" width="100%">
   </p>
 
-  [![Live site](https://img.shields.io/badge/🌐_Live-harvestbot.vercel.app-1E7A46?style=for-the-badge)](https://harvestbot.vercel.app)
-  [![Verify on chain](https://img.shields.io/badge/🔎_Verify-live_on_chain-1F4E9C?style=for-the-badge)](https://harvestbot.vercel.app/verify/)
-  [![Deck](https://img.shields.io/badge/🗂️_Pitch-deck-363636?style=for-the-badge)](https://harvestbot.vercel.app/deck/)
+  [![Live site](https://img.shields.io/badge/🌐_Live-harvestbot.edycu.dev-1E7A46?style=for-the-badge)](https://harvestbot.edycu.dev)
+  [![Verify on chain](https://img.shields.io/badge/🔎_Verify-live_on_chain-1F4E9C?style=for-the-badge)](https://harvestbot.edycu.dev/verify/)
+  [![Deck](https://img.shields.io/badge/🗂️_Pitch-deck-363636?style=for-the-badge)](https://harvestbot.edycu.dev/deck/)
   [![Judge in 30s](https://img.shields.io/badge/👩‍⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![Demo receipts](https://img.shields.io/badge/🧾_Demo-receipts-ef4444?style=for-the-badge)](DEMO.md)
   [![Benchmark](https://img.shields.io/badge/📊_Stylus_vs_Solidity-bench-f59e0b?style=for-the-badge)](bench/RESULTS.md)

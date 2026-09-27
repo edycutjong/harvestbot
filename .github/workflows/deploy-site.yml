@@ -1,0 +1,49 @@
+name: Deploy site
+
+# Publishes site/ (landing + /verify) and deck/ to https://harvestbot.edycu.dev.
+on:
+  push:
+    branches: [main]
+    paths: [site/**, deck/**, .github/workflows/deploy-site.yml]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Vercel (production)
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://harvestbot.edycu.dev
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble site + deck
+        run: |
+          mkdir -p out
+          cp -R site/. out/
+          cp -R deck out/deck
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy
+        run: npx --yes vercel@53.2.0 deploy ./out --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Smoke test
+        run: |
+          for path in / /verify/ /deck/; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://harvestbot.edycu.dev${path}")
+            echo "${path} -> ${code}"
+            test "$code" = 200
+          done
