@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "cargo"
-    directory: "/stylus/ledger"
+    directories: ["/stylus/ledger", "/stylus/spike"]
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
