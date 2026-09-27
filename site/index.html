@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarvestBot — the ledger that books your losses and refuses the rebuy</title>
+<meta name="description" content="A tax-loss-harvesting agent for Robinhood tokenized stocks, bounded by an onchain mandate on Robinhood Chain. Stylus HIFO ledger: 2.87× less L2 gas at 64 lots.">
+<meta name="author" content="Edy Cu">
+<meta name="theme-color" content="#F1F3E6">
+<link rel="canonical" href="https://harvestbot.vercel.app/">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<!-- OG image: bump ?v= whenever og-image.png is regenerated (platforms cache by URL) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HarvestBot">
+<meta property="og:url" content="https://harvestbot.vercel.app/">
+<meta property="og:title" content="HarvestBot — books your losses, refuses the rebuy">
+<meta property="og:description" content="Tax-loss harvesting agent on Robinhood Chain. Stylus HIFO ledger, 2.87× less gas. Rebuy reverted, rogue agent slashed.">
+<meta property="og:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HarvestBot: nine high-basis lots struck through in green ink; an amber stamp walls the rebuy until 15 Oct 2026.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HarvestBot — books your losses, refuses the rebuy">
+<meta name="twitter:description" content="Tax-loss harvesting agent on Robinhood Chain. Stylus HIFO ledger, 2.87× less gas. Rebuy reverted, rogue agent slashed.">
+<meta name="twitter:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rpc.testnet.chain.robinhood.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F1F3E6;  /* columnar-pad paper */
+  --paper-2: #E6EBD6;  /* alternate band every 8 rows */
+  --ink:     #1C2620;  /* bookkeeper's black-green ink */
+  --muted:   #5E6A60;  /* printed pad headings */
+  --rule:    #B8C9B3;  /* the pad's green row ruling */
+  --margin:  #C9564B;  /* red double margin rule — structure only */
+  --link:    #1F4E9C;  /* carbon-copy blue — links and focus */
+  --before:  #6B6F68;  /* state: open lot, graphite pencil */
+  --after:   #1E7A46;  /* state: banked — green ink strike */
+  --wall:    #B86E00;  /* state: walled — amber hold stamp */
+  --wall-fill: #F3D38B;
+  --slash:   #B3261E;  /* state: slashed — red ink on the bond line */
+  --mock:    #6A4FB0;  /* MOCK label chip */
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+</style>
+<link rel="stylesheet" href="assets/ledger.css">
+<style>
+/* ---------- hero ---------- */
+.hero { overflow-x: clip; display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 80px); align-items: start;
+  padding: clamp(40px, 7vw, 88px) var(--gut) 88px calc(var(--gut) + 24px); max-width: 1400px; margin: 0 auto; }
+.hero h1 { font: 400 clamp(46px, 6.1vw, 92px)/.98 var(--font-display); letter-spacing: -.025em; margin: 18px 0 26px; text-wrap: balance; }
+.hero h1 .hl { font-style: italic; font-weight: 500; white-space: nowrap;
+  background: linear-gradient(transparent 62%, var(--wall-fill) 62%, var(--wall-fill) 92%, transparent 92%) no-repeat 0 0 / 100% 100%; padding: 0 .06em; }
+.hero .sub { font-size: 19px; line-height: 1.6; max-width: 34em; margin: 0 0 30px; }
+.hero .sub b { font-weight: 600; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.proof { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--muted); }
+.proof span::before { content: "—"; margin-right: 8px; color: var(--rule); }
+.proof span:first-child::before { content: none; }
+
+/* the pad sheet */
+.sheet-wrap { position: relative; padding-bottom: 54px; }
+.sheet { position: relative; background: var(--bg); border: 1px solid var(--rule); padding: 0 20px 18px 34px; transform: rotate(.6deg);
+  box-shadow: 0 1px 0 var(--rule), 0 26px 50px -30px rgba(28,38,32,.55), 0 4px 10px -6px rgba(28,38,32,.2);
+  background-image: linear-gradient(to right, transparent 16px, var(--margin) 16px, var(--margin) 17px, transparent 17px, transparent 20px, var(--margin) 20px, var(--margin) 21px, transparent 21px); }
+.sheet::before { content: ""; position: absolute; left: -1px; right: -1px; top: -9px; height: 10px;
+  background: radial-gradient(circle at 6px 10px, transparent 3.2px, var(--paper-2) 3.6px) 0 0 / 12px 10px repeat-x; }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 0 10px; border-bottom: 1px solid var(--rule); }
+.sheet-head .t { font: italic 500 21px/1.2 var(--font-display); }
+.sheet .ledger td:nth-child(2), .sheet .ledger th:nth-child(2) { color: var(--muted); }
+.sheet .ledger tr.hit td:nth-child(2) { color: var(--ink); }
+.sheet .stamp { position: absolute; right: 18px; bottom: 2px; z-index: 2; }
+.sheet .ledger tr.scale td { height: auto; border: 0; }
+.sheet .ledger tr.rebuy td { height: 58px; text-align: left; font: italic 400 19px/1.2 var(--font-display); color: var(--ink); border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.sheet .ledger tr.rebuy td .muted { font: 400 13px var(--font-data); font-style: normal; }
+.sheet-foot { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; }
+.sheet-foot a { font: 500 13px/1.4 var(--font-data); }
+
+/* ---------- receipts band ---------- */
+.receipts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0 var(--gut) 0 calc(var(--gut) + 24px);
+  border-top: 1.5px solid var(--ink); border-bottom: 3.5px double var(--ink); }
+.receipts > div { padding: 26px 18px 22px; border-right: 1px solid var(--rule); min-width: 0; }
+.receipts > div:last-child { border-right: 0; }
+.receipts .n { font: italic 400 clamp(38px, 4vw, 58px)/1 var(--font-display); letter-spacing: -.02em; white-space: nowrap; }
+.receipts .n.g { color: var(--after); }
+.receipts .seed .n { color: var(--muted); font-size: clamp(30px, 3vw, 42px); padding-top: 8px; }
+.sheet-scale { font: 400 12.5px/1.4 var(--font-data); color: var(--muted); text-align: right; padding: 6px 10px 0; }
+.receipts .l { margin-top: 10px; font-size: 14.5px; line-height: 1.45; }
+.receipts .p { margin-top: 8px; font: 400 12px/1.4 var(--font-data); color: var(--muted); overflow-wrap: anywhere; }
+.receipts .p a { color: var(--muted); }
+.receipts .p a:hover { color: var(--link); }
+
+/* ---------- the loop ---------- */
+.loop { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; margin-top: 44px; align-items: start; }
+.entry { position: relative; padding: 22px 0 24px 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 18px; }
+.entry:last-child { border-bottom: 1px solid var(--rule); }
+.entry .when { font: 500 12.5px/1.5 var(--font-data); color: var(--muted); }
+.entry .when b { display: block; font: 600 11px/1.3 var(--font-body); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+.entry h3 { font: 400 28px/1.15 var(--font-display); margin: 0 0 8px; letter-spacing: -.01em; }
+.entry p { margin: 0 0 10px; }
+.entry .tx { font: 500 13px var(--font-data); }
+.entry.banked h3 em { color: var(--after); }
+.entry.walled h3 em { color: var(--wall); font-weight: 600; }
+.entry.slashed h3 em { color: var(--slash); }
+.entry .inline-stamp { font-size: 11px; padding: 5px 9px 4px; margin-left: 8px; vertical-align: .3em; }
+.bond { font: 500 15px var(--font-data); }
+.bond s { color: var(--slash); text-decoration-color: var(--slash); text-decoration-thickness: 2px; }
+.bond b { color: var(--ink); }
+
+.term { background: var(--ink); color: var(--bg); border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px -36px rgba(28,38,32,.8); position: sticky; top: 90px; }
+.term-bar { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid color-mix(in srgb, var(--bg) 14%, transparent);
+  font: 500 12px/1.4 var(--font-data); color: color-mix(in srgb, var(--bg) 70%, var(--ink)); }
+.term pre { margin: 0; padding: 18px 16px 20px; font: 400 12.5px/1.7 var(--font-data); white-space: pre-wrap; word-break: break-word; min-height: 360px; }
+.term .c { color: var(--wall-fill); }
+.term .ok { color: var(--rule); font-weight: 600; }
+.term .dim { color: color-mix(in srgb, var(--bg) 62%, var(--ink)); }
+.term .cur { display: inline-block; width: 8px; height: 1.1em; background: var(--wall-fill); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.term-foot { padding: 0 16px 14px; font: 400 12px/1.5 var(--font-body); color: color-mix(in srgb, var(--bg) 70%, var(--ink)); }
+.term-foot button { margin-left: 8px; color: var(--wall-fill); border-color: color-mix(in srgb, var(--wall-fill) 50%, transparent); }
+.term-foot button:hover { background: var(--wall-fill); color: var(--ink); }
+
+/* ---------- killer number ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: 48px; align-items: start; margin-top: 36px; }
+.big { font: italic 400 clamp(96px, 13vw, 184px)/.9 var(--font-display); letter-spacing: -.04em; color: var(--after); margin: 0; }
+.bars { display: grid; gap: 18px; }
+.bar-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; }
+.bar-row .k { font: 500 13px/1.3 var(--font-data); color: var(--muted); }
+.bar-row .k b { display: block; font: 600 20px/1 var(--font-data); color: var(--ink); }
+.bar-row.key .k b { color: var(--ink); text-decoration: underline 3px var(--after); text-underline-offset: 4px; }
+.b2 { display: grid; gap: 4px; }
+.bar { height: 20px; display: flex; align-items: center; transform-origin: left center; transition: transform 1s var(--ease); min-width: 2px; }
+.bar span { font: 500 12.5px/1 var(--font-data); white-space: nowrap; padding-left: calc(100% + 8px); color: var(--ink); }
+.bar.sol { background: repeating-linear-gradient(135deg, var(--before) 0 2px, color-mix(in srgb, var(--before) 70%, var(--bg)) 2px 5px); }
+.bar.sty { background: var(--after); }
+.bars.pre .bar { transform: scaleX(0); }
+.bar-row.key { background: color-mix(in srgb, var(--wall-fill) 22%, transparent); margin: -8px -10px; padding: 8px 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13.5px; color: var(--muted); margin-top: 18px; }
+.legend i { display: inline-block; width: 18px; height: 10px; margin-right: 6px; vertical-align: 0; }
+.legend .ls { background: repeating-linear-gradient(135deg, var(--before) 0 2px, color-mix(in srgb, var(--before) 70%, var(--bg)) 2px 5px); }
+.legend .ly { background: var(--after); }
+.fine { font-size: 14.5px; color: var(--muted); max-width: 40em; margin-top: 18px; }
+
+/* ---------- mechanism bento ---------- */
+.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; margin-top: 40px; border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); }
+.cell { position: relative; padding: 26px 24px 28px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--bg);
+  transition: background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease); }
+.cell:hover { background: var(--paper-2); transform: translateY(-3px); box-shadow: 0 14px 26px -22px rgba(28,38,32,.6); z-index: 1; }
+.cell.w3 { grid-column: span 3; } .cell.w2 { grid-column: span 2; } .cell.w4 { grid-column: span 4; }
+.cell svg.ic { width: 44px; height: 44px; stroke: var(--ink); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cell h3 { font: 400 26px/1.15 var(--font-display); margin: 14px 0 8px; letter-spacing: -.01em; }
+.cell p { margin: 0 0 14px; max-width: 34em; }
+.cell .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cell.lead { background: color-mix(in srgb, var(--paper-2) 55%, var(--bg)); }
+.cell.lead h3 { font-size: 34px; }
+
+/* ---------- why only ---------- */
+.why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 36px; }
+.why div { border-top: 1.5px solid var(--ink); padding-top: 16px; }
+.why h3 { font: italic 400 24px/1.2 var(--font-display); margin: 0 0 8px; }
+.why p { margin: 0; }
+
+/* ---------- honest ---------- */
+.quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 36px; }
+.quotes figure { margin: 0; padding: 22px 0 0; border-top: 3.5px double var(--ink); }
+.quotes blockquote { margin: 0 0 14px; font: italic 400 24px/1.35 var(--font-display); letter-spacing: -.005em; }
+.quotes figcaption { font: 500 12.5px/1.4 var(--font-data); color: var(--muted); }
+
+/* ---------- end ---------- */
+.end { text-align: left; }
+.end .sec-h { max-width: 14em; }
+
+@media (max-width: 1080px) {
+  .hero, .loop, .bench { grid-template-columns: minmax(0, 1fr); }
+  .term { position: relative; top: 0; }
+  .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .receipts > div { border-bottom: 1px solid var(--rule); }
+  .receipts > div:nth-child(2n) { border-right: 0; }
+  .receipts > div:last-child { grid-column: 1 / -1; border-bottom: 0; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cell.w3, .cell.w2, .cell.w4 { grid-column: span 1; }
+  .cell.lead { grid-column: 1 / -1; }
+  .why, .quotes { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+@media (max-width: 640px) {
+  .hero h1 .hl { white-space: normal; }
+  .hero .sub { font-size: 17px; }
+  .sheet { padding: 0 10px 14px 26px; transform: none; }
+  .sheet .ledger { font-size: 12.5px; }
+  .sheet .ledger th, .sheet .ledger td { padding-left: 5px; padding-right: 5px; }
+  .sheet .ledger th:nth-child(3), .sheet .ledger td:nth-child(3) { display: none; }
+  .sheet .stamp { right: 4px; bottom: 30px; font-size: 11px; }
+  .sheet .ledger tr.scale td { height: auto; border: 0; }
+.sheet .ledger tr.rebuy td { height: 84px; vertical-align: top; padding-top: 12px; }
+  .sheet .stamp b { font-size: 17px; }
+  .entry { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bar-row { grid-template-columns: 54px minmax(0, 1fr); }
+  .bar span { font-size: 11px; }
+  .b2 { padding-right: 64px; }
+  .receipts { grid-template-columns: minmax(0, 1fr); }
+  .receipts > div { border-right: 0; }
+  .nav-links { gap: 12px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <a class="brand" href="./" aria-label="HarvestBot home"><img src="assets/icon.svg" alt="" width="30" height="30">HarvestBot</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a class="hide-sm" href="#loop">The loop</a>
+    <a class="hide-sm" href="#numbers">The numbers</a>
+    <a class="hide-sm" href="#honest">Limits</a>
+    <a class="hide-sm" href="#faq">FAQ</a>
+    <a class="btn sm ink" href="verify/">Verify on chain</a>
+  </nav>
+</header>
+
+<main id="main">
+<section class="hero" aria-labelledby="h1">
+  <div>
+    <div class="label">Statement of harvested lots · Robinhood Chain testnet 46630</div>
+    <h1 id="h1">The ledger that books your losses — and <span class="hl">refuses the rebuy.</span></h1>
+    <p class="sub">Every December, Maya leaves a paper loss on the table: banking it means picking which of <b>64 tax lots</b> to sell, then policing a <b>30-day</b> wash-sale calendar. HarvestBot's agent does it on Robinhood Chain, under a mandate it cannot exceed: <b>9 lots</b> harvested, the rebuy <b>reverted by the contract</b>, the lying agent <b>slashed 200 mUSDC</b>.</p>
+    <div class="ctas">
+      <a class="btn ink" href="verify/">Verify the three transactions <svg class="arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+      <a class="btn" href="deck/">Pitch deck</a>
+      <a class="btn" href="https://github.com/edycutjong/harvestbot">GitHub</a>
+    </div>
+    <div class="proof"><span>no wallet needed</span><span>real AMZN, NFLX, PLTR Stock Tokens</span><span>81 + 6 tests</span></div>
+  </div>
+
+  <div class="sheet-wrap">
+    <div class="sheet" role="figure" aria-label="Beat 1 ledger: lots 63 to 55 struck through as banked, total ($24.53); rebuy of AMZN stamped walled until 15 October 2026">
+      <div class="sheet-head"><span class="t">AMZN · lot ledger</span><span class="label">beat 1 · HIFO</span></div>
+      <table class="ledger" id="hero-ledger">
+        <thead><tr><th scope="col">Lot</th><th scope="col">Basis/sh</th><th scope="col">Mark <span class="chip mock">mock</span></th><th scope="col">Gain/(loss)</th></tr></thead>
+        <tbody>
+          <tr class="hit" data-lot="63"><td>63</td><td>455.00</td><td>412.30</td><td>(3.34)</td></tr>
+          <tr class="hit" data-lot="62"><td>62</td><td>453.81</td><td>412.30</td><td>(3.24)</td></tr>
+          <tr class="hit" data-lot="61"><td>61</td><td>452.62</td><td>412.30</td><td>(3.15)</td></tr>
+          <tr class="hit" data-lot="60"><td>60</td><td>451.43</td><td>412.30</td><td>(3.06)</td></tr>
+          <tr class="hit" data-lot="59"><td>59</td><td>450.24</td><td>412.30</td><td>(2.96)</td></tr>
+          <tr class="hit" data-lot="58"><td>58</td><td>449.05</td><td>412.30</td><td>(2.87)</td></tr>
+          <tr class="hit" data-lot="57"><td>57</td><td>447.86</td><td>412.30</td><td>(2.78)</td></tr>
+          <tr class="hit" data-lot="56"><td>56</td><td>446.67</td><td>412.30</td><td>(2.68)</td></tr>
+          <tr class="hit" data-lot="55"><td>55<span class="part">part</span></td><td>445.48</td><td>412.30</td><td>(0.45)</td></tr>
+          <tr><td>54</td><td>444.29</td><td>412.30</td><td>open</td></tr>
+          <tr><td>53</td><td>443.10</td><td>412.30</td><td>open</td></tr>
+          <tr class="total"><td>Banked</td><td colspan="3" id="hero-total">($24.53)</td></tr>
+          <tr class="scale"><td colspan="4" class="sheet-scale">faucet scale: 0.078125 AMZN per lot · realized on chain</td></tr>
+          <tr class="rebuy"><td colspan="4">Buy back AMZN <span class="muted">· beat 2</span></td></tr>
+        </tbody>
+      </table>
+      <div class="stamp land" style="--d:2.1s">Walled · reverted<b>until 15 Oct 2026</b></div>
+    </div>
+    <div class="sheet-foot">
+      <span class="live" id="hero-live" data-state="idle"><i></i><span>reading tx 0x689c…6123 from chain 46630…</span></span>
+      <a href="https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123">explorer ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="receipts" aria-label="Receipts">
+  <div><div class="n g" data-count="2.87" data-dec="2" data-suffix="×">2.87×</div><div class="l">less L2 gas for a 64-lot HIFO harvest, Stylus vs Solidity (3.1× at 128)</div><div class="p"><a href="https://github.com/edycutjong/harvestbot/blob/main/bench/RESULTS.md">bench/RESULTS.md</a></div></div>
+  <div><div class="n" data-count="81" data-suffix=" + 6">81 + 6</div><div class="l">Foundry tests + Stylus native tests, 3 fuzz properties</div><div class="p">forge test · cargo test</div></div>
+  <div><div class="n">0 · 0</div><div class="l">Slither high · medium findings, the rest triaged</div><div class="p"><a href="https://github.com/edycutjong/harvestbot/blob/main/docs/SLITHER.md">docs/SLITHER.md</a></div></div>
+  <div><div class="n g">3 of 3</div><div class="l">demo beats executed as real transactions on chain 46630</div><div class="p"><a href="https://github.com/edycutjong/harvestbot/blob/main/receipts/46630.json">receipts/46630.json</a></div></div>
+  <div class="seed"><div class="n">($3,140.00)</div><div class="l">the 10-share seed scenario in <code>forge test</code>, exact on both engines (not an on-chain amount)</div><div class="p">forge test --match-test seed_scenario</div></div>
+</section>
+
+<section class="sec" id="loop" aria-labelledby="loop-h">
+  <div class="label">The one flow, as it happened on chain</div>
+  <h2 class="sec-h" id="loop-h">Harvest, <em>refuse</em>, slash — three transactions, one agent key.</h2>
+  <p class="lede">The agent only ever signs a decision. The contracts recompute everything from scratch and either execute it or revert it. Here is each beat, with the chain's own words.</p>
+  <div class="loop">
+    <div>
+      <article class="entry banked">
+        <div class="when"><b>Beat 1</b>block<br>119,852,570</div>
+        <div>
+          <h3>Nine lots <em>banked</em>.</h3>
+          <p>The agent signs a HIFO decision: sell 0.638501 AMZN, lots 63 → 55, rotate into NFLX. The router lets its key call exactly one function. The mandate recomputes the picks on the Stylus ledger, matches them, realizes <b>($24.531251)</b> at the oracle mark and opens a 30-day window.</p>
+          <a class="tx" href="https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123">0x689c4d34…6123 ↗</a>
+        </div>
+      </article>
+      <article class="entry walled">
+        <div class="when"><b>Beat 2</b>block<br>119,852,786</div>
+        <div>
+          <h3>The rebuy, <em>refused</em>. <span class="stamp inline-stamp">reverted</span></h3>
+          <p>Forty seconds later the same agent tries NFLX → AMZN. The contract reverts <code>WashSaleViolation(owner, AMZN, AMZN, 1792060681)</code>: the way back is walled until 15 Oct 2026. The agent cannot route around it; the chain says no.</p>
+          <a class="tx" href="https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10">0xd486468e…cf10 ↗</a>
+        </div>
+      </article>
+      <article class="entry slashed">
+        <div class="when"><b>Beat 3</b>blocks<br>119,852,971<br>119,853,005</div>
+        <div>
+          <h3>The rogue trade, <em>slashed</em>.</h3>
+          <p>The agent signs AMZN → PLTR, a trade the substitute map never sanctioned. It reverts <code>OffMapSubstitute</code>, and the signed envelope becomes evidence: <code>challenge()</code> cuts 20&nbsp;% of the bond, 20 to the challenger, 180 to the owner.</p>
+          <p class="bond">bond <s>1,000.00</s> → <b>800.00</b> mUSDC at block 119,853,005 <span class="chip mock">mock usdc</span></p>
+          <a class="tx" href="https://explorer.testnet.chain.robinhood.com/tx/0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6">attempt 0x7dca0680…0bf6 ↗</a> ·
+          <a class="tx" href="https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493">challenge 0xcceb12a7…6493 ↗</a>
+        </div>
+      </article>
+    </div>
+
+    <figure class="term" style="margin:0" aria-label="Terminal replay of real runs">
+      <div class="term-bar"><span>zsh — harvestbot</span><span>real runs · 27 Sep 2026</span></div>
+<pre id="term"><span class="c">$</span> forge test --match-test seed_scenario
+<span class="ok">[PASS]</span> test_seed_scenario_realizes_exactly_minus_3140_dollars() <span class="dim">(gas: 1433602)</span>
+Suite result: ok. 1 passed; 0 failed; 0 skipped
+
+<span class="c">$</span> forge test
+<span class="dim">Ran 8 test suites in 236.92ms (741.71ms CPU time):</span>
+<span class="ok">81 tests passed</span>, 0 failed, 0 skipped (81 total tests)
+
+<span class="c">$</span> cast call 0xEff7B46049fC677F58264e0ebb19dF1a39195a21 \
+    'computeHarvest(address,address,uint256,uint256)(uint64[],int256)' \
+    0x72cd…557b 0x5884…9E02 638501157098660213 412300000 \
+    --rpc-url https://rpc.testnet.chain.robinhood.com
+[55, 54, 53, 52, 51, 50, 49, 48, 47]
+-18321704 <span class="dim">[-1.832e7]</span>
+<span class="cur" aria-hidden="true"></span></pre>
+      <figcaption class="term-foot">The Stylus ledger, asked at block 125,053,420: beat 1 already sold lots 63–56 and part of 55, so it now answers with the next nine. <button class="copy" type="button" id="replay">Replay</button></figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="hr">
+
+<section class="sec" id="numbers" aria-labelledby="num-h">
+  <div class="label">Stylus vs Solidity · same chain, same inputs, identical output</div>
+  <div class="bench">
+    <div>
+      <p class="big" aria-hidden="true">2.87×</p>
+      <h2 class="sec-h" id="num-h">The bookkeeping runs in Rust, and costs <em>2.87× less</em> L2 gas.</h2>
+      <p>A 9-lot HIFO harvest over 64 open lots: <b>1,456,905</b> gas on Solidity, <b>507,993</b> on the Stylus ledger. The ratio grows with the portfolio: <b>3.1×</b> at 128 lots.</p>
+      <p class="fine">Measured with Arbitrum's own <code>NodeInterface.gasEstimateComponents</code> on chain 46630. The Stylus program is <em>uncached</em> on this testnet, so every call pays the WASM start-up floor (near parity at 8 lots): these are worst-case Stylus numbers. The spec had guessed ~8×; the chain says 2.87×, and that is the number we report.</p>
+    </div>
+    <div>
+      <div class="bars pre" id="bars" role="img" aria-label="L2 gas by open lots. 8 lots: Solidity 132,362, Stylus 125,859. 16: 352,195 vs 180,017. 32: 720,431 vs 289,013. 64: 1,456,905 vs 507,993. 128: 2,929,938 vs 945,989.">
+        <div class="bar-row"><div class="k"><b>8</b>1.05×</div><div class="b2"><div class="bar sol" style="width:3.84%"><span>132,362</span></div><div class="bar sty" style="width:3.65%"><span>125,859</span></div></div></div>
+        <div class="bar-row"><div class="k"><b>16</b>1.96×</div><div class="b2"><div class="bar sol" style="width:10.22%"><span>352,195</span></div><div class="bar sty" style="width:5.22%"><span>180,017</span></div></div></div>
+        <div class="bar-row"><div class="k"><b>32</b>2.49×</div><div class="b2"><div class="bar sol" style="width:20.90%"><span>720,431</span></div><div class="bar sty" style="width:8.38%"><span>289,013</span></div></div></div>
+        <div class="bar-row key"><div class="k"><b>64</b>2.87×</div><div class="b2"><div class="bar sol" style="width:42.27%"><span>1,456,905</span></div><div class="bar sty" style="width:14.74%"><span>507,993</span></div></div></div>
+        <div class="bar-row"><div class="k"><b>128</b>3.1×</div><div class="b2"><div class="bar sol" style="width:85%"><span>2,929,938</span></div><div class="bar sty" style="width:27.44%"><span>945,989</span></div></div></div>
+      </div>
+      <div class="legend"><span><i class="ls"></i>Solidity twin, L2 gas</span><span><i class="ly"></i>Stylus (Rust → WASM), L2 gas</span><span>open lots on the left</span></div>
+      <p class="fine"><a href="https://github.com/edycutjong/harvestbot/blob/main/bench/RESULTS.md">Full table with p50/p95 latency →</a></p>
+    </div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<section class="sec" id="how" aria-labelledby="how-h">
+  <div class="label">Six contracts, one bound</div>
+  <h2 class="sec-h" id="how-h">The agent signs. The contracts <em>check every line</em>.</h2>
+  <div class="bento">
+    <article class="cell w4 lead">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><rect x="5" y="6" width="34" height="32" rx="2"/><path d="M11 6v32M5 16h34M5 24h34M5 32h34"/><path d="M8 20h28M8 28h24" stroke="#1E7A46" stroke-width="2.4"/></svg>
+      <h3>TaxLotLedger, in Rust on Stylus</h3>
+      <p>Records every lot, picks the highest-basis lots for a sale, prorates the last one and computes the realized loss deterministically. It is the thing the mandate checks the agent's claim against, and it runs as WASM on Robinhood Chain.</p>
+      <div class="chips"><span class="chip prim">computeHarvest</span><span class="chip prim">realize</span><span class="chip prim">0xEff7…5a21</span><span class="chip real">stylus</span></div>
+    </article>
+    <article class="cell w2">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="9" width="32" height="29" rx="2"/><path d="M6 17h32M14 5v7M30 5v7"/><rect x="12" y="22" width="20" height="10" transform="rotate(-6 22 27)" stroke="#B86E00" stroke-width="2.2"/></svg>
+      <h3>WashSaleGuard</h3>
+      <p>For the 2,592,000 seconds after a harvest, any rebuy of the asset or its identical cluster reverts.</p>
+      <div class="chips"><span class="chip prim">WashSaleViolation</span></div>
+    </article>
+    <article class="cell w3">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><path d="M5 12h34v22H5z"/><path d="M5 12l17 12 17-12"/><circle cx="33" cy="32" r="6"/><path d="M30.5 32l2 2 3.5-4"/></svg>
+      <h3>HarvestMandate</h3>
+      <p>Owner custody. Re-validates signature, nonce, deadline, map, window, HIFO and the loss at the oracle mark.</p>
+      <div class="chips"><span class="chip prim">EIP-712</span><span class="chip mock">mock oracle</span></div>
+    </article>
+    <article class="cell w3">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><circle cx="10" cy="14" r="5"/><circle cx="34" cy="14" r="5"/><circle cx="22" cy="34" r="5"/><path d="M15 14h14"/><path d="M13 18l6 12M31 18l-6 12" stroke-dasharray="2 3"/><path d="M19 27l6 6M25 27l-6 6" stroke="#B3261E" stroke-width="2"/></svg>
+      <h3>SubstituteMap</h3>
+      <p>Owner-curated pairs the agent may rotate into. AMZN ⇄ NFLX is sanctioned; PLTR is not, which is why beat 3 reverted.</p>
+      <div class="chips"><span class="chip prim">isSubstitute</span><span class="chip prim">OffMapSubstitute</span></div>
+    </article>
+    <article class="cell w3">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><path d="M4 22h24"/><path d="M22 16l6 6-6 6"/><rect x="30" y="10" width="10" height="24" rx="1"/><path d="M35 16v12"/></svg>
+      <h3>ExecutionRouter</h3>
+      <p>The agent key reaches one target, one selector, value 0, with an expiry and a daily rate limit.</p>
+      <div class="chips"><span class="chip prim">1 selector</span></div>
+    </article>
+    <article class="cell w3">
+      <svg class="ic" viewBox="0 0 44 44" aria-hidden="true"><ellipse cx="22" cy="12" rx="14" ry="5"/><path d="M8 12v8c0 2.8 6.3 5 14 5s14-2.2 14-5v-8M8 20v8c0 2.8 6.3 5 14 5s14-2.2 14-5v-8"/><path d="M6 38L38 4" stroke="#B3261E" stroke-width="2.2"/></svg>
+      <h3>AgentBond</h3>
+      <p>Anyone holding an envelope the mandate must reject can slash it: 20&nbsp;%, a tenth of that as bounty.</p>
+      <div class="chips"><span class="chip prim">challenge()</span><span class="chip mock">mock usdc</span></div>
+    </article>
+  </div>
+</section>
+
+<section class="sec" id="why" aria-labelledby="why-h" style="padding-top:24px">
+  <div class="label">Why only Robinhood Chain + Stylus</div>
+  <h2 class="sec-h" id="why-h">A tax-lot ledger belongs on the chain that <em>issues the stock</em>.</h2>
+  <div class="why">
+    <div><h3>The assets are Robinhood's.</h3><p>The mandate holds real testnet Stock Tokens from the official faucet: AMZN <code>0x5884…9E02</code>, NFLX <code>0x3b82…8C93</code>, PLTR <code>0x1FBE…98d0</code>.</p></div>
+    <div><h3>The ledger is WASM.</h3><p><code>cargo stylus deploy</code> put the Rust ledger on chain 46630; <code>ArbWasm.stylusVersion() = 3</code>. Remove Stylus and the HIFO scan costs 2.87× more.</p></div>
+    <div><h3>The venue is not real, and says so.</h3><p>There is no Stock-Token AMM on the testnet, so the rotation runs through a fixed-rate venue labeled <span class="chip mock">mock</span>. The tokens are real; the venue is not.</p></div>
+  </div>
+</section>
+
+<hr class="hr">
+
+<section class="sec" id="honest" aria-labelledby="hon-h">
+  <div class="label">Honest by design</div>
+  <h2 class="sec-h" id="hon-h">What it is not, in the repo's own words.</h2>
+  <div class="quotes">
+    <figure><blockquote>“The oracle mark, the swap venue and the bond's USDC are MOCK contracts, labeled in name and symbol.”</blockquote><figcaption>— JUDGE.md · Honest limitations</figcaption></figure>
+    <figure><blockquote>“Re-buys are walled for the 30 days after a harvest; the 30-day look-back before the sale is not enforced yet.”</blockquote><figcaption>— JUDGE.md · Honest limitations · Wash-sale scope</figcaption></figure>
+    <figure><blockquote>“The spec had guessed ~8×; the chain says 2.9×–3.1× — we report the chain.”</blockquote><figcaption>— JUDGE.md · Honest limitations</figcaption></figure>
+  </div>
+</section>
+
+<hr class="hr">
+
+<section class="sec faq" id="faq" aria-labelledby="faq-h">
+  <div class="label">Questions a judge would ask</div>
+  <h2 class="sec-h" id="faq-h">Before you click Verify.</h2>
+  <details><summary>Is this really on chain, or a replay?</summary><div>All three beats are real transactions on Robinhood Chain testnet (46630), signed by an agent key that is different from the owner's. The <a href="verify/">verify page</a> fetches their receipts from the public RPC in your browser, decodes the events, and re-asks the contracts their current state. No wallet, no server of ours in between.</div></details>
+  <details><summary>What is mocked?</summary><div>Three things, each labeled MOCK in its name and symbol: the oracle mark (AMZN $412.30), the fixed-rate swap venue, and the USDC the bond is posted in. There is no Stock-Token AMM and no USDC on the testnet. The AMZN, NFLX and PLTR tokens are Robinhood's own faucet Stock Tokens, and the ledger, mandate, guard, router and bond are the real contracts.</div></details>
+  <details><summary>Why is the on-chain loss only $24.53?</summary><div>The faucet hands out 5 of each Stock Token per day, so the on-chain portfolio is the 64-lot shape at 1/128 scale (0.078125 AMZN per lot). The same engine on 10 shares per lot realizes exactly ($3,140.00), pinned in <code>contracts/test/fixtures/expected.json</code> and asserted by <code>forge test</code> and <code>cargo test</code>. Real small numbers on chain, the big number in the deterministic test.</div></details>
+  <details><summary>Why 2.87× and not a bigger number?</summary><div>Because that is what the chain measured. The Stylus program is uncached on this testnet (no ArbOS cache manager yet), so each call pays a WASM start-up floor, and both engines pay the same cold storage reads per lot. Stylus wins on the comparison loop, so the ratio grows with portfolio size: 1.05× at 8 lots, 2.87× at 64, 3.1× at 128.</div></details>
+  <details><summary>Can the agent withdraw my tokens?</summary><div>No. The agent's key can call exactly one function through the router, and the mandate's withdraw path is owner-only. A test pins it: <code>test_owner_can_withdraw_and_the_agent_cannot_stop_it</code>. If the agent signs something the mandate must reject, that signature is enough to slash its bond.</div></details>
+  <details><summary>Is there an AI in it?</summary><div>No. The agent is <code>rule-v1</code>: deterministic HIFO plus the first allowed substitute, with a hash of a plain-text rationale. We say "agent", not "AI". The point is the bound, not the brain: whatever decides, the contracts recompute it.</div></details>
+  <details><summary>How do I check it myself?</summary><div>Open the <a href="verify/">verify page</a>, or clone the repo and run <code>forge test</code> (81) and <code>cargo test</code> (6) offline, then one read-only <code>cast call</code> against the deployed Stylus ledger. Commands are in <a href="https://github.com/edycutjong/harvestbot/blob/main/DEMO.md">DEMO.md</a>.</div></details>
+</section>
+
+<section class="sec end" aria-labelledby="end-h" style="padding-top:24px">
+  <h2 class="sec-h" id="end-h">Don't take the page's word for it. <em>Ask the chain.</em></h2>
+  <div class="ctas"><a class="btn ink" href="verify/">Verify on chain <svg class="arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a><a class="btn" href="deck/">Pitch deck</a><a class="btn" href="https://github.com/edycutjong/harvestbot">GitHub</a></div>
+</section>
+</main>
+
+<footer class="foot">
+  <span>HarvestBot · built solo for the Arbitrum Open House Singapore Online Buildathon (HackQuest), Sept 2026 · MIT © 2026 Edy Cu</span>
+  <nav aria-label="Footer"><a href="verify/">Verify</a><a href="deck/">Deck</a><a href="https://github.com/edycutjong/harvestbot">GitHub</a><a href="https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21">Stylus ledger ↗</a></nav>
+</footer>
+
+<script src="assets/chain.js"></script>
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* hero: stagger the strike in HIFO order, then confirm it against the chain */
+  var rows = document.querySelectorAll("#hero-ledger tr.hit");
+  rows.forEach(function (r, i) { r.style.setProperty("--d", (0.5 + i * 0.16) + "s"); });
+  var live = document.getElementById("hero-live");
+  HB.read().then(function (o) {
+    var txt = live.querySelector("span");
+    if (o.live && o.beat1 && o.beat1.lotIds) {
+      var ids = o.beat1.lotIds.join(",");
+      var same = ids === "63,62,61,60,59,58,57,56,55";
+      live.dataset.state = "live";
+      txt.textContent = (same ? "struck lots = LotsRealized log of tx 0x689c…6123" : "log lots: " + ids) + " · re-verified at block " + o.head.toLocaleString("en-US");
+      document.getElementById("hero-total").title = "realizedLoss " + HB.units(o.beat1.realizedLoss, 6, 6) + " USD, read from the chain";
+    } else {
+      live.dataset.state = "fallback";
+      txt.textContent = "RPC unreachable — showing the committed receipt (receipts/46630.json, block 119,852,570)";
+    }
+  });
+
+  /* receipts: count up when first seen (the final value is already in the HTML) */
+  function countUp(el) {
+    var end = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0), suf = el.dataset.suffix || "", t0 = null;
+    function step(t) { if (!t0) t0 = t; var p = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = (end * e).toFixed(dec) + suf; if (p < 1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+  var bars = document.getElementById("bars");
+  if (!reduce && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return; io.unobserve(e.target);
+        if (e.target === bars) { requestAnimationFrame(function () { bars.classList.remove("pre"); }); }
+        else if (e.target.id === "term") { typeOut(); }
+        else countUp(e.target);
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll("[data-count]").forEach(function (el) { io.observe(el); });
+    var br = bars.getBoundingClientRect();
+    if (br.top < innerHeight) bars.classList.remove("pre"); else io.observe(bars);
+    setTimeout(function () { bars.classList.remove("pre"); }, 3500);
+    io.observe(document.getElementById("term"));
+  } else { bars.classList.remove("pre"); }
+
+  /* terminal replay: re-type the real run (full text is in the HTML for no-JS, print and screenshots) */
+  var term = document.getElementById("term"), full = term.innerHTML, typing = false;
+  function typeOut() {
+    if (typing || reduce) return; typing = true;
+    var tmp = document.createElement("div"); tmp.innerHTML = full;
+    var nodes = Array.prototype.slice.call(tmp.childNodes); term.innerHTML = "";
+    var i = 0;
+    (function next() {
+      if (i >= nodes.length) { typing = false; return; }
+      var n = nodes[i++];
+      if (n.nodeType === 3) {
+        var s = n.textContent, j = 0, tn = document.createTextNode(""); term.appendChild(tn);
+        (function ch() { var k = Math.min(s.length, j + 3); tn.textContent = s.slice(0, k); j = k;
+          if (j < s.length) setTimeout(ch, 8); else next(); })();
+      } else { term.appendChild(n.cloneNode(true)); setTimeout(next, n.className === "c" ? 260 : 30); }
+    })();
+  }
+  document.getElementById("replay").addEventListener("click", function () { typing = false; typeOut(); });
+})();
+</script>
+</body>
+</html>

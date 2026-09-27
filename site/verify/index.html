@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify HarvestBot on Robinhood Chain — live receipt check</title>
+<meta name="description" content="Your browser reads HarvestBot's three demo transactions and current contract state straight from Robinhood Chain testnet RPC. No wallet, no server.">
+<meta name="author" content="Edy Cu">
+<meta name="theme-color" content="#F1F3E6">
+<link rel="canonical" href="https://harvestbot.vercel.app/verify/">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<!-- OG image: bump ?v= whenever og-image.png is regenerated -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HarvestBot">
+<meta property="og:url" content="https://harvestbot.vercel.app/verify/">
+<meta property="og:title" content="Verify HarvestBot — live from Robinhood Chain">
+<meta property="og:description" content="Three demo transactions and the contracts' current state, read live from chain 46630 in your browser.">
+<meta property="og:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HarvestBot: nine high-basis lots struck through in green ink; an amber stamp walls the rebuy until 15 Oct 2026.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verify HarvestBot — live from Robinhood Chain">
+<meta name="twitter:description" content="Three demo transactions and the contracts' current state, read live from chain 46630 in your browser.">
+<meta name="twitter:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rpc.testnet.chain.robinhood.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F1F3E6;
+  --paper-2: #E6EBD6;
+  --ink:     #1C2620;
+  --muted:   #5E6A60;
+  --rule:    #B8C9B3;
+  --margin:  #C9564B;
+  --link:    #1F4E9C;
+  --before:  #6B6F68;
+  --after:   #1E7A46;
+  --wall:    #B86E00;
+  --wall-fill: #F3D38B;
+  --slash:   #B3261E;
+  --mock:    #6A4FB0;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+</style>
+<link rel="stylesheet" href="../assets/ledger.css">
+<style>
+.head { padding: 56px var(--gut) 24px calc(var(--gut) + 24px); max-width: 1400px; margin: 0 auto; }
+.head h1 { font: 400 clamp(40px, 5vw, 72px)/1.02 var(--font-display); letter-spacing: -.02em; margin: 14px 0 16px; max-width: 16em; text-wrap: balance; }
+.head h1 em { font-style: italic; }
+.head p { max-width: 42em; font-size: 18px; margin: 0; }
+
+.status { margin: 28px var(--gut) 0 calc(var(--gut) + 24px); max-width: calc(1400px - 2 * var(--gut)); display: flex; flex-wrap: wrap; gap: 14px 24px;
+  align-items: center; justify-content: space-between; padding: 16px 20px; border: 1.5px solid var(--ink); background: var(--bg); }
+.status .live { font-size: 14px; color: var(--ink); }
+.status .meta { font: 400 13px/1.5 var(--font-data); color: var(--muted); }
+.status[data-state="fallback"] { border-color: var(--wall); background: color-mix(in srgb, var(--wall-fill) 40%, var(--bg)); }
+
+.boxes { padding: 40px var(--gut) 24px calc(var(--gut) + 24px); max-width: 1400px; margin: 0 auto; display: grid; gap: 34px; }
+.beat { border-top: 3.5px double var(--ink); padding-top: 18px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: 32px; }
+.beat h2 { font: 400 34px/1.1 var(--font-display); margin: 8px 0 10px; letter-spacing: -.01em; }
+.beat h2 em { font-style: italic; }
+.beat.b1 h2 em { color: var(--after); } .beat.b2 h2 em { color: var(--wall); font-weight: 600; } .beat.b3 h2 em { color: var(--slash); }
+.beat .say { margin: 0 0 12px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); }
+.box { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 10px 12px 12px; min-width: 0; min-height: 76px; }
+.box.w2 { grid-column: span 2; } .box.w3 { grid-column: 1 / -1; }
+.box .k { font: 600 11.5px/1.3 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.box .k i { font-style: normal; color: var(--ink); margin-right: 6px; }
+.box .v { margin-top: 6px; font: 500 15px/1.45 var(--font-data); overflow-wrap: anywhere; }
+.box .v small { display: block; font: 400 12px/1.4 var(--font-body); color: var(--muted); margin-top: 2px; }
+.box.ok .v b { color: var(--after); } .box.no .v b { color: var(--ink); background: var(--wall-fill); box-shadow: inset 0 0 0 1.5px var(--wall); padding: 0 5px; } .box.cut .v b { color: var(--slash); }
+.src { display: inline-block; margin-left: 6px; font: 600 11px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; padding: 3px 5px 2px; border: 1px solid currentColor; border-radius: 2px; vertical-align: .2em; }
+.src.live { color: var(--after); } .src.rec { color: var(--ink); background: var(--wall-fill); border-color: var(--wall); } .src.now { color: var(--link); }
+.lots { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.lots span { font: 500 13px/1 var(--font-data); padding: 5px 6px; border: 1px solid var(--rule); background: var(--bg); position: relative; }
+.lots span::after { content: ""; position: absolute; left: -2px; right: -2px; top: 50%; height: 2px; background: var(--after); transform: scaleX(0); transform-origin: left; animation: strike .35s var(--ease) forwards; animation-delay: calc(var(--i) * 90ms + .3s); }
+.beat .stamp { margin-top: 22px; }
+.box.stamped { position: relative; } .box.stamped .v { padding-right: 230px; }
+.box.stamped .stamp { position: absolute; right: 18px; top: 50%; margin: -26px 0 0; font-size: 12px; pointer-events: none; }
+@media (max-width: 760px) { .box.stamped .v { padding-right: 0; } .box.stamped .stamp { position: static; margin: 12px 0 4px; } }
+.txlink { font: 500 13.5px var(--font-data); }
+
+.contracts { padding: 24px var(--gut) 80px calc(var(--gut) + 24px); max-width: 1400px; margin: 0 auto; }
+.tbl-wrap { overflow-x: auto; position: relative; margin-top: 18px; }
+.ctable { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 620px; }
+.ctable th { font: 600 11px/1.2 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1.5px solid var(--ink); }
+.ctable td { padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.ctable td:nth-child(2) { font: 500 13.5px var(--font-data); white-space: nowrap; }
+.how { max-width: 46em; color: var(--muted); font-size: 15px; margin-top: 22px; }
+.skel { color: var(--before); }
+
+@media (max-width: 960px) {
+  .beat { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}
+@media (max-width: 600px) {
+  .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .box.w2 { grid-column: 1 / -1; }
+  .status { flex-direction: column; align-items: flex-start; }
+  .nav-links { gap: 10px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <a class="brand" href="../" aria-label="HarvestBot home"><img src="../assets/icon.svg" alt="" width="30" height="30">HarvestBot</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a class="hide-sm" href="../#loop">The loop</a>
+    <a class="hide-sm" href="../#numbers">The numbers</a>
+    <a href="../deck/">Deck</a>
+    <a class="btn sm" href="https://github.com/edycutjong/harvestbot">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+<section class="head" aria-labelledby="h1">
+  <div class="label">Receipt check · Robinhood Chain testnet · chain 46630</div>
+  <h1 id="h1">Don't trust the page. <em>Your browser just asked the chain.</em></h1>
+  <p>This page sends one batch of JSON-RPC calls from your browser to <code>rpc.testnet.chain.robinhood.com</code>: the four demo receipts, and seven read-only calls to the deployed contracts. No wallet, no server of ours. Every box says where its value came from.</p>
+</section>
+
+<div class="status" id="status" data-state="idle" role="status" aria-live="polite">
+  <span class="live" id="st-live" data-state="idle"><i></i><span id="st-text">Reading chain 46630…</span></span>
+  <span class="meta" id="st-meta">rpc.testnet.chain.robinhood.com</span>
+  <button class="btn sm" type="button" id="recheck">Re-check now</button>
+</div>
+
+<div class="boxes">
+  <!-- BEAT 1 -->
+  <article class="beat b1" aria-labelledby="b1h">
+    <div>
+      <div class="label">Beat 1 · harvest</div>
+      <h2 id="b1h">Nine lots <em>banked</em>.</h2>
+      <p class="say">Agent-signed, router-gated. The mandate recomputed the HIFO picks on the Stylus ledger and realized the loss at the MOCK oracle mark. The ledger emitted <code>LotsRealized</code>; this page decodes it.</p>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123">0x689c4d34…6123 on the explorer ↗</a>
+    </div>
+    <div class="grid">
+      <div class="box ok"><div class="k"><i>1</i>Status</div><div class="v" data-f="b1.status"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>2</i>Block</div><div class="v" data-f="b1.block"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>3</i>Gas used</div><div class="v" data-f="b1.gas"><span class="skel">…</span></div></div>
+      <div class="box w2"><div class="k"><i>4</i>Lots realized · HIFO order</div><div class="v" data-f="b1.lots"><span class="skel">…</span></div></div>
+      <div class="box ok"><div class="k"><i>5</i>Realized gain/(loss)</div><div class="v" data-f="b1.loss"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>6</i>Sold</div><div class="v" data-f="b1.qty"><span class="skel">…</span></div></div>
+      <div class="box w2"><div class="k"><i>7</i>Signed by → sent to</div><div class="v" data-f="b1.from"><span class="skel">…</span></div></div>
+    </div>
+  </article>
+
+  <!-- BEAT 2 -->
+  <article class="beat b2" aria-labelledby="b2h">
+    <div>
+      <div class="label">Beat 2 · blocked rebuy</div>
+      <h2 id="b2h">The rebuy, <em>refused</em>.</h2>
+      <p class="say">Forty seconds after beat 1, the same agent tried NFLX → AMZN. The transaction reverted. The RPC is not an archive node, so this page cannot replay that old call; instead it asks the guard the same question <em>now</em>.</p>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10">0xd486468e…cf10 on the explorer ↗</a>
+    </div>
+    <div class="grid">
+      <div class="box no"><div class="k"><i>1</i>Status</div><div class="v" data-f="b2.status"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>2</i>Block</div><div class="v" data-f="b2.block"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>3</i>Signed by</div><div class="v" data-f="b2.from"><span class="skel">…</span></div></div>
+      <div class="box w3 no stamped"><div class="k"><i>4</i>Asked now: <code>WashSaleGuard.assertBuyAllowed(owner, AMZN)</code></div><div class="v" data-f="b2.now"><span class="skel">…</span></div><span class="stamp" id="b2-stamp">Walled · until 15 Oct 2026</span></div>
+      <div class="box w2"><div class="k"><i>5</i>Window ends · <code>windowEndsAt(owner, AMZN)</code></div><div class="v" data-f="b2.end"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>6</i>Scope</div><div class="v" style="font-family:var(--font-body);font-size:14px">The 30 days <em>after</em> a harvest. The look-back before a sale is not enforced yet.</div></div>
+    </div>
+  </article>
+
+  <!-- BEAT 3 -->
+  <article class="beat b3" aria-labelledby="b3h">
+    <div>
+      <div class="label">Beat 3 · slashed</div>
+      <h2 id="b3h">The rogue trade, <em>slashed</em>.</h2>
+      <p class="say">The agent signed AMZN → PLTR, which the substitute map never sanctioned. It reverted <code>OffMapSubstitute</code>; then <code>challenge()</code> used the signed envelope as proof. In this run the challenger was the owner's own key; <code>challenge</code> is permissionless.</p>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6">attempt 0x7dca0680…0bf6 ↗</a><br>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493">challenge 0xcceb12a7…6493 ↗</a>
+    </div>
+    <div class="grid">
+      <div class="box no"><div class="k"><i>1</i>Attempt status</div><div class="v" data-f="b3.astatus"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>2</i>Asked now: <code>isSubstitute(AMZN, PLTR)</code></div><div class="v" data-f="b3.map"><span class="skel">…</span></div></div>
+      <div class="box ok"><div class="k"><i>3</i>Challenge status</div><div class="v" data-f="b3.cstatus"><span class="skel">…</span></div></div>
+      <div class="box w2 cut"><div class="k"><i>4</i><code>Slashed</code> event · at that block</div><div class="v" data-f="b3.slash"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>5</i>Bounty · restitution</div><div class="v" data-f="b3.split"><span class="skel">…</span></div></div>
+      <div class="box w3"><div class="k"><i>6</i>Current bond, read now · <code>bondOf(agent)</code></div><div class="v" data-f="b3.now"><span class="skel">…</span></div></div>
+    </div>
+  </article>
+
+  <!-- STYLUS -->
+  <article class="beat" aria-labelledby="sth">
+    <div>
+      <div class="label">The engine</div>
+      <h2 id="sth">The ledger is <em>WASM</em>, and it answers.</h2>
+      <p class="say">Two reads of the Stylus <code>TaxLotLedger</code> at <code>0xEff7…5a21</code>: its code, and the same <code>computeHarvest</code> call the README runs with <code>cast</code>.</p>
+      <a class="txlink" href="https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21">0xEff7…5a21 on the explorer ↗</a>
+    </div>
+    <div class="grid">
+      <div class="box w2"><div class="k"><i>1</i>Code prefix · <code>eth_getCode</code></div><div class="v" data-f="st.code"><span class="skel">…</span></div></div>
+      <div class="box"><div class="k"><i>2</i>Open AMZN lots</div><div class="v" data-f="st.open"><span class="skel">…</span></div></div>
+      <div class="box w3 ok"><div class="k"><i>3</i>Asked now: next HIFO harvest of 0.638501 AMZN at $412.30</div><div class="v" data-f="st.next"><span class="skel">…</span></div></div>
+    </div>
+  </article>
+</div>
+
+<section class="contracts" aria-labelledby="ch">
+  <div class="label">Deployed on chain 46630 · deployments/46630.json</div>
+  <h2 class="sec-h" id="ch" style="font-size:clamp(30px,3.4vw,44px)">Every contract, one click from its source of truth.</h2>
+  <div class="tbl-wrap">
+    <table class="ctable">
+      <thead><tr><th scope="col">Contract</th><th scope="col">Address</th><th scope="col">Kind</th></tr></thead>
+      <tbody id="ctable"></tbody>
+    </table>
+  </div>
+  <p class="how">How this page works: <code>assets/chain.js</code>, about 150 lines of plain JavaScript. One <code>fetch</code> POST of a JSON-RPC batch; events and return values decoded by hand with <code>BigInt</code>. If the RPC cannot be reached, every box falls back to the committed <code>receipts/46630.json</code> and is labeled <span class="src rec">receipt</span> instead of <span class="src live">live</span>.</p>
+</section>
+</main>
+
+<footer class="foot">
+  <span>HarvestBot · MIT © 2026 Edy Cu · testnet only</span>
+  <nav aria-label="Footer"><a href="../">Home</a><a href="../deck/">Deck</a><a href="https://github.com/edycutjong/harvestbot">GitHub</a><a href="https://explorer.testnet.chain.robinhood.com">Explorer ↗</a></nav>
+</footer>
+
+<script src="../assets/chain.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var A = HB.A, fmt = function (n) { return Number(n).toLocaleString("en-US"); };
+  function set(f, html) { var el = document.querySelector('[data-f="' + f + '"]'); if (el) el.innerHTML = html; }
+  function tag(live) { return live ? ' <span class="src live">live</span>' : ' <span class="src rec">receipt</span>'; }
+  var NOW = ' <span class="src now">now</span>';
+  function who(a) {
+    a = String(a || "").toLowerCase();
+    if (a === A.agent.toLowerCase()) return "agent " + HB.short(A.agent, 6, 4);
+    if (a === A.owner.toLowerCase()) return "owner " + HB.short(A.owner, 6, 4);
+    if (a === A.router.toLowerCase()) return "ExecutionRouter " + HB.short(A.router, 6, 4);
+    if (a === A.bond.toLowerCase()) return "AgentBond " + HB.short(A.bond, 6, 4);
+    return HB.short(a, 6, 4);
+  }
+  function status(s, live) { return (s === 1 ? "<b>success</b> · status 1" : "<b>reverted</b> · status 0") + tag(live); }
+  function date(ts) { return new Date(ts * 1000).toUTCString().replace(" GMT", " UTC"); }
+
+  var rows = [
+    ["TaxLotLedger", A.ledger, "Stylus (Rust → WASM)"], ["HarvestMandate", A.mandate, "Solidity"], ["ExecutionRouter", A.router, "Solidity"],
+    ["WashSaleGuard", A.guard, "Solidity"], ["SubstituteMap", A.subMap, "Solidity"], ["AgentBond", A.bond, "Solidity"],
+    ["MockOracle", A.oracle, '<span class="chip mock">mock</span>'], ["MockSwap", A.swap, '<span class="chip mock">mock</span>'], ["MockUSDC", A.usdc, '<span class="chip mock">mock</span>'],
+    ["AMZN Stock Token", A.AMZN, '<span class="chip real">real faucet token</span>'], ["NFLX Stock Token", A.NFLX, '<span class="chip real">real faucet token</span>'], ["PLTR Stock Token", A.PLTR, '<span class="chip real">real faucet token</span>']
+  ];
+  $("#ctable").innerHTML = rows.map(function (r) {
+    return "<tr><td>" + r[0] + '</td><td><a href="' + HB.addrUrl(r[1]) + '">' + r[1] + "</a></td><td>" + r[2] + "</td></tr>";
+  }).join("");
+
+  function render(o) {
+    var L = o.live, st = $("#status"), sl = $("#st-live");
+    st.dataset.state = L ? "live" : "fallback"; sl.dataset.state = L ? "live" : "fallback";
+    if (L) {
+      $("#st-text").innerHTML = "Live · re-verified at block <b>" + fmt(o.head) + "</b>";
+      $("#st-meta").textContent = "chainId " + o.chainId + " · " + o.at.toLocaleTimeString() + " · 1 batch, 14 calls";
+    } else {
+      $("#st-text").innerHTML = "RPC unreachable — showing the <b>committed receipts</b> (receipts/46630.json), not live data";
+      $("#st-meta").textContent = o.error;
+    }
+    var b1 = o.beat1 || {}, b2 = o.beat2 || {}, a3 = o.beat3a || {}, s3 = o.beat3s || {};
+    set("b1.status", status(b1.status, L));
+    set("b1.block", fmt(b1.block) + (L ? "<small>" + fmt(o.head - b1.block) + " blocks ago</small>" : ""));
+    set("b1.gas", fmt(b1.gas));
+    if (b1.lotIds) set("b1.lots", '<div class="lots">' + b1.lotIds.map(function (x, i) { return '<span style="--i:' + i + '">' + x + "</span>"; }).join("") + "</div>" + (L ? "<small>decoded from the ledger's LotsRealized log" + tag(true) + "</small>" : "<small>from receipts/46630.json" + tag(false) + "</small>"));
+    if (b1.realizedLoss) set("b1.loss", "<b>(" + HB.units(b1.realizedLoss, 6, 6).replace("-", "") + ")</b> USD<small>faucet scale; the 10-share seed scenario is ($3,140.00) in forge test</small>");
+    if (b1.sellQty) set("b1.qty", HB.units(b1.sellQty, 18, 6) + " AMZN<small>→ NFLX via MOCK venue</small>");
+    set("b1.from", L ? who(b1.from) + " → " + who(b1.to) : "agent 0xF783…457E → ExecutionRouter 0x2a12…19aE" + tag(false));
+
+    set("b2.status", status(b2.status, L));
+    set("b2.block", fmt(b2.block) + (L && b1.block ? "<small>" + fmt(b2.block - b1.block) + " blocks after beat 1</small>" : ""));
+    set("b2.from", L ? who(b2.from) + "<small>the same agent key as beat 1</small>" : "agent 0xF783…457E" + tag(false));
+    if (o.rebuyNow && o.rebuyNow.reverts) {
+      set("b2.now", "<b>reverts</b> <code>WashSaleViolation(owner, AMZN, AMZN, " + o.rebuyNow.windowEnd + ")</code>" + NOW + "<small>the same custom error beat 2 hit, decoded from the RPC's revert data</small>");
+    } else if (o.rebuyNow && !o.rebuyNow.reverts) {
+      set("b2.now", "does not revert" + NOW + "<small>the 30-day window has closed; the rebuy path is open again, as test_beat2_after_thirty_days_the_rebuy_path_is_open_again expects</small>");
+      $("#b2-stamp").textContent = "Window closed · 15 Oct 2026";
+    } else {
+      set("b2.now", "not available offline<small>beat 2 reverted WashSaleViolation(owner, AMZN, AMZN, 1792060681) per DEMO.md</small>" + tag(false));
+    }
+    if (o.windowEnd) {
+      var left = Math.ceil((o.windowEnd * 1000 - Date.now()) / 86400000);
+      set("b2.end", o.windowEnd + " · " + date(o.windowEnd) + (L ? NOW : tag(false)) + "<small>" + (left > 0 ? left + " days left on the wall" : "window has ended") + "</small>");
+    }
+
+    set("b3.astatus", status(a3.status, L) + "<small>OffMapSubstitute</small>");
+    set("b3.map", o.pltrOnMap == null ? "false<small>per the deployed map</small>" + tag(false) : (o.pltrOnMap ? "true" : "<b style=\"color:var(--slash)\">false</b>") + NOW + (o.nflxOnMap ? "<small>isSubstitute(AMZN, NFLX) = true</small>" : ""));
+    set("b3.cstatus", status(s3.status, L) + "<small>block " + fmt(s3.block) + "</small>");
+    if (s3.S) set("b3.slash", "bond <s style=\"color:var(--slash)\">1,000.00</s> → <b>" + HB.units(1000000000n - BigInt(s3.S), 6, 2) + "</b> mUSDC · slashed <b>" + HB.units(s3.S, 6, 2) + "</b>" + (L ? tag(true) : tag(false)) + "<small>S from the Slashed event of tx 0xcceb…6493; the bond before it was 1,000.00 (DEMO.md)</small>");
+    if (s3.bounty) set("b3.split", HB.units(s3.bounty, 6, 2) + " · " + HB.units(s3.restitution, 6, 2) + "<small>mUSDC <span class=\"chip mock\">mock</span></small>");
+    if (L && o.bondNow != null) set("b3.now", HB.units(o.bondNow, 6, 2) + " mUSDC" + NOW + "<small>A live balance, not a claim: it can differ from the post-slash figure above. The deployed AgentBond predates a 2026-09-27 hardening that lives in source (JUDGE.md, Honest limitations).</small>");
+    else set("b3.now", "not read (offline)" + tag(false));
+
+    if (L) {
+      set("st.code", "<b>" + o.ledgerCodePrefix + "…</b>" + NOW + "<small>0xEFF0… is the Stylus program prefix; EVM bytecode may never start with 0xEF (EIP-3541)</small>");
+      set("st.open", (o.openLots != null ? o.openLots : "—") + NOW);
+      if (o.nextHarvest) set("st.next", "lots <b>[" + o.nextHarvest.lotIds.join(", ") + "]</b> · (" + HB.units(o.nextHarvest.realizedLoss, 6, 6).replace("-", "") + ") USD" + NOW + "<small>beat 1 already sold 63–56 and part of 55, so the ledger answers with the next nine</small>");
+    } else {
+      set("st.code", "not read (offline)" + tag(false)); set("st.open", "—"); set("st.next", "not read (offline)" + tag(false));
+    }
+  }
+
+  var btn = $("#recheck");
+  function go() {
+    btn.disabled = true; btn.textContent = "Checking…";
+    HB.read().then(function (o) { render(o); btn.disabled = false; btn.textContent = "Re-check now"; });
+  }
+  btn.addEventListener("click", go);
+  go();
+})();
+</script>
+</body>
+</html>

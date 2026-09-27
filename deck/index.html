@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarvestBot — pitch deck</title>
+<meta name="description" content="HarvestBot pitch deck: a tax-loss-harvesting agent on Robinhood Chain, bounded by an onchain mandate. 12 slides.">
+<meta name="author" content="Edy Cu">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HarvestBot">
+<meta property="og:url" content="https://harvestbot.vercel.app/deck/">
+<meta property="og:title" content="HarvestBot — pitch deck">
+<meta property="og:description" content="The ledger that books your losses and refuses the rebuy. 12 slides, every number on chain 46630.">
+<meta property="og:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HarvestBot: nine high-basis lots struck through in green ink; an amber stamp walls the rebuy until 15 Oct 2026.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://harvestbot.vercel.app/assets/og-image.png?v=1">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcm9sZT0iaW1nIgogICAgIGFyaWEtbGFiZWw9IkhhcnZlc3RCb3Q6IGEgbGVkZ2VyIHBhZ2Ugd2hvc2UgaGlnaGVzdC1iYXNpcyBsb3RzIGFyZSBzdHJ1Y2sgdGhyb3VnaCBpbiBncmVlbiBpbmssIHdpdGggYW4gYW1iZXIgaG9sZCBzdGFtcCB3YWxsaW5nIHRoZSByZWJ1eSI+CiAgPCEtLSBUaGUgbWFyayAoMjAyNi0wOS0yNyk6IGEgY29sdW1uYXItcGFkIHBhZ2UuIExvdCBsaW5lcyBpbiBncmFwaGl0ZTsgdGhlIHR3byB0b3AKICAgICAgIGxpbmVzIChoaWdoZXN0IGJhc2lzLCBISUZPKSBzdHJ1Y2sgdGhyb3VnaCB3aXRoIG9uZSBncmVlbi1pbmsgcnVsZSA9IGJhbmtlZDsgYW4gYW1iZXIgcnViYmVyCiAgICAgICBzdGFtcCBzZXQgYXQgLTYgZGVncmVlcyBhY3Jvc3MgdGhlIGxvd2VyIGxpbmUgPSB3YWxsZWQuIEF0IDE2cHggaXQgaXMgdGhyZWUgc2hhcGVzOiB0aGUgcGFwZXIKICAgICAgIHBsYXRlLCB0aGUgZ3JlZW4gc3RyaWtlLCB0aGUgYW1iZXIgc3RhbXAuIFRoZSBpbmsgYm9yZGVyIGhvbGRzIHRoZSBwbGF0ZSBvbiBHaXRIdWIgbGlnaHQgQU5EIGRhcmsuIC0tPgogIDxyZWN0IHg9IjI4IiB5PSIyOCIgd2lkdGg9IjQ1NiIgaGVpZ2h0PSI0NTYiIHJ4PSI5MiIgZmlsbD0iI0YxRjNFNiIgc3Ryb2tlPSIjMUMyNjIwIiBzdHJva2Utd2lkdGg9IjE0Ii8+CiAgPCEtLSB0aGUgcGFkJ3MgcmVkIGRvdWJsZSBtYXJnaW4gcnVsZSAoc3RydWN0dXJlLCBub3Qgc3RhdGUpIC0tPgogIDxsaW5lIHgxPSIxMTgiIHkxPSI0MiIgeDI9IjExOCIgeTI9IjQ3MCIgc3Ryb2tlPSIjQzk1NjRCIiBzdHJva2Utd2lkdGg9IjYiLz4KICA8bGluZSB4MT0iMTMyIiB5MT0iNDIiIHgyPSIxMzIiIHkyPSI0NzAiIHN0cm9rZT0iI0M5NTY0QiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPCEtLSB0aGUgcGFkJ3MgZ3JlZW4gcm93IHJ1bGluZyAtLT4KICA8bGluZSB4MT0iNDIiIHkxPSIxODgiIHgyPSI0NzAiIHkyPSIxODgiIHN0cm9rZT0iI0I4QzlCMyIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPGxpbmUgeDE9IjQyIiB5MT0iMjY4IiB4Mj0iNDcwIiB5Mj0iMjY4IiBzdHJva2U9IiNCOEM5QjMiIHN0cm9rZS13aWR0aD0iNiIvPgogIDxsaW5lIHgxPSI0MiIgeTE9IjM0OCIgeDI9IjQ3MCIgeTI9IjM0OCIgc3Ryb2tlPSIjQjhDOUIzIiBzdHJva2Utd2lkdGg9IjYiLz4KICA8IS0tIGxvdCBlbnRyaWVzIGluIGdyYXBoaXRlIChvcGVuLCB1bmJvb2tlZCkgLS0+CiAgPHJlY3QgeD0iMTY4IiB5PSIxMjAiIHdpZHRoPSIyMjYiIGhlaWdodD0iNDYiIHJ4PSI4IiBmaWxsPSIjNkI2RjY4Ii8+CiAgPHJlY3QgeD0iMTY4IiB5PSIyMDAiIHdpZHRoPSIxODYiIGhlaWdodD0iNDYiIHJ4PSI4IiBmaWxsPSIjNkI2RjY4Ii8+CiAgPHJlY3QgeD0iMTY4IiB5PSIyODQiIHdpZHRoPSIyMDYiIGhlaWdodD0iMzgiIHJ4PSI4IiBmaWxsPSIjNkI2RjY4IiBvcGFjaXR5PSIwLjciLz4KICA8IS0tIHRoZSBsZWRnZXIgc3RyaWtlOiBvbmUgZ3JlZW4taW5rIHJ1bGUgdGhyb3VnaCB0aGUgdHdvIGhpZ2hlc3QtYmFzaXMgbGluZXMgPSBiYW5rZWQgLS0+CiAgPGxpbmUgeDE9IjE0NiIgeTE9IjE0MyIgeDI9IjQ0MCIgeTI9IjE0MyIgc3Ryb2tlPSIjMUU3QTQ2IiBzdHJva2Utd2lkdGg9IjE4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8bGluZSB4MT0iMTQ2IiB5MT0iMjIzIiB4Mj0iNDAwIiB5Mj0iMjIzIiBzdHJva2U9IiMxRTdBNDYiIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gdGhlIGFtYmVyIGhvbGQgc3RhbXAsIC02IGRlZ3JlZXMsIGFjcm9zcyB0aGUgcmVidXkgbGluZSA9IHdhbGxlZCAtLT4KICA8ZyB0cmFuc2Zvcm09InJvdGF0ZSgtNiAzMDAgMzgwKSI+CiAgICA8cmVjdCB4PSIxNzAiIHk9IjMzMCIgd2lkdGg9IjI2MiIgaGVpZ2h0PSIxMDQiIHJ4PSIxMiIgZmlsbD0iI0YzRDM4QiIgc3Ryb2tlPSIjQjg2RTAwIiBzdHJva2Utd2lkdGg9IjE2Ii8+CiAgICA8cmVjdCB4PSIyMDIiIHk9IjM2NCIgd2lkdGg9IjE5OCIgaGVpZ2h0PSIxNCIgcng9IjQiIGZpbGw9IiMxQzI2MjAiLz4KICAgIDxyZWN0IHg9IjIwMiIgeT0iMzkyIiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyIiByeD0iNCIgZmlsbD0iIzFDMjYyMCIgb3BhY2l0eT0iMC43NSIvPgogIDwvZz4KPC9zdmc+Cg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+/* Speaker notes live here, outside the slides, so the ≤40-words-per-slide gate measures only what is on screen. Press N. */
+window.NOTES = [
+  "Title. One sentence: an agent harvests tax losses on Robinhood tokenized stocks, and the chain bounds it. The terminal card is a real run from 27 Sep 2026: 81 Foundry tests, and the deployed Stylus ledger answering live.",
+  "Maya. The emotional hook from the spec. 64 lots, 30-day wash-sale rule; direct-indexing services sell exactly this for 0.25 percent a year. The 3,140 is the deterministic seed scenario, proven by forge test, not an on-chain amount.",
+  "What is missing on chain. Robinhood put the asset on chain; nobody put the accounting there. Three gaps, and each maps to a contract in the next slides.",
+  "The whole product is one loop. Agent signs, contracts recompute, execute or revert. Three real transactions on chain 46630, one agent key, different from the owner key.",
+  "Frozen slide. These are the real lot ids from the LotsRealized log of beat 1. Faucet scale: 0.078125 AMZN per lot, so the loss is 24.53 dollars. Same code, 10-share lots, gives exactly 3,140.",
+  "Beat 2. Forty seconds after the harvest, the same agent tries to buy AMZN back. The WashSaleGuard reverts with the window end: 15 October 2026. Scope: the 30 days after a sale; the look-back is not enforced yet.",
+  "Beat 3. The agent signs a rotation into PLTR, which the substitute map never sanctioned. It reverts, and the signature itself is the evidence: challenge slashes 20 percent. Here the challenger was the owner's own key; it is permissionless and tested from a third party.",
+  "Why Stylus. HIFO over 64 lots is a compute loop, and WASM is cheaper per instruction. Measured with NodeInterface on chain 46630. Uncached program, so worst case. We guessed 8x in the spec; the chain says 2.87, and we report the chain.",
+  "Contract quality is criterion one. 81 Foundry tests, 6 Stylus native, 3 fuzz properties, Slither with zero high and zero medium; the rest triaged in docs/SLITHER.md.",
+  "Why only here. The assets are Robinhood's faucet Stock Tokens; the ledger is a Stylus program on Robinhood Chain; the reserved Robinhood slot is what we target.",
+  "Honest limits, verbatim from JUDGE.md. Judges read disclosed limits as competence.",
+  "Close. Scan the code: the verify page reads all of this from the RPC in your browser, no wallet."
+];
+</script>
+<style>
+:root {
+  --bg:      #F1F3E6;
+  --paper-2: #E6EBD6;
+  --ink:     #1C2620;
+  --muted:   #5E6A60;
+  --rule:    #B8C9B3;
+  --margin:  #C9564B;
+  --link:    #1F4E9C;
+  --before:  #6B6F68;
+  --after:   #1E7A46;
+  --wall:    #B86E00;
+  --wall-fill: #F3D38B;
+  --slash:   #B3261E;
+  --mock:    #6A4FB0;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); }
+::selection { background: var(--wall-fill); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+.viewport { position: fixed; inset: 0; display: grid; place-items: center; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.slide { position: absolute; inset: 0; background: var(--bg); color: var(--ink); font: 400 38px/1.45 var(--font-body);
+  padding: 90px 150px 120px 200px; display: flex; flex-direction: column; justify-content: center; opacity: 0; visibility: hidden; transition: opacity .45s cubic-bezier(.16,1,.3,1), visibility 0s .45s;
+  background-image:
+    linear-gradient(to right, transparent 92px, var(--margin) 92px, var(--margin) 95px, transparent 95px, transparent 102px, var(--margin) 102px, var(--margin) 105px, transparent 105px),
+    repeating-linear-gradient(to bottom, transparent 0 53px, color-mix(in srgb, var(--rule) 60%, transparent) 53px 54px);
+  font-variant-numeric: tabular-nums; overflow: hidden; }
+.slide.on { opacity: 1; visibility: visible; transition: opacity .45s cubic-bezier(.16,1,.3,1); }
+.lab { font: 600 24px/1.3 var(--font-body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+h1, h2 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+h1 { font-size: 142px; line-height: .98; }
+h2 { font-size: 118px; line-height: 1.02; margin-top: 26px; }
+h1 em, h2 em { font-style: italic; font-weight: 500; }
+.hl { background: linear-gradient(transparent 62%, var(--wall-fill) 62%, var(--wall-fill) 92%, transparent 92%); padding: 0 .06em; }
+.g { color: var(--after); } .w { color: var(--wall); } .r { color: var(--slash); }
+code, .mono { font-family: var(--font-data); font-size: .85em; }
+.foot { position: absolute; left: 200px; right: 150px; bottom: 44px; display: flex; justify-content: space-between; font: 500 18px/1 var(--font-data); color: var(--muted); }
+.chip { display: inline-block; font: 600 16px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; padding: 6px 9px 5px; border: 2px solid currentColor; border-radius: 3px; vertical-align: .2em; }
+.chip.mock { color: var(--mock); }
+.stamp { display: inline-block; transform: rotate(-6deg); border: 6px solid var(--wall); outline: 2px solid var(--wall); outline-offset: 6px; background: var(--wall-fill);
+  color: var(--ink); padding: 22px 38px 18px; font: 700 34px/1.2 var(--font-body); letter-spacing: .14em; text-transform: uppercase; text-align: center; }
+.stamp b { display: block; font-size: 60px; letter-spacing: .08em; }
+.slide.on .stamp.land { animation: land .55s cubic-bezier(.2,1.4,.4,1) .9s both; }
+@keyframes land { from { transform: rotate(-6deg) scale(1.9); opacity: 0; } to { transform: rotate(-6deg) scale(1); opacity: 1; } }
+
+/* cover */
+.cover { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); gap: 70px; align-items: center; }
+.brandline { display: flex; align-items: center; gap: 22px; font: 500 44px/1 var(--font-display); margin-bottom: 44px; }
+.brandline svg { width: 84px; height: 84px; }
+.term { background: var(--ink); color: var(--bg); border-radius: 10px; padding: 0 0 28px; font: 400 25px/1.7 var(--font-data); min-width: 0; overflow: hidden; box-shadow: 0 40px 80px -40px rgba(28,38,32,.9); }
+.term .tbar { display: flex; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid color-mix(in srgb, var(--bg) 14%, transparent); font-size: 17px; color: color-mix(in srgb, var(--bg) 65%, var(--ink)); }
+.term pre { margin: 0; padding: 20px 26px 0; white-space: pre-wrap; font: inherit; }
+.term .c { color: var(--wall-fill); } .term .ok { color: var(--rule); font-weight: 600; } .term .dim { color: color-mix(in srgb, var(--bg) 60%, var(--ink)); }
+
+/* gaps / loop */
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; margin-top: 70px; }
+.cols > div { border-top: 3px solid var(--ink); padding-top: 26px; }
+.cols h3 { font: italic 400 66px/1.1 var(--font-display); margin: 0 0 14px; }
+.cols p { margin: 0; }
+.cols .tx { margin-top: 18px; font: 500 28px var(--font-data); color: var(--link); }
+.cols .n { font: 600 20px/1 var(--font-body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+/* frozen ledger slide */
+.frozen { display: grid; grid-template-columns: minmax(0,.75fr) minmax(0,1.25fr); gap: 80px; align-items: center; }
+.sheet { position: relative; background: var(--bg); border: 2px solid var(--rule); padding: 24px 34px 40px 60px; transform: rotate(.6deg);
+  box-shadow: 0 40px 80px -46px rgba(28,38,32,.7);
+  background-image: linear-gradient(to right, transparent 28px, var(--margin) 28px, var(--margin) 30px, transparent 30px, transparent 35px, var(--margin) 35px, var(--margin) 37px, transparent 37px); }
+table.ledger { width: 100%; border-collapse: collapse; font: 400 31px/1 var(--font-data); }
+.ledger th { font: 600 16px/1.2 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: right; padding: 10px 12px; border-bottom: 2.5px solid var(--ink); }
+.ledger td { height: 62px; padding: 0 12px; text-align: right; border-bottom: 1.5px solid var(--rule); color: var(--before); }
+.ledger th:first-child, .ledger td:first-child { text-align: left; }
+.ledger tr.hit td { color: var(--ink); position: relative; }
+.ledger tr.hit td::after { content: ""; position: absolute; left: -4px; right: -4px; top: 50%; height: 3px; margin-top: -1.5px; background: var(--after); transform: scaleX(0); transform-origin: left; }
+.slide.on .ledger tr.hit td::after { animation: strike .4s cubic-bezier(.16,1,.3,1) forwards; animation-delay: var(--d); }
+@keyframes strike { to { transform: scaleX(1); } }
+@media print { .ledger tr.hit td::after { transform: scaleX(1); } }
+.ledger tr.total td { height: 86px; font: italic 500 54px/1 var(--font-display); color: var(--after); border-bottom: 6px double var(--ink); }
+.ledger tr.total td:first-child { font: 600 16px/1 var(--font-body); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); vertical-align: bottom; padding-bottom: 14px; }
+.sheet .stamp { position: absolute; right: -30px; bottom: -44px; }
+
+/* big number */
+.bignum { font: italic 400 250px/.85 var(--font-display); letter-spacing: -.045em; color: var(--after); margin: 70px 0 0 -8px; }
+.lg { display: flex; gap: 32px; font: 500 24px var(--font-body); color: var(--muted); margin-top: 20px; } .lg i { display: inline-block; width: 30px; height: 16px; margin-right: 10px; } .lg .s1 { background: repeating-linear-gradient(135deg, var(--before) 0 3px, color-mix(in srgb, var(--before) 70%, var(--bg)) 3px 7px); } .lg .s2 { background: var(--after); }
+.bars { display: grid; gap: 26px; }
+.bar-row { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: center; }
+.bar-row .k { font: 600 40px/1 var(--font-data); } .bar-row .k small { display: block; font: 500 20px var(--font-data); color: var(--muted); margin-top: 6px; }
+.bar-row.key { background: color-mix(in srgb, var(--wall-fill) 35%, transparent); margin: -12px -16px; padding: 12px 16px; }
+.bar-row.key .k { color: var(--after); }
+.bar { height: 36px; display: flex; align-items: center; margin: 5px 0; }
+.bar span { padding-left: calc(100% + 12px); white-space: nowrap; font: 500 25px var(--font-data); }
+.bar.sol { background: repeating-linear-gradient(135deg, var(--before) 0 3px, color-mix(in srgb, var(--before) 70%, var(--bg)) 3px 7px); }
+.bar.sty { background: var(--after); }
+
+/* receipts grid */
+.rec { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 80px; border-top: 3px solid var(--ink); border-bottom: 6px double var(--ink); }
+.rec > div { padding: 36px 28px; border-right: 1.5px solid var(--rule); }
+.rec > div:last-child { border: 0; }
+.rec .n { font: italic 400 150px/1 var(--font-display); letter-spacing: -.03em; }
+.rec .l { margin-top: 14px; font-size: 32px; line-height: 1.35; }
+
+.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px 64px; margin-top: 60px; }
+.quotes blockquote { margin: 0; padding-top: 26px; border-top: 6px double var(--ink); font: italic 400 54px/1.25 var(--font-display); }
+
+.close { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap: 80px; align-items: center; }
+.qr-wrap { background: var(--bg); border: 3px solid var(--ink); padding: 34px; width: 470px; justify-self: end; }
+.qr { width: 100%; height: auto; display: block; }
+.qr-cap { font: 500 28px/1.4 var(--font-data); margin-top: 18px; text-align: center; }
+.url { font: 500 48px/1.4 var(--font-data); color: var(--link); }
+
+/* chrome */
+.hud { position: fixed; right: 16px; bottom: 12px; font: 500 13px/1 var(--font-data); color: var(--rule); opacity: .8; z-index: 5; }
+.notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow: auto; background: var(--ink); color: var(--bg); font: 400 17px/1.5 var(--font-body);
+  padding: 16px 22px; border-top: 3px solid var(--wall); transform: translateY(100%); transition: transform .3s cubic-bezier(.16,1,.3,1); z-index: 6; }
+body.show-notes .notes { transform: none; }
+.navbtn { position: fixed; top: 50%; z-index: 5; width: 44px; height: 64px; margin-top: -32px; border: 0; background: color-mix(in srgb, var(--ink) 55%, transparent); color: var(--bg);
+  font: 400 28px/1 var(--font-body); cursor: pointer; opacity: .35; transition: opacity .2s, background .2s; }
+.navbtn:hover, .navbtn:focus-visible { opacity: 1; background: var(--ink); }
+.navbtn.prev { left: 0; } .navbtn.next { right: 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; } }
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { height: auto; overflow: visible; background: none; }
+  .viewport, .stage { position: static; transform: none !important; width: 1920px; height: auto; }
+  .slide { position: relative; opacity: 1; visibility: visible; width: 1920px; height: 1080px; page-break-after: always; break-after: page; }
+  .hud, .notes, .navbtn { display: none; }
+  .stamp.land { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage" id="stage">
+
+<section class="slide" aria-label="Slide 1: title">
+  <div class="cover">
+    <div>
+      <div class="brandline"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"
+     aria-label="HarvestBot: a ledger page whose highest-basis lots are struck through in green ink, with an amber hold stamp walling the rebuy">
+  
+  <rect x="28" y="28" width="456" height="456" rx="92" fill="#F1F3E6" stroke="#1C2620" stroke-width="14"/>
+  
+  <line x1="118" y1="42" x2="118" y2="470" stroke="#C9564B" stroke-width="6"/>
+  <line x1="132" y1="42" x2="132" y2="470" stroke="#C9564B" stroke-width="6"/>
+  
+  <line x1="42" y1="188" x2="470" y2="188" stroke="#B8C9B3" stroke-width="6"/>
+  <line x1="42" y1="268" x2="470" y2="268" stroke="#B8C9B3" stroke-width="6"/>
+  <line x1="42" y1="348" x2="470" y2="348" stroke="#B8C9B3" stroke-width="6"/>
+  
+  <rect x="168" y="120" width="226" height="46" rx="8" fill="#6B6F68"/>
+  <rect x="168" y="200" width="186" height="46" rx="8" fill="#6B6F68"/>
+  <rect x="168" y="284" width="206" height="38" rx="8" fill="#6B6F68" opacity="0.7"/>
+  
+  <line x1="146" y1="143" x2="440" y2="143" stroke="#1E7A46" stroke-width="18" stroke-linecap="round"/>
+  <line x1="146" y1="223" x2="400" y2="223" stroke="#1E7A46" stroke-width="18" stroke-linecap="round"/>
+  
+  <g transform="rotate(-6 300 380)">
+    <rect x="170" y="330" width="262" height="104" rx="12" fill="#F3D38B" stroke="#B86E00" stroke-width="16"/>
+    <rect x="202" y="364" width="198" height="14" rx="4" fill="#1C2620"/>
+    <rect x="202" y="392" width="128" height="12" rx="4" fill="#1C2620" opacity="0.75"/>
+  </g>
+</svg>
+HarvestBot</div>
+      <h1>The ledger that books your losses — and <em class="hl">refuses the rebuy.</em></h1>
+    </div>
+    <div class="term" role="img" aria-label="Terminal: forge test, 81 passed; cast call to the Stylus ledger">
+      <div class="tbar"><span>zsh — harvestbot</span><span>real run · 27 Sep 2026</span></div>
+<pre><span class="c">$</span> forge test
+<span class="ok">81 tests passed</span>, 0 failed
+<span class="c">$</span> cast call 0xEff7…5a21 computeHarvest…
+[55, 54, 53, 52, 51, 50, 49, 48, 47]
+-18321704</pre>
+    </div>
+  </div>
+  <div class="foot"><span>Arbitrum Open House Singapore · Robinhood Chain 46630</span><span>v0.0.0-dev · 01/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 2: the problem">
+  <div class="lab">Every December</div>
+  <h2>Maya leaves <em class="g">($3,140.00)</em> of losses on paper.</h2>
+  <p style="font-size:48px;max-width:28em;margin-top:60px">Pick which of <b>64 tax lots</b> to sell. Police a <b>30-day</b> calendar. One wrong rebuy voids it.</p>
+  <div class="foot"><span>seed scenario, proven by forge test</span><span>v0.0.0-dev · 02/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 3: what is missing">
+  <div class="lab">The stock is on chain. The accounting isn't.</div>
+  <div class="cols">
+    <div><h3>No cost-basis ledger</h3><p>HIFO is unprovable.</p></div>
+    <div><h3>No wash-sale wall</h3><p>A rebuy voids the loss.</p></div>
+    <div><h3>No safe delegate</h3><p>Agents are unbounded.</p></div>
+  </div>
+  <div class="foot"><span>&nbsp;</span><span>v0.0.0-dev · 03/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 4: the loop">
+  <div class="lab">One flow · three real transactions · one agent key</div>
+  <h2>The agent signs. The contracts <em>recompute</em>.</h2>
+  <div class="cols" style="margin-top:80px">
+    <div><div class="n">Beat 1</div><h3 class="g">Harvest</h3><div class="tx">0x689c…6123</div></div>
+    <div><div class="n">Beat 2</div><h3 class="w" style="font-weight:600">Refuse</h3><div class="tx">0xd486…cf10</div></div>
+    <div><div class="n">Beat 3</div><h3 class="r">Slash</h3><div class="tx">0xcceb…6493</div></div>
+  </div>
+  <div class="foot"><span>Robinhood Chain testnet 46630</span><span>v0.0.0-dev · 04/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 5: beat 1, the ledger strike">
+  <div class="frozen">
+    <div>
+      <div class="lab">Beat 1 · block 119,852,570</div>
+      <h2>Nine lots, <em class="g">struck through</em>.</h2>
+      <p style="margin-top:36px;max-width:16em">Real AMZN → real NFLX. HIFO recomputed on the Stylus ledger.</p>
+    </div>
+    <div class="sheet">
+      <table class="ledger">
+        <thead><tr><th>Lot</th><th>Basis/sh</th><th>Gain/(loss)</th></tr></thead>
+        <tbody>
+          <tr class="hit" style="--d:.3s"><td>63</td><td>455.00</td><td>(3.34)</td></tr>
+          <tr class="hit" style="--d:.42s"><td>62</td><td>453.81</td><td>(3.24)</td></tr>
+          <tr class="hit" style="--d:.54s"><td>61</td><td>452.62</td><td>(3.15)</td></tr>
+          <tr class="hit" style="--d:.66s"><td>60</td><td>451.43</td><td>(3.06)</td></tr>
+          <tr class="hit" style="--d:.78s"><td>59</td><td>450.24</td><td>(2.96)</td></tr>
+          <tr class="hit" style="--d:.9s"><td>58</td><td>449.05</td><td>(2.87)</td></tr>
+          <tr class="hit" style="--d:1.02s"><td>57</td><td>447.86</td><td>(2.78)</td></tr>
+          <tr class="hit" style="--d:1.14s"><td>56</td><td>446.67</td><td>(2.68)</td></tr>
+          <tr class="hit" style="--d:1.26s"><td>55 part</td><td>445.48</td><td>(0.45)</td></tr>
+          <tr class="total"><td>Banked</td><td colspan="2">($24.53)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>LotsRealized · faucet scale</span><span>v0.0.0-dev · 05/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 6: beat 2, rebuy refused">
+  <div class="lab">Beat 2 · 40 seconds later</div>
+  <h2>The rebuy, <em class="w" style="font-weight:600">refused</em> by the contract.</h2>
+  <p class="mono" style="font-size:44px;margin-top:60px">WashSaleViolation(owner, AMZN, AMZN, 1792060681)</p>
+  <div style="margin-top:80px;margin-left:80px"><span class="stamp land">Walled · reverted<b>until 15 Oct 2026</b></span></div>
+  <div class="foot"><span>tx 0xd486…cf10 · status 0</span><span>v0.0.0-dev · 06/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 7: beat 3, slashed">
+  <div class="lab">Beat 3 · off-map AMZN → PLTR</div>
+  <h2>The rogue trade became <em class="r">evidence</em>.</h2>
+  <p class="mono" style="font-size:112px;margin:70px 0 0;line-height:1.1">bond <s class="r" style="text-decoration-thickness:4px">1,000</s> → <b>800</b> mUSDC <span class="chip mock">mock</span></p>
+  <p style="margin-top:40px">challenge() · 20 bounty · 180 to the owner</p>
+  <div class="foot"><span>Slashed event · tx 0xcceb…6493</span><span>v0.0.0-dev · 07/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 8: Stylus vs Solidity">
+  <div style="display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:70px;align-items:center">
+    <div>
+      <div class="lab">Stylus vs Solidity · L2 gas</div>
+      <div class="bignum">2.87×</div>
+      <p style="margin-top:20px">less at 64 lots. 3.1× at 128. Uncached: worst case.</p>
+    </div>
+    <div class="bars" role="img" aria-label="64 lots: Solidity 1,456,905, Stylus 507,993">
+      <div class="bar-row"><div class="k">16<small>1.96×</small></div><div><div class="bar sol" style="width:10.22%"><span>352,195</span></div><div class="bar sty" style="width:5.22%"><span>180,017</span></div></div></div>
+      <div class="bar-row"><div class="k">32<small>2.49×</small></div><div><div class="bar sol" style="width:20.90%"><span>720,431</span></div><div class="bar sty" style="width:8.38%"><span>289,013</span></div></div></div>
+      <div class="bar-row key"><div class="k">64<small>2.87×</small></div><div><div class="bar sol" style="width:42.27%"><span>1,456,905</span></div><div class="bar sty" style="width:14.74%"><span>507,993</span></div></div></div>
+      <div class="bar-row"><div class="k">128<small>3.1×</small></div><div><div class="bar sol" style="width:85%"><span>2,929,938</span></div><div class="bar sty" style="width:27.44%"><span>945,989</span></div></div></div>
+      <div class="lg"><span><i class="s1"></i>Solidity</span><span><i class="s2"></i>Stylus</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>bench/RESULTS.md · NodeInterface.gasEstimateComponents</span><span>v0.0.0-dev · 08/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 9: contract quality">
+  <div class="lab">Smart-contract quality, measured</div>
+  <h2>Checked before a judge <em>opens it</em>.</h2>
+  <div class="rec">
+    <div><div class="n">81</div><div class="l">Foundry tests</div></div>
+    <div><div class="n">6</div><div class="l">Stylus native tests</div></div>
+    <div><div class="n">0 · 0</div><div class="l">Slither high · medium</div></div>
+    <div><div class="n g">100%</div><div class="l">line coverage on src/</div></div>
+  </div>
+  <div class="foot"><span>forge test · cargo test · docs/SLITHER.md</span><span>v0.0.0-dev · 09/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 10: why only Robinhood Chain">
+  <div class="lab">Why only Robinhood Chain + Stylus</div>
+  <h2>Where the <em>stock is issued</em>.</h2>
+  <div class="cols">
+    <div><h3>Real assets</h3><p>AMZN, NFLX, PLTR faucet Stock Tokens.</p></div>
+    <div><h3>WASM ledger</h3><p><code>stylusVersion() = 3</code></p></div>
+    <div><h3>Labeled mocks</h3><p>Oracle, venue, USDC. No testnet AMM.</p></div>
+  </div>
+  <div class="foot"><span>deployments/46630.json</span><span>v0.0.0-dev · 10/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 11: honest limits">
+  <div class="lab">Honest limits · JUDGE.md</div>
+  <div class="quotes">
+    <blockquote>“The oracle mark, the swap venue and the bond's USDC are MOCK contracts”</blockquote>
+    <blockquote>“Re-buys are walled for the 30 days after a harvest”</blockquote>
+    <blockquote>“The spec had guessed ~8×; the chain says 2.9×–3.1×”</blockquote>
+  </div>
+  <div class="foot"><span>verbatim</span><span>v0.0.0-dev · 11/12</span></div>
+</section>
+
+<section class="slide" aria-label="Slide 12: verify it yourself">
+  <div class="close">
+    <div>
+      <div class="lab">No wallet · your browser · chain 46630</div>
+      <h2>Don't take the deck's word. <em>Ask the chain.</em></h2>
+      <p class="url" style="margin-top:50px">harvestbot.vercel.app/verify</p>
+      <p class="mono" style="font-size:26px;color:var(--muted)">github.com/edycutjong/harvestbot</p>
+    </div>
+    <div class="qr-wrap"><svg class="qr" viewBox="0 0 29 29" role="img" aria-label="QR code: harvestbot.vercel.app/verify" shape-rendering="crispEdges"><path fill="#1C2620" d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM10 0h1v1h-1zM13 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM22 0h1v1h-1zM23 0h1v1h-1zM24 0h1v1h-1zM25 0h1v1h-1zM26 0h1v1h-1zM27 0h1v1h-1zM28 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM9 1h1v1h-1zM13 1h1v1h-1zM14 1h1v1h-1zM15 1h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM18 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM10 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM19 2h1v1h-1zM22 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM16 3h1v1h-1zM17 3h1v1h-1zM20 3h1v1h-1zM22 3h1v1h-1zM24 3h1v1h-1zM25 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM13 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM28 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM11 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM16 7h1v1h-1zM20 7h1v1h-1zM0 8h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM1 9h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM23 9h1v1h-1zM24 9h1v1h-1zM28 9h1v1h-1zM2 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM12 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM0 11h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM5 11h1v1h-1zM7 11h1v1h-1zM8 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM20 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM25 11h1v1h-1zM27 11h1v1h-1zM2 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM11 12h1v1h-1zM12 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM20 12h1v1h-1zM23 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM0 13h1v1h-1zM1 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM28 13h1v1h-1zM0 14h1v1h-1zM3 14h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM17 14h1v1h-1zM21 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM1 15h1v1h-1zM7 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM13 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM24 15h1v1h-1zM27 15h1v1h-1zM0 16h1v1h-1zM1 16h1v1h-1zM3 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM0 17h1v1h-1zM2 17h1v1h-1zM3 17h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM18 17h1v1h-1zM19 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM0 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM11 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM26 18h1v1h-1zM0 19h1v1h-1zM2 19h1v1h-1zM5 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM24 19h1v1h-1zM27 19h1v1h-1zM0 20h1v1h-1zM2 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM15 20h1v1h-1zM17 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM26 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM8 21h1v1h-1zM9 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM0 22h1v1h-1zM1 22h1v1h-1zM2 22h1v1h-1zM3 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM11 23h1v1h-1zM13 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM0 24h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM0 25h1v1h-1zM2 25h1v1h-1zM3 25h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM12 25h1v1h-1zM16 25h1v1h-1zM19 25h1v1h-1zM20 25h1v1h-1zM25 25h1v1h-1zM26 25h1v1h-1zM27 25h1v1h-1zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM15 26h1v1h-1zM16 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1zM27 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM10 27h1v1h-1zM11 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM24 27h1v1h-1zM25 27h1v1h-1zM27 27h1v1h-1zM0 28h1v1h-1zM1 28h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM12 28h1v1h-1zM17 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM21 28h1v1h-1zM22 28h1v1h-1zM26 28h1v1h-1z"/></svg><div class="qr-cap">scan → live receipts</div></div>
+  </div>
+  <div class="foot"><span>MIT © 2026 Edy Cu</span><span>v0.0.0-dev · 12/12</span></div>
+</section>
+
+</div></div>
+<button class="navbtn prev" type="button" aria-label="Previous slide">‹</button>
+<button class="navbtn next" type="button" aria-label="Next slide">›</button>
+<div class="hud" id="hud">←/→ · N notes · Cmd+P PDF</div>
+<div class="notes" id="notes" aria-live="polite"></div>
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var stage = document.getElementById("stage"), notes = document.getElementById("notes"), hud = document.getElementById("hud");
+  var i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  function fit() {
+    /* clientWidth, not innerWidth: a 1920px stage makes mobile browsers zoom out and innerWidth lies */
+    var w = document.documentElement.clientWidth, h = document.documentElement.clientHeight;
+    var s = Math.min(w / 1920, h / 1080);
+    stage.style.transform = "scale(" + s + ") translate(-50%, -50%)";
+  }
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach(function (s, k) { s.classList.toggle("on", k === i); s.setAttribute("aria-hidden", k === i ? "false" : "true"); });
+    notes.textContent = (i + 1) + "/" + slides.length + " — " + (window.NOTES[i] || "");
+    hud.textContent = (i + 1) + " / " + slides.length + " · ←/→ · N notes · Cmd+P PDF";
+    if (history.replaceState) history.replaceState(null, "", "#" + (i + 1));
+  }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); show(i + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(i - 1); }
+    else if (e.key === "Home") show(0); else if (e.key === "End") show(slides.length - 1);
+    else if (e.key === "n" || e.key === "N") document.body.classList.toggle("show-notes");
+  });
+  document.querySelector(".navbtn.prev").addEventListener("click", function () { show(i - 1); });
+  document.querySelector(".navbtn.next").addEventListener("click", function () { show(i + 1); });
+  var x0 = null;
+  document.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1)); x0 = null; });
+  window.addEventListener("resize", fit);
+  fit(); show(i);
+})();
+</script>
+</body>
+</html>
