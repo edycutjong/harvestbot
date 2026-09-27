@@ -22,6 +22,7 @@
   [![CI](https://github.com/edycutjong/harvestbot/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/harvestbot/actions/workflows/ci.yml)
   [![CodeQL](https://github.com/edycutjong/harvestbot/actions/workflows/codeql.yml/badge.svg)](https://github.com/edycutjong/harvestbot/actions/workflows/codeql.yml)
   [![gitleaks](https://github.com/edycutjong/harvestbot/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/edycutjong/harvestbot/actions/workflows/gitleaks.yml)
+  [![Release](https://img.shields.io/github/v/release/edycutjong/harvestbot?sort=semver&style=flat&color=1E7A46)](https://github.com/edycutjong/harvestbot/releases)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 </div>
 
@@ -127,7 +128,7 @@ Your own deploy (testnet key + faucet ETH, see [`.env.example`](.env.example)): 
 
 ## 🧪 Testing & CI
 
-`make ci` = `forge fmt --check` · `forge test` · `forge coverage` · gas-snapshot gate (`make snapshot`, fails on a >2 % regression) · `cargo fmt/clippy -D warnings/test` on both crates · ruff + shellcheck on `scripts/` · gitleaks over full history + Slither (`make security-scan`, fails on medium+) · readiness check. GitHub Actions run the same gates in parallel, plus Slither SARIF, TruffleHog, CodeQL (Rust · Python · Actions), Lighthouse CI on the live site after each deploy (`lighthouserc.json`), Dependabot (Cargo · submodules · Actions), and tagged releases from conventional commits.
+`make ci` = `forge fmt --check` · `forge test` · `forge coverage` · gas-snapshot gate (`make snapshot`, fails on a >2 % regression) · `cargo fmt/clippy -D warnings/test` on both crates · ruff + shellcheck on `scripts/` · gitleaks over full history + Slither (`make security-scan`, fails on medium+) · readiness check. GitHub Actions run the same gates in parallel, plus Slither SARIF, TruffleHog, CodeQL (Rust · Python · Actions), Lighthouse CI on the live site after each deploy (`lighthouserc.json`), Dependabot (Cargo · submodules · Actions), and semver releases cut from conventional commits only after CI is green on that commit (grouped notes, live links and the deployment/receipt/bench JSON attached).
 
 | Category | Where | What it proves |
 |---|---|---|
