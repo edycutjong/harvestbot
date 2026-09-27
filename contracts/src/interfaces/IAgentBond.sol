@@ -19,6 +19,9 @@ interface IAgentBond {
     error AlreadyChallenged(bytes32 proofHash);
     error CooldownActive(uint256 until);
     error NothingToWithdraw();
+    error EnvelopeNotLive();
+    error AgentStillActive();
+    error BoundToOtherMandate(address mandate);
 
     function stake(address mandate, uint256 amount) external;
     function requiredBond(address mandate) external view returns (uint256);

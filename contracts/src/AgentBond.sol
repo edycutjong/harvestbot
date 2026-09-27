@@ -39,8 +39,14 @@ contract AgentBond is IAgentBond, ReentrancyGuard {
     // ── staking ──────────────────────────────────────────────────────────────
 
     /// @notice Stake `amount` toward `mandate`. Caller must be the mandate's current agent key.
+    ///         An agent's bond backs ONE mandate at a time: while any bond is staked it cannot be
+    ///         re-pointed at another mandate (which would let it exit through a mandate it controls).
     function stake(address mandate, uint256 amount) external nonReentrant {
         if (HarvestMandate(mandate).agentKey() != msg.sender) revert NotAgentOfMandate();
+        address bound = mandateOf[msg.sender];
+        if (bound != address(0) && bound != mandate && _bond[msg.sender] != 0) {
+            revert BoundToOtherMandate(bound);
+        }
         bondToken.safeTransferFrom(msg.sender, address(this), amount);
         _bond[msg.sender] += amount;
         agentOf[mandate] = msg.sender;
@@ -60,10 +66,14 @@ contract AgentBond is IAgentBond, ReentrancyGuard {
         return _bond[agent];
     }
 
-    /// @notice Agent exits after the cooldown. A successful challenge resets the cooldown.
+    /// @notice Agent exits after the cooldown, and only once the owner has rotated its key out of the
+    ///         mandate — an agent that can still sign harvests cannot pull the bond that backs them.
+    ///         A successful challenge resets the cooldown.
     function withdrawBond() external nonReentrant {
         uint256 b = _bond[msg.sender];
         if (b == 0) revert NothingToWithdraw();
+        address m = mandateOf[msg.sender];
+        if (HarvestMandate(m).agentKey() == msg.sender) revert AgentStillActive();
         if (block.timestamp < cooldownEnd[msg.sender]) {
             revert CooldownActive(cooldownEnd[msg.sender]);
         }
@@ -74,25 +84,35 @@ contract AgentBond is IAgentBond, ReentrancyGuard {
 
     // ── slashing ─────────────────────────────────────────────────────────────
 
-    /// @notice Permissionless. Proof = an envelope the agent signed that the mandate must reject.
+    /// @notice Permissionless. Proof = a LIVE envelope the agent signed that the mandate must reject.
     ///         Violations recognised: (a) off-map substitute; (b) rotating INTO an asset inside a
     ///         wash-sale window. L_owner is 0 for both — the mandate reverts before any funds move.
+    /// @dev    "Live" = addressed to this mandate's owner, nonce unused, deadline not passed — i.e. the
+    ///         mandate could still be asked to execute it. An executed envelope (nonce used) was fully
+    ///         validated when it ran, and an expired one can never run; judging either against TODAY's
+    ///         map and windows would let anyone slash an honest agent for state that changed after it
+    ///         signed (e.g. replaying last month's AMZN→NFLX harvest once NFLX is itself harvested).
     function challenge(address mandate, bytes calldata signedEnvelope) external nonReentrant {
         HarvestMandate m = HarvestMandate(mandate);
         (HarvestMandate.HarvestDecision memory d, address signer) =
             m.recoverEnvelope(signedEnvelope);
         address agent = agentOf[mandate];
         if (signer != agent || agent == address(0)) revert NotAgentOfMandate();
+        if (d.owner != m.owner() || m.usedNonce(d.nonce) || block.timestamp > d.deadline) {
+            revert EnvelopeNotLive();
+        }
 
         bytes32 proofHash = m.hashDecision(d);
         if (challenged[proofHash]) revert AlreadyChallenged(proofHash);
 
         bool violation = !m.subMap().isSubstitute(d.sellAsset, d.buyAsset);
         if (!violation) {
-            // a rebuy of something still inside its window is the second recognised offence
+            // a rebuy of something still inside its window is the second recognised offence —
+            // only the guard's own WashSaleViolation counts, never an arbitrary revert
             try m.guard().assertBuyAllowed(d.owner, d.buyAsset) {}
-            catch {
-                violation = true;
+            catch (bytes memory reason) {
+                violation = reason.length >= 4
+                    && bytes4(reason) == IWashSaleGuard.WashSaleViolation.selector;
             }
         }
         if (!violation) revert NoViolation();

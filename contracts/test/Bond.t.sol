@@ -131,16 +131,21 @@ contract BondTest is BaseTest {
 
     function test_withdrawBond_blocked_during_cooldown_and_reset_by_a_slash() public {
         stakeBond();
+        vm.prank(owner);
+        mandate.setAgentKey(stranger); // rotated out at once, so only the cooldown stands in the way
+        uint256 until = bond.cooldownEnd(agent);
         vm.prank(agent);
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(IAgentBond.CooldownActive.selector, until));
         bond.withdrawBond();
 
         vm.warp(block.timestamp + 6 days);
+        bytes memory rogue = rogueEnvelope(7);
         vm.prank(challenger);
-        bond.challenge(address(mandate), rogueEnvelope(7)); // resets the cooldown
+        bond.challenge(address(mandate), rogue); // resets the cooldown
         vm.warp(block.timestamp + 2 days); // 8 days after stake, but only 2 after the slash
+        until = bond.cooldownEnd(agent);
         vm.prank(agent);
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(IAgentBond.CooldownActive.selector, until));
         bond.withdrawBond();
 
         vm.warp(block.timestamp + 6 days);
@@ -167,5 +172,119 @@ contract BondTest is BaseTest {
         uint256 bounty = S / 10;
         assertGt(S, bounty);
         assertEq(S, staked * 2_000 / 10_000);
+    }
+
+    // ── regressions: honest-agent griefing (audit F2/F3/F4) ──────────────────
+
+    /// @dev F2 — an EXECUTED envelope was validated when it ran. Before the fix, the owner could
+    ///      un-sanction the pair afterwards and replay the agent's own honest harvest as "off-map" proof,
+    ///      collecting 90 % of the slash as restitution.
+    function test_an_executed_envelope_cannot_be_replayed_as_proof_after_the_map_changes() public {
+        stakeBond();
+        (bytes memory env,,) = harvestEnvelope(SELL_QTY, 1);
+        vm.prank(agent);
+        router.execute(env);
+
+        vm.prank(owner);
+        subMap.setPair(address(AMZN), address(NFLX), false);
+
+        vm.prank(owner);
+        vm.expectRevert(IAgentBond.EnvelopeNotLive.selector);
+        bond.challenge(address(mandate), env);
+        assertEq(bond.bondOf(agent), BOND);
+    }
+
+    /// @dev F2 — the realistic replay: harvest AMZN→NFLX, a month later harvest NFLX→AMZN (legal: the
+    ///      AMZN window has closed). NFLX is now walled, so the first, honest envelope "rotates into a
+    ///      walled asset" when re-read today. It must not be proof.
+    function test_last_months_honest_harvest_is_not_proof_once_its_buy_asset_is_walled() public {
+        stakeBond();
+        (bytes memory first,,) = harvestEnvelope(SELL_QTY, 1);
+        vm.prank(agent);
+        router.execute(first);
+
+        vm.warp(block.timestamp + 31 days);
+        vm.prank(owner);
+        oracle.setPrice(address(NFLX), 800 * USD); // NFLX now below its rotation basis
+        uint256 nflxQty = ledger.openQty(owner, address(NFLX));
+        (uint64[] memory ids,) = ledger.computeHarvest(owner, address(NFLX), nflxQty, 800 * USD);
+        HarvestMandate.HarvestDecision memory d =
+            decision(address(NFLX), address(AMZN), nflxQty, ids, 2);
+        bytes memory second = envelope(d, ids, agentPk);
+        vm.prank(agent);
+        router.execute(second);
+        assertGt(guard.windowEndsAt(owner, address(NFLX)), block.timestamp); // NFLX walled
+
+        vm.prank(challenger);
+        vm.expectRevert(IAgentBond.EnvelopeNotLive.selector);
+        bond.challenge(address(mandate), first);
+        assertEq(bond.bondOf(agent), BOND);
+    }
+
+    function test_an_expired_envelope_is_not_proof() public {
+        stakeBond();
+        bytes memory rogue = rogueEnvelope(7);
+        vm.warp(block.timestamp + 1 hours + 1);
+        vm.prank(challenger);
+        vm.expectRevert(IAgentBond.EnvelopeNotLive.selector);
+        bond.challenge(address(mandate), rogue);
+    }
+
+    function test_an_envelope_addressed_to_another_owner_is_not_proof() public {
+        stakeBond();
+        (uint64[] memory ids,) = ledger.computeHarvest(owner, address(AMZN), SELL_QTY, MARK);
+        HarvestMandate.HarvestDecision memory d =
+            decision(address(AMZN), address(PLTR), SELL_QTY, ids, 7);
+        d.owner = stranger;
+        bytes memory env = envelope(d, ids, agentPk);
+        vm.prank(challenger);
+        vm.expectRevert(IAgentBond.EnvelopeNotLive.selector);
+        bond.challenge(address(mandate), env);
+    }
+
+    /// @dev F4 — only the guard's own WashSaleViolation is an offence; any other revert is not.
+    function test_a_guard_revert_other_than_WashSaleViolation_is_not_a_violation() public {
+        stakeBond();
+        (bytes memory env,,) = harvestEnvelope(SELL_QTY, 1);
+        vm.mockCallRevert(
+            address(guard), abi.encodeWithSelector(guard.assertBuyAllowed.selector), bytes("boom")
+        );
+        vm.prank(challenger);
+        vm.expectRevert(IAgentBond.NoViolation.selector);
+        bond.challenge(address(mandate), env);
+
+        vm.mockCallRevert(
+            address(guard), abi.encodeWithSelector(guard.assertBuyAllowed.selector), bytes("")
+        ); // a bare revert (e.g. out-of-gas) carries no selector at all
+        vm.prank(challenger);
+        vm.expectRevert(IAgentBond.NoViolation.selector);
+        bond.challenge(address(mandate), env);
+    }
+
+    /// @dev F3 — an agent that can still sign harvests cannot pull the bond that backs them.
+    function test_an_active_agent_cannot_withdraw_its_bond_after_the_cooldown() public {
+        stakeBond();
+        vm.warp(block.timestamp + 8 days);
+        vm.prank(agent);
+        vm.expectRevert(IAgentBond.AgentStillActive.selector);
+        bond.withdrawBond();
+    }
+
+    /// @dev F3 — a staked bond cannot be re-pointed at another mandate (e.g. one the agent controls,
+    ///      whose agentKey() it can flip to unlock withdrawBond).
+    function test_a_staked_bond_cannot_be_repointed_at_another_mandate() public {
+        stakeBond();
+        HarvestMandate other =
+            new HarvestMandate(owner, ledger, guard, subMap, oracle, swap, address(router));
+        vm.prank(owner);
+        other.setAgentKey(agent);
+        USDC.mint(agent, BOND);
+        vm.startPrank(agent);
+        USDC.approve(address(bond), BOND);
+        vm.expectRevert(
+            abi.encodeWithSelector(IAgentBond.BoundToOtherMandate.selector, address(mandate))
+        );
+        bond.stake(address(other), BOND);
+        vm.stopPrank();
     }
 }
