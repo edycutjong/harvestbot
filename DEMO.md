@@ -43,7 +43,9 @@ cast call 0xEff7B46049fC677F58264e0ebb19dF1a39195a21 \
   'computeHarvest(address,address,uint256,uint256)(uint64[],int256)' \
   0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b 0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02 638501157098660213 412300000 \
   --rpc-url https://rpc.testnet.chain.robinhood.com
-# → [55, 54, …, 47] and a smaller loss: beat 1 already sold lots 63–56 and part of 55, so the ledger
+# → [55, 54, 53, 52, 51, 50, 49, 48, 47]
+#   -18321704   (−$18.321704, 6-dp USD; captured live 2026-09-27)
+#   A smaller loss: beat 1 already sold lots 63–56 and part of 55, so the ledger
 #   now answers with the next nine. Beat 1's own picks and −24531251 are in its HarvestReport event.
 
 # re-run the beats yourself against a fresh deploy (needs a funded testnet key — see .env.example)

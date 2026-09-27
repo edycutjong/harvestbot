@@ -3,16 +3,19 @@
   <h1>HarvestBot</h1>
   <p><em>An agent that harvests tax losses on Robinhood tokenized equities — bounded by an onchain mandate it cannot exceed, and slashed when it lies.</em></p>
   <p>
-    <img src="docs/assets/readme-hero-animated.svg" alt="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days" width="100%">
+    <img src="docs/assets/readme-hero-animated.svg" alt="HarvestBot — nine high-basis lots struck through in green ink; an amber stamp walls the way back until 15 Oct" width="100%">
   </p>
 
+  [![Live site](https://img.shields.io/badge/🌐_Live-harvestbot.vercel.app-1E7A46?style=for-the-badge)](https://harvestbot.vercel.app)
+  [![Verify on chain](https://img.shields.io/badge/🔎_Verify-live_on_chain-1F4E9C?style=for-the-badge)](https://harvestbot.vercel.app/verify/)
+  [![Deck](https://img.shields.io/badge/🗂️_Pitch-deck-363636?style=for-the-badge)](https://harvestbot.vercel.app/deck/)
   [![Judge in 30s](https://img.shields.io/badge/👩‍⚖️_Judge_in-30_seconds-06b6d4?style=for-the-badge)](JUDGE.md)
   [![Demo receipts](https://img.shields.io/badge/🧾_Demo-receipts-ef4444?style=for-the-badge)](DEMO.md)
   [![Benchmark](https://img.shields.io/badge/📊_Stylus_vs_Solidity-bench-f59e0b?style=for-the-badge)](bench/RESULTS.md)
   [![Arbitrum Open House](https://img.shields.io/badge/HackQuest-Arbitrum_Open_House_Singapore-8b5cf6?style=for-the-badge)](https://www.hackquest.io/hackathons/Arbitrum-Open-House-Singapore-Online-Buildathon)
 
-  ![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-testnet_46630-00C805?style=flat)
-  ![Stylus](https://img.shields.io/badge/Arbitrum_Stylus-Rust→WASM-12AAFF?style=flat&logo=rust&logoColor=white)
+  ![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-testnet_46630-1E7A46?style=flat)
+  ![Stylus](https://img.shields.io/badge/Arbitrum_Stylus-Rust→WASM-1F4E9C?style=flat&logo=rust&logoColor=white)
   ![Solidity](https://img.shields.io/badge/Solidity-0.8.28-363636?style=flat&logo=solidity&logoColor=white)
   ![Foundry](https://img.shields.io/badge/Foundry-forge-orange?style=flat)
   ![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.4-4E5EE4?style=flat)
