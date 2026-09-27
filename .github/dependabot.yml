@@ -16,6 +16,11 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 2
+    ignore:
+      # Deployed bytecode on 46630 was compiled against these exact commits; a bump changes
+      # what `forge build` reproduces. Security alerts still fire; bumps are a deliberate redeploy.
+      - dependency-name: "contracts/lib/openzeppelin-contracts"
+      - dependency-name: "contracts/lib/forge-std"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -24,3 +29,7 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+    ignore:
+      # Major action bumps are migrations, not maintenance — never unattended on a frozen submission.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
