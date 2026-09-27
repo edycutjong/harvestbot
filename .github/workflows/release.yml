@@ -1,47 +1,59 @@
 name: release
 
+# Semver release from conventional commits — only after CI is green on that exact commit.
+# The tag is pushed with GITHUB_TOKEN, which never triggers another workflow run (no loop);
+# the concurrency group serializes runs so two green CI runs can't mint the same version.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ env.SHA }}
+          fetch-depth: 0 # tags + full history, or every run would compute v0.0.1
 
-      - name: Compute next version from Angular commits
-        id: ver
-        run: |
-          set -euo pipefail
-          LAST=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$LAST" ]; then RANGE=""; CUR="0.0.0"; else RANGE="${LAST}..HEAD"; CUR="${LAST#v}"; fi
-          LOG=$(git log --format=%B ${RANGE:+"$RANGE"})
-          if [ -z "$(echo "$LOG" | tr -d '[:space:]')" ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          BUMP="none"
-          echo "$LOG" | grep -qE '^(feat|fix|perf)(\(.+\))?!:|BREAKING CHANGE:' && BUMP="major"
-          [ "$BUMP" = none ] && echo "$LOG" | grep -qE '^feat(\(.+\))?:'       && BUMP="minor"
-          [ "$BUMP" = none ] && echo "$LOG" | grep -qE '^(fix|perf)(\(.+\))?:' && BUMP="patch"
-          if [ "$BUMP" = none ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          IFS=. read -r MA MI PA <<< "$CUR"
-          case "$BUMP" in major) MA=$((MA+1)); MI=0; PA=0 ;; minor) MI=$((MI+1)); PA=0 ;; patch) PA=$((PA+1)) ;; esac
-          NEXT="v${MA}.${MI}.${PA}"
-          echo "next=$NEXT" >> "$GITHUB_OUTPUT"; echo "skip=false" >> "$GITHUB_OUTPUT"
+      - name: Plan version + grouped notes
+        id: plan
+        run: scripts/release_plan.sh "$SHA" release-notes.md | tee -a "$GITHUB_OUTPUT"
 
-      - name: Tag and publish
-        if: steps.ver.outputs.skip == 'false'
+      - name: Tag, release, attach receipts
+        if: steps.plan.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT: ${{ steps.plan.outputs.next }}
+          PREV: ${{ steps.plan.outputs.prev }}
         run: |
           set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/$NEXT" >/dev/null; then
+            echo "$NEXT already exists on origin — nothing to do"; exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.ver.outputs.next }}" -m "${{ steps.ver.outputs.next }}"
-          git push origin "${{ steps.ver.outputs.next }}"
-          gh release create "${{ steps.ver.outputs.next }}" --generate-notes --title "${{ steps.ver.outputs.next }}"
+          git tag -a "$NEXT" -m "$NEXT" "$SHA"
+          git push origin "refs/tags/$NEXT"
+          mkdir -p dist
+          cp deployments/46630.json dist/deployments-46630.json
+          cp receipts/46630.json dist/receipts-46630.json
+          cp bench/results.json dist/bench-results.json
+          gh release create "$NEXT" dist/*.json \
+            --verify-tag --latest --title "HarvestBot $NEXT" \
+            --notes-file release-notes.md --generate-notes ${PREV:+--notes-start-tag "$PREV"}

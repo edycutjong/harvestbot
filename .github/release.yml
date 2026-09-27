@@ -1,0 +1,17 @@
+# Categories for GitHub-generated release notes (PR-based; appended below the commit-grouped notes).
+changelog:
+  exclude:
+    authors: [github-actions]
+  categories:
+    - title: "🚀 Features"
+      labels: [feat, feature, enhancement]
+    - title: "🐛 Fixes"
+      labels: [fix, bug, perf]
+    - title: "🔒 Security"
+      labels: [security]
+    - title: "📝 Docs"
+      labels: [docs, documentation]
+    - title: "📦 Dependencies"
+      labels: [dependencies, github_actions, rust, submodules]
+    - title: "🧰 CI / Chores"
+      labels: ["*"]
