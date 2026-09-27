@@ -221,13 +221,27 @@ contract BondTest is BaseTest {
         assertEq(bond.bondOf(agent), BOND);
     }
 
-    function test_an_expired_envelope_is_not_proof() public {
+    function test_an_envelope_past_deadline_plus_grace_is_not_proof() public {
         stakeBond();
         bytes memory rogue = rogueEnvelope(7);
-        vm.warp(block.timestamp + 1 hours + 1);
+        vm.warp(block.timestamp + 1 hours + bond.CHALLENGE_GRACE() + 1);
         vm.prank(challenger);
         vm.expectRevert(IAgentBond.EnvelopeNotLive.selector);
         bond.challenge(address(mandate), rogue);
+    }
+
+    /// @dev A same-block deadline must not make a rogue signature unchallengeable.
+    function test_a_rogue_envelope_with_a_tight_deadline_is_still_proof_within_the_grace() public {
+        stakeBond();
+        (uint64[] memory ids,) = ledger.computeHarvest(owner, address(AMZN), SELL_QTY, MARK);
+        HarvestMandate.HarvestDecision memory d =
+            decision(address(AMZN), address(PLTR), SELL_QTY, ids, 9);
+        d.deadline = block.timestamp; // expires this block
+        bytes memory rogue = envelope(d, ids, agentPk);
+        vm.warp(block.timestamp + 12 hours);
+        vm.prank(challenger);
+        bond.challenge(address(mandate), rogue);
+        assertEq(bond.bondOf(agent), BOND - 2_640 * USD);
     }
 
     function test_an_envelope_addressed_to_another_owner_is_not_proof() public {

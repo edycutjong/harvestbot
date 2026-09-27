@@ -23,6 +23,9 @@ contract AgentBond is IAgentBond, ReentrancyGuard {
     uint256 public constant SLASH_BPS = 2_000; // 20 % of B on top of owner loss
     uint256 public constant BOUNTY_BPS = 1_000; // 10 % of S
     uint256 public constant COOLDOWN = 7 days;
+    /// @dev How long after its deadline an unexecuted envelope still counts as proof. Without it an agent
+    ///      could sign violations with a same-block deadline and never be challengeable.
+    uint256 public constant CHALLENGE_GRACE = 1 days;
 
     IERC20 public immutable bondToken; // MOCK USDC on testnet, 6dp
 
@@ -87,18 +90,22 @@ contract AgentBond is IAgentBond, ReentrancyGuard {
     /// @notice Permissionless. Proof = a LIVE envelope the agent signed that the mandate must reject.
     ///         Violations recognised: (a) off-map substitute; (b) rotating INTO an asset inside a
     ///         wash-sale window. L_owner is 0 for both — the mandate reverts before any funds move.
-    /// @dev    "Live" = addressed to this mandate's owner, nonce unused, deadline not passed — i.e. the
-    ///         mandate could still be asked to execute it. An executed envelope (nonce used) was fully
-    ///         validated when it ran, and an expired one can never run; judging either against TODAY's
-    ///         map and windows would let anyone slash an honest agent for state that changed after it
-    ///         signed (e.g. replaying last month's AMZN→NFLX harvest once NFLX is itself harvested).
+    /// @dev    "Live" = addressed to this mandate's owner, nonce unused, and no more than
+    ///         `CHALLENGE_GRACE` past its deadline. An executed envelope (nonce used) was fully validated
+    ///         when it ran; judging it — or a long-dead one — against TODAY's map and windows would let
+    ///         anyone slash an honest agent for state that changed after it signed (e.g. replaying last
+    ///         month's AMZN→NFLX harvest once NFLX is itself harvested). The grace period stops the
+    ///         opposite abuse: a same-block deadline that expires before any challenger can act.
     function challenge(address mandate, bytes calldata signedEnvelope) external nonReentrant {
         HarvestMandate m = HarvestMandate(mandate);
         (HarvestMandate.HarvestDecision memory d, address signer) =
             m.recoverEnvelope(signedEnvelope);
         address agent = agentOf[mandate];
         if (signer != agent || agent == address(0)) revert NotAgentOfMandate();
-        if (d.owner != m.owner() || m.usedNonce(d.nonce) || block.timestamp > d.deadline) {
+        if (
+            d.owner != m.owner() || m.usedNonce(d.nonce)
+                || block.timestamp > d.deadline + CHALLENGE_GRACE
+        ) {
             revert EnvelopeNotLive();
         }
 
