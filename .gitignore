@@ -28,3 +28,8 @@ stylus/**/target/
 # forge script artefacts: keep run-latest only
 contracts/broadcast/**/run-1*.json
 contracts/cache/**/run-*.json
+# deploy-site assembly dir + Vercel link
+/out/
+.vercel/
+# Lighthouse CI
+.lighthouseci/
