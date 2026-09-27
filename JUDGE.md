@@ -3,6 +3,8 @@
 **HarvestBot lets an autonomous agent harvest tax losses on Robinhood tokenized equities, bounded by an
 onchain mandate it physically cannot exceed, and gets it slashed when it lies.**
 
+Zero clicks into code: [harvestbot.vercel.app/verify](https://harvestbot.vercel.app/verify/) — your browser reads the receipts below from chain 46630 live, no wallet.
+
 ## Click these, in order
 
 1. **The harvest happened** — [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123): agent-signed, router-gated, HIFO recomputed by the Stylus ledger, 9 lots, real AMZN → real NFLX.
@@ -42,5 +44,7 @@ onchain mandate it physically cannot exceed, and gets it slashed when it lies.**
 - **The bench is worst-case for Stylus**: Robinhood testnet has no ArbOS cache manager yet, so every call pays the WASM init floor. The spec had guessed ~8×; the chain says 2.9×–3.1× — we report the chain.
 
 ## Links
+
+Live site: https://harvestbot.vercel.app · Verify in your browser, no wallet: https://harvestbot.vercel.app/verify/ · Deck: https://harvestbot.vercel.app/deck/
 
 Repo: this one · Live contracts: `deployments/46630.json` · Explorer: https://explorer.testnet.chain.robinhood.com
