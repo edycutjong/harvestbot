@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No such lot — HarvestBot</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="This page is not on the ledger.">
+<meta name="theme-color" content="#F1F3E6">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F1F3E6;
+  --paper-2: #E6EBD6;
+  --ink:     #1C2620;
+  --muted:   #5E6A60;
+  --rule:    #B8C9B3;
+  --margin:  #C9564B;
+  --link:    #1F4E9C;
+  --before:  #6B6F68;
+  --after:   #1E7A46;
+  --wall:    #B86E00;
+  --wall-fill: #F3D38B;
+  --slash:   #B3261E;
+  --mock:    #6A4FB0;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+</style>
+<link rel="stylesheet" href="/assets/ledger.css">
+<style>
+.miss { overflow-x: clip; padding: clamp(40px, 8vw, 110px) var(--gut) 96px calc(var(--gut) + 24px); max-width: 1100px; margin: 0 auto; }
+.miss h1 { font: 400 clamp(52px, 8vw, 118px)/.95 var(--font-display); letter-spacing: -.03em; margin: 16px 0 20px; }
+.miss h1 em { font-style: italic; }
+.miss .lede { margin: 0 0 34px; }
+.sheet { position: relative; max-width: 720px; border: 1px solid var(--rule); background: var(--bg); padding: 0 20px 26px 34px;
+  box-shadow: 0 26px 50px -30px rgba(28,38,32,.55), 0 4px 10px -6px rgba(28,38,32,.2); transform: rotate(-.4deg);
+  background-image: linear-gradient(to right, transparent 16px, var(--margin) 16px, var(--margin) 17px, transparent 17px, transparent 20px, var(--margin) 20px, var(--margin) 21px, transparent 21px); }
+.sheet .ledger { table-layout: fixed; }
+.sheet .ledger td { overflow: hidden; text-overflow: ellipsis; }
+.sheet .ledger th:first-child, .sheet .ledger td:first-child { width: 56px; }
+.sheet .ledger th:last-child, .sheet .ledger td:last-child { width: 110px; }
+.sheet .ledger td.path { text-align: left; color: var(--ink); }
+.ledger tr.void td { color: var(--before); position: relative; }
+.ledger tr.void td::after { content: ""; position: absolute; left: -4px; right: -4px; top: 50%; height: 2px; margin-top: -1px; background: var(--ink);
+  transform: scaleX(0); transform-origin: left center; animation: strike .5s var(--ease) .5s forwards; }
+.stamp.void { position: absolute; right: 22px; bottom: -22px; border-color: var(--ink); outline-color: var(--ink); background: var(--bg); color: var(--ink);
+  box-shadow: 0 6px 14px -10px rgba(28,38,32,.6); --d: 1s; }
+.go { margin-top: 64px; display: flex; flex-wrap: wrap; gap: 12px; }
+.note { margin-top: 26px; font-size: 14.5px; color: var(--muted); }
+@media (max-width: 600px) {
+  .sheet { padding: 0 10px 22px 26px; transform: none; }
+  .sheet .ledger { font-size: 12.5px; }
+  .sheet .ledger th, .sheet .ledger td { padding-left: 5px; padding-right: 5px; }
+  .sheet .ledger th:first-child, .sheet .ledger td:first-child { width: 38px; }
+  .sheet .ledger th:last-child, .sheet .ledger td:last-child { width: 84px; }
+  .stamp.void { right: 8px; font-size: 11px; }
+  .nav-links { gap: 12px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <a class="brand" href="/" aria-label="HarvestBot home"><img src="/assets/icon.svg" alt="" width="30" height="30">HarvestBot</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="/verify/">Verify</a>
+    <a href="/judge/">Judge</a>
+    <a class="hide-sm" href="/deck/">Deck</a>
+  </nav>
+</header>
+
+<main id="main" class="miss">
+  <div class="label">Error 404 · not on the ledger</div>
+  <h1>No such <em>lot</em>.</h1>
+  <p class="lede">The page you asked for was never booked. Nothing was harvested here, nothing was walled — the line is simply void.</p>
+
+  <div class="sheet" role="figure" aria-label="A ledger line for the requested path, struck through and stamped void">
+    <table class="ledger">
+      <thead><tr><th scope="col">Lot</th><th scope="col" style="text-align:left">Path requested</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr><td>—</td><td class="path">/</td><td>open</td></tr>
+        <tr class="void"><td>—</td><td class="path" id="req">/this-page</td><td>no record</td></tr>
+        <tr><td>—</td><td class="path">/verify/</td><td>open</td></tr>
+        <tr><td>—</td><td class="path">/judge/</td><td>open</td></tr>
+      </tbody>
+    </table>
+    <div class="stamp void land">Void<b>no such lot</b></div>
+  </div>
+
+  <nav class="go" aria-label="Where to go">
+    <a class="btn ink" href="/">Home <svg class="arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+    <a class="btn" href="/verify/">Verify</a>
+    <a class="btn" href="/judge/">Judge</a>
+    <a class="btn" href="/deck/">Deck</a>
+  </nav>
+  <p class="note">Looking for a transaction? Every hash is on <a href="/judge/">/judge</a>, each one an explorer link.</p>
+</main>
+
+<footer class="foot">
+  <span>HarvestBot · MIT © 2026 Edy Cu · testnet only</span>
+  <nav aria-label="Footer"><a href="/">Home</a><a href="/verify/">Verify</a><a href="/judge/">Judge</a><a href="/deck/">Deck</a></nav>
+</footer>
+<script>
+(function () {
+  var p = location.pathname || "/";
+  var el = document.getElementById("req"); el.textContent = p; el.title = p;
+})();
+</script>
+</body>
+</html>
