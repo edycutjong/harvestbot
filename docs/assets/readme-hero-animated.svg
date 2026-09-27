@@ -1,226 +1,91 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img"
-     aria-label="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days">
-<!-- STORYBOARD (dur 8s — must equal this file's single master dur)
-  0-10%   steady state: plate, grid, mini mark, outlined wordmark, tagline, pulsing metric, tech line;
-          the 64-lot ledger, the rail to wIVV with a dashed placeholder where the wall will stand (poster rule satisfied)
-  10-25%  trigger:      the mark drops to $412.30 — the chip lands and the nine highest-basis lots light up in the ledger   data-story="beat-2"
-  25-55%  mechanism:    nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days   data-story="beat-3"
-  55-80%  resolution:   a rebuy of wVOO heads back from wIVV, meets the wall and is refused — BLOCKED seals, then the
-          SLASHED echo: a rogue off-map attempt is cut from the bond. Wall, BLOCKED and banked label persist         data-story="beat-4"
-  80-100% breathe + seam fade (all story opacity is 0 by 97%)
+     aria-label="HarvestBot: the tax-lot ledger on Robinhood Chain. Nine high-basis AMZN lots are struck through in green ink one by one and carried to a banked total of (24.53 dollars); then an amber stamp walls the rebuy until 15 Oct 2026. 2.87x less L2 gas on Stylus at 64 lots.">
+<!-- STORYBOARD (dur 8s, this file's single master dur)
+  0-10%   steady state: the pad (paper, green ruling, red double margin), outlined wordmark, tagline, metric, and the open lot table in graphite. Poster-complete.
+  10-45%  trigger: the harvest confirms (beat 1, tx 0x689c4d34). HIFO order: lot 63, 62, 61, 60, then 59 to 55 are struck, one line at a time.   data-story="beat-2"
+  45-62%  mechanism: Nine high-basis lots struck through in green ink; an amber stamp walls the way back until 15 Oct.   data-story="beat-3"
+  62-94%  resolution: the banked total stays double-underlined and the stamp stays across the rebuy line (held state, rule 7).   data-story="beat-4"
+  94-100% seam: the story layer fades out and the loop restarts on the poster (rule 5).
 -->
-  <style>
-    .aur1 { animation: drift1 16s ease-in-out infinite alternate; }
-    .aur2 { animation: drift2 19s ease-in-out infinite alternate; }
-    .beam { animation: beamSweep 8s linear infinite; }
-    .metric { animation: metricPulse 8s ease-in-out infinite; }
-    .pop-bank { animation: popBank 8s ease infinite; transform-box: fill-box; transform-origin: center; }
-    .pop-block { animation: popBlock 8s ease infinite; transform-box: fill-box; transform-origin: center; }
-    .pop-slash { animation: popSlash 8s ease infinite; transform-box: fill-box; transform-origin: center; }
-    @keyframes drift1 { from { transform: translate(0, 0); } to { transform: translate(70px, 24px); } }
-    @keyframes drift2 { from { transform: translate(0, 0); } to { transform: translate(-80px, -20px); } }
-    @keyframes beamSweep { 0%, 12% { transform: translateX(-300px) skewX(-18deg); } 38%, 100% { transform: translateX(1700px) skewX(-18deg); } }
-    @keyframes metricPulse { 0%, 100% { opacity: 0.72; } 50% { opacity: 1; } }
-    @keyframes popBank  { 0%, 48% { transform: scale(0.6); } 52% { transform: scale(1.14); } 55%, 100% { transform: scale(1); } }
-    @keyframes popBlock { 0%, 66% { transform: scale(0.6); } 70% { transform: scale(1.14); } 73%, 100% { transform: scale(1); } }
-    @keyframes popSlash { 0%, 76% { transform: scale(0.6); } 80% { transform: scale(1.12); } 83%, 100% { transform: scale(1); } }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-  </style>
-  <defs>
-    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
-    </pattern>
-    <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,0.55)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-    </linearGradient>
-    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,0.6)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-    </linearGradient>
-    <linearGradient id="wmGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2ED573"/>
-      <stop offset="100%" stop-color="#7BE8A5"/>
-    </linearGradient>
-    <linearGradient id="banked" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2ED573"/>
-      <stop offset="100%" stop-color="#22C55E"/>
-    </linearGradient>
-    <linearGradient id="walled" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FFB020"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <filter id="auroraBlur" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="46"/>
-    </filter>
-    <filter id="packetGlow" x="-120%" y="-120%" width="340%" height="340%">
-      <feGaussianBlur stdDeviation="5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="wallGlow" x="-200%" y="-30%" width="500%" height="160%">
-      <feGaussianBlur stdDeviation="10"/>
-    </filter>
-    <clipPath id="wmclip"><use href="#wm1"/></clipPath>
-  </defs>
+<style>
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<defs>
+  <pattern id="ruling" width="1280" height="28" patternUnits="userSpaceOnUse" y="10">
+    <line x1="0" y1="27.5" x2="1280" y2="27.5" stroke="#B8C9B3" stroke-width="1"/>
+  </pattern>
+  <clipPath id="plateclip"><rect x="6" y="6" width="1268" height="308" rx="18"/></clipPath>
+</defs>
+<!-- plate: the pad paper with an ink border, self-sufficient on GitHub light and dark -->
+<rect x="6" y="6" width="1268" height="308" rx="18" fill="#F1F3E6"/>
+<g clip-path="url(#plateclip)">
+  <rect x="6" y="6" width="1268" height="308" fill="url(#ruling)"/>
+  <line x1="44" y1="0" x2="44" y2="320" stroke="#C9564B" stroke-width="2"/>
+  <line x1="51" y1="0" x2="51" y2="320" stroke="#C9564B" stroke-width="2"/>
+</g>
+<rect x="6" y="6" width="1268" height="308" rx="18" fill="none" stroke="#1C2620" stroke-width="3"/>
 
-  <!-- ===== backdrop (brand plate: mandatory, opaque — survives white AND dark GitHub) ===== -->
-  <rect x="0" y="0" width="1280" height="320" rx="22" fill="#12161B"/>
-  <rect x="1" y="1" width="1278" height="318" rx="21" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
-  <rect x="0" y="0" width="1280" height="320" rx="22" fill="url(#grid)"/>
-  <g filter="url(#auroraBlur)">
-    <circle class="aur1" cx="230" cy="50" r="160" fill="#2ED573" opacity="0.10"/>
-    <circle class="aur2" cx="1080" cy="290" r="180" fill="#FFB020" opacity="0.07"/>
+<!-- brand layer (visible at t=0) -->
+
+<g transform="translate(78,112) scale(1.16)" fill="#1C2620"><path d="M18.3 -22.5L18.3 -3.9L23.9 -2L23.9 0L2.8 0L2.8 -2L8.4 -3.9L8.4 -44.7L2.8 -46.7L2.8 -48.7L23.9 -48.7L23.9 -46.7L18.3 -44.7L18.3 -27.2L41.8 -27.2L41.8 -44.7L36.3 -46.7L36.3 -48.7L57.3 -48.7L57.3 -46.7L51.7 -44.7L51.7 -3.9L57.3 -2L57.3 0L36.3 0L36.3 -2L41.8 -3.9L41.8 -22.5L18.3 -22.5M80.8 -19.8L80.8 -19.8L80.8 -23.3Q80.8 -25.8 79.5 -27.3Q78.3 -28.7 75.3 -28.7L75.3 -28.7Q74.1 -28.7 72.8 -28.4L72.8 -28.4Q72.3 -28.3 71.7 -28.2L71.7 -28.2Q71.7 -27.6 71.6 -27.2L71.6 -27.2Q71.3 -26 71 -25.1Q70.7 -24.3 70.3 -23.8L70.3 -23.8Q69.7 -23 68.7 -22.6Q67.7 -22.2 66.4 -22.2L66.4 -22.2Q64.8 -22.2 64 -22.8Q63.1 -23.5 63.1 -24.5L63.1 -24.5Q63.1 -25.9 64.4 -27.3Q65.7 -28.8 68 -30Q70.2 -31.2 73 -32Q75.9 -32.7 78.9 -32.7L78.9 -32.7Q82.9 -32.7 85.3 -31.5Q87.7 -30.3 88.7 -28.1Q89.6 -25.9 89.6 -22.9L89.6 -22.9L89.6 -6.9Q89.6 -5.9 89.9 -5.3Q90.3 -4.6 90.8 -4.3Q91.4 -4 92.3 -4L92.3 -4Q93 -4 93.9 -4.2Q94.7 -4.4 95.6 -4.9L95.6 -4.9L95.6 -2.5Q93.8 -0.9 91.8 -0.1Q89.7 0.8 87.9 0.8L87.9 0.8Q85.6 0.8 84.1 -0.1Q82.6 -1 81.9 -2.8L81.9 -2.8Q81.3 -4.2 81.1 -6.1L81.1 -6.1Q80.5 -4.1 79.4 -2.7L79.4 -2.7Q78 -0.9 76.1 0Q74.2 0.9 71.8 0.9L71.8 0.9Q67.7 0.9 65.2 -1.3Q62.7 -3.4 62.7 -7.6L62.7 -7.6Q62.7 -9.7 63.5 -11.4Q64.4 -13.1 66.6 -14.7Q68.8 -16.2 72.7 -17.5L72.7 -17.5Q76 -18.6 80.8 -19.8M80.8 -9.9L80.8 -16.4Q78.6 -15.9 77 -15.4L77 -15.4Q74.7 -14.5 73.5 -13.6Q72.3 -12.7 71.8 -11.7Q71.4 -10.7 71.4 -9.5L71.4 -9.5Q71.4 -7.1 72.5 -6Q73.7 -4.8 75.7 -4.8L75.7 -4.8Q77.1 -4.8 78.3 -5.5Q79.5 -6.2 80.1 -7.4Q80.8 -8.5 80.8 -9.9L80.8 -9.9M121.5 -32.6L121.5 -32.6Q123.7 -32.6 124.7 -31.4Q125.7 -30.2 125.7 -28.5L125.7 -28.5Q125.7 -26.2 124.4 -25Q123.1 -23.8 121.4 -23.8L121.4 -23.8Q120 -23.8 118.9 -24.1Q117.9 -24.3 116.8 -24.6Q115.8 -24.8 114.6 -24.8L114.6 -24.8Q113.7 -24.8 112.8 -24.6Q112 -24.4 111.1 -24.1L111.1 -24.1Q111.1 -24 111.1 -24L111.1 -24L111.1 -3.7L116.4 -1.8L116.4 0L97.4 0L97.4 -1.8L102.3 -3.6L102.3 -24.1Q101.7 -24.8 101 -25.3Q100.2 -25.8 99.3 -26.4Q98.3 -26.9 97.2 -27.4L97.2 -27.4L97.2 -28.8L108.8 -32.9L110 -32.9L110.9 -26.9Q111.9 -27.7 112.7 -28.4L112.7 -28.4Q114.5 -29.8 116.1 -30.8Q117.6 -31.7 118.9 -32.1Q120.3 -32.6 121.5 -32.6M165.1 -30L161.4 -28.7L149.5 0.4L143.8 0.4L130.5 -28.3L126 -30.1L126 -32L144.5 -32L144.5 -30L140.1 -28.6L149.2 -8.2L156.9 -28.7L152.7 -30L152.7 -32L165.1 -32L165.1 -30M184.5 -32.9L184.5 -32.9Q188.7 -32.9 191.7 -31.1Q194.7 -29.3 196.3 -25.9Q198 -22.5 198.3 -17.6L198.3 -17.6L176.9 -17.6Q176.9 -13.9 178.3 -11.2L178.3 -11.2Q179.7 -8.4 182.4 -7Q185 -5.5 188.6 -5.5L188.6 -5.5Q190.3 -5.5 191.7 -5.8Q193.2 -6.1 194.6 -6.7Q196 -7.3 197.4 -8.3L197.4 -8.3L198.3 -6.3Q196.2 -4.1 194 -2.5Q191.8 -0.9 189.4 0Q187.1 0.9 184.4 0.9L184.4 0.9Q179.6 0.9 176 -1.2Q172.4 -3.3 170.4 -7Q168.4 -10.7 168.4 -15.5L168.4 -15.5Q168.4 -20.4 170.3 -24.3Q172.2 -28.3 175.8 -30.6Q179.4 -32.9 184.5 -32.9M177 -21L177 -21L189.5 -21.5Q189.3 -23.5 188.9 -25L188.9 -25Q188.2 -27.1 186.9 -28.1Q185.7 -29.1 183.8 -29.1L183.8 -29.1Q181.7 -29.1 180.2 -28Q178.6 -26.9 177.7 -24.5L177.7 -24.5Q177.2 -23 177 -21M216.6 -32.9L216.6 -32.9Q219.3 -32.9 221.3 -32.5Q223.4 -32.1 225.7 -31.1L225.7 -31.1L226.3 -22.3L223.7 -22.3L220.5 -28.8Q220.1 -29 219.7 -29.1L219.7 -29.1Q218.2 -29.6 216.8 -29.6L216.8 -29.6Q213.9 -29.6 212.4 -28.5Q210.9 -27.5 210.9 -25.6L210.9 -25.6Q210.9 -24.1 211.7 -23.1Q212.5 -22.2 214.2 -21.4Q216 -20.7 218.6 -19.8L218.6 -19.8Q220.6 -19.2 222.3 -18.3Q224 -17.5 225.2 -16.3Q226.4 -15.2 227 -13.5Q227.7 -11.9 227.7 -9.7L227.7 -9.7Q227.7 -6.2 226 -3.9Q224.2 -1.5 221.1 -0.3Q218 0.9 213.9 0.9L213.9 0.9Q211.3 0.9 208.9 0.5Q206.6 0.1 204.7 -0.7L204.7 -0.7L203.3 -9.9L205.9 -9.9L209.9 -2.7Q210.3 -2.6 210.7 -2.6L210.7 -2.6Q211.8 -2.5 212.8 -2.5L212.8 -2.5Q216.3 -2.5 218.3 -3.7Q220.2 -4.9 220.2 -7.3L220.2 -7.3Q220.2 -8.6 219.6 -9.5Q219 -10.4 217.9 -11Q216.8 -11.7 215.2 -12.2Q213.6 -12.8 211.7 -13.4L211.7 -13.4Q209.1 -14.3 207.4 -15.5Q205.6 -16.8 204.8 -18.7Q203.9 -20.5 203.9 -23.1L203.9 -23.1Q203.9 -26.2 205.5 -28.4Q207.2 -30.6 210.1 -31.7Q213 -32.9 216.6 -32.9M245 -27.3L245 -9.8Q245 -7.6 246.5 -6.4Q247.9 -5.3 250.8 -5.3L250.8 -5.3Q252.2 -5.3 253.8 -5.5Q255.4 -5.8 257.3 -6.4L257.3 -6.4L257.3 -4Q254.7 -2.2 252.7 -1.2Q250.6 -0.1 249 0.3Q247.3 0.8 245.8 0.8L245.8 0.8Q243 0.8 240.8 -0.2Q238.6 -1.2 237.4 -3.2Q236.2 -5.2 236.2 -8.2L236.2 -8.2L236.2 -25.9L231.3 -29.3L231.3 -30.7Q232.3 -31.4 233.5 -32.1Q234.6 -32.8 235.9 -33.6Q237.1 -34.3 238.2 -35.2Q239.4 -36 240.6 -36.8Q241.7 -37.6 242.7 -38.4L242.7 -38.4L245 -38.4L245 -32L256.2 -32L255.6 -27.3L245 -27.3"/></g>
+<g transform="translate(381.6,112) scale(1.16)" fill="#1E7A46"><path d="M4.6 -3.8L17.2 -45L12.3 -46.8L12.9 -48.7L35.3 -48.7Q40 -48.7 42.9 -47.4Q45.8 -46.1 47.1 -43.9Q48.4 -41.7 48.4 -39L48.4 -39Q48.4 -35.2 46.6 -32.4Q44.9 -29.6 41.5 -27.9L41.5 -27.9Q39 -26.6 35.8 -26.1L35.8 -26.1Q39.6 -25.5 41.8 -23.4L41.8 -23.4Q44.6 -20.7 44.6 -16.6L44.6 -16.6Q44.6 -12 42.2 -8.3Q39.9 -4.5 35.2 -2.3Q30.5 0 23.4 0L23.4 0L-1.8 0L-1.3 -1.8L4.6 -3.8M27.1 -23.7L20 -23.7L14.1 -4.3L21.7 -4.3Q25.8 -4.3 28.8 -5.9Q31.8 -7.5 33.4 -10.3Q35 -13.2 35 -17L35 -17Q35 -20.1 33.1 -21.9Q31.3 -23.7 27.1 -23.7L27.1 -23.7M32.1 -44.4L26.4 -44.4L21.3 -27.9L28.8 -27.9Q32 -27.9 34.3 -29.3Q36.7 -30.7 38 -33.1Q39.3 -35.5 39.3 -38.6L39.3 -38.6Q39.3 -40.4 38.5 -41.7Q37.7 -43.1 36.1 -43.7Q34.6 -44.4 32.1 -44.4L32.1 -44.4M69.3 -32.9L69.3 -32.9Q73.2 -32.9 75.8 -31.4Q78.4 -29.9 79.8 -27.2Q81.2 -24.6 81.2 -20.9L81.2 -20.9Q81.2 -16.5 79.7 -12.6Q78.3 -8.7 75.6 -5.6Q73 -2.6 69.5 -0.9Q66 0.9 61.9 0.9L61.9 0.9Q58 0.9 55.4 -0.6Q52.7 -2.1 51.4 -4.8Q50 -7.5 50 -11.1L50 -11.1Q50 -15.5 51.5 -19.4Q52.9 -23.4 55.5 -26.4Q58.1 -29.4 61.7 -31.1Q65.2 -32.9 69.3 -32.9M62 -2.7L62 -2.7Q63.6 -2.7 65.3 -4Q66.9 -5.2 68.2 -7.4Q69.6 -9.5 70.7 -12.2Q71.7 -14.9 72.3 -17.8Q72.9 -20.8 72.9 -23.6L72.9 -23.6Q72.9 -26.6 72 -27.9Q71.1 -29.3 69.2 -29.3L69.2 -29.3Q67.5 -29.3 65.9 -28Q64.3 -26.8 62.9 -24.7Q61.5 -22.5 60.5 -19.8Q59.4 -17.1 58.8 -14.2Q58.2 -11.2 58.2 -8.4L58.2 -8.4Q58.2 -5.4 59.1 -4.1Q60.1 -2.7 62 -2.7M94.3 -28.4L87.5 -28.4L88.1 -32L95.4 -32L97.7 -39.5L106.1 -39.5L103.8 -32L111.1 -32L110.6 -28.4L102.6 -28.4L97.5 -11.7Q97.1 -10.2 96.8 -9.3Q96.6 -8.4 96.5 -7.8Q96.4 -7.3 96.4 -6.9L96.4 -6.9Q96.4 -6.2 96.7 -5.9Q97 -5.6 97.5 -5.6L97.5 -5.6Q98.2 -5.6 99.3 -6.3Q100.5 -6.9 102 -8.3Q103.5 -9.7 105.3 -11.8L105.3 -11.8L107 -10.4Q104.9 -7.4 103 -5.3Q101 -3.2 99.1 -1.8Q97.3 -0.4 95.6 0.2Q93.9 0.8 92.4 0.8L92.4 0.8Q90.3 0.8 89.1 -0.3Q87.8 -1.5 87.8 -4.4L87.8 -4.4Q87.8 -5.6 88.2 -7.4Q88.5 -9.2 89.3 -11.6L89.3 -11.6L94.3 -28.4"/></g>
+
+<text x="80" y="160" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="19" fill="#1C2620">Books your tax losses on Robinhood Chain,</text>
+<text x="80" y="185" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="19" fill="#1C2620">and refuses the rebuy for 30 days.</text>
+<text x="80" y="232" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" font-weight="700" fill="#1E7A46">2.87× less L2 gas at 64 lots</text>
+<text x="80" y="256" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#5E6A60">Stylus 507,993 vs Solidity 1,456,905</text>
+<text x="80" y="290" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#5E6A60">chain 46630 · Rust → WASM · 81 + 6 tests</text>
+
+<!-- the ledger sheet -->
+<rect x="630" y="26" width="620" height="268" rx="4" fill="#F7F8EF" stroke="#1C2620" stroke-width="1.5"/>
+<line x1="648" y1="26" x2="648" y2="294" stroke="#C9564B" stroke-width="1.2"/>
+<line x1="653" y1="26" x2="653" y2="294" stroke="#C9564B" stroke-width="1.2"/>
+<g font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#5E6A60">
+  <text x="672" y="52">LOT</text><text x="920" y="52" text-anchor="end">BASIS/SH</text><text x="1060" y="52" text-anchor="end">MARK</text><text x="1228" y="52" text-anchor="end">GAIN/(LOSS)</text>
+</g>
+<line x1="664" y1="60" x2="1236" y2="60" stroke="#1C2620" stroke-width="2"/>
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+
+  <text x="672" y="82" fill="#1C2620">63</text><text x="920" y="82" text-anchor="end" fill="#1C2620">455.00</text><text x="1060" y="82" text-anchor="end" fill="#1C2620">412.30</text><text x="1228" y="82" text-anchor="end" fill="#1E7A46">(3.34)</text>
+  <line x1="664" y1="90" x2="1236" y2="90" stroke="#B8C9B3" stroke-width="1"/>
+  <text x="672" y="109" fill="#1C2620">62</text><text x="920" y="109" text-anchor="end" fill="#1C2620">453.81</text><text x="1060" y="109" text-anchor="end" fill="#1C2620">412.30</text><text x="1228" y="109" text-anchor="end" fill="#1E7A46">(3.24)</text>
+  <line x1="664" y1="117" x2="1236" y2="117" stroke="#B8C9B3" stroke-width="1"/>
+  <text x="672" y="136" fill="#1C2620">61</text><text x="920" y="136" text-anchor="end" fill="#1C2620">452.62</text><text x="1060" y="136" text-anchor="end" fill="#1C2620">412.30</text><text x="1228" y="136" text-anchor="end" fill="#1E7A46">(3.15)</text>
+  <line x1="664" y1="144" x2="1236" y2="144" stroke="#B8C9B3" stroke-width="1"/>
+  <text x="672" y="163" fill="#1C2620">60</text><text x="920" y="163" text-anchor="end" fill="#1C2620">451.43</text><text x="1060" y="163" text-anchor="end" fill="#1C2620">412.30</text><text x="1228" y="163" text-anchor="end" fill="#1E7A46">(3.06)</text>
+  <line x1="664" y1="171" x2="1236" y2="171" stroke="#B8C9B3" stroke-width="1"/>
+  <text x="672" y="190" fill="#1C2620">59–55</text><text x="920" y="190" text-anchor="end" fill="#1C2620">450.24…445.48</text><text x="1060" y="190" text-anchor="end" fill="#1C2620">412.30</text><text x="1228" y="190" text-anchor="end" fill="#1E7A46">(11.74)</text>
+  <line x1="664" y1="198" x2="1236" y2="198" stroke="#B8C9B3" stroke-width="1"/>
+  <text x="672" y="245" fill="#6B6F68">buy back AMZN, 40 seconds later</text>
+  <line x1="664" y1="253" x2="1236" y2="253" stroke="#B8C9B3" stroke-width="1"/>
+</g>
+
+<!-- story layer: one master dur (8s) -->
+<g>
+  <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.94;0.985;1" dur="8s" repeatCount="indefinite"/>
+
+  <line data-story="beat-2" x1="662" y1="77" x2="1238" y2="75.5" stroke="#1E7A46" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.10;0.16;1" dur="8s" repeatCount="indefinite"/></line>
+  <line data-story="beat-2" x1="662" y1="104" x2="1238" y2="102.5" stroke="#1E7A46" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.17;0.23;1" dur="8s" repeatCount="indefinite"/></line>
+  <line data-story="beat-2" x1="662" y1="131" x2="1238" y2="129.5" stroke="#1E7A46" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.24;0.30;1" dur="8s" repeatCount="indefinite"/></line>
+  <line data-story="beat-2" x1="662" y1="158" x2="1238" y2="156.5" stroke="#1E7A46" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.31;0.37;1" dur="8s" repeatCount="indefinite"/></line>
+  <line data-story="beat-2" x1="662" y1="185" x2="1238" y2="183.5" stroke="#1E7A46" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.38;0.44;1" dur="8s" repeatCount="indefinite"/></line>
+  <g data-story="beat-3" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.45;0.49;1" dur="8s" repeatCount="indefinite"/>
+    <text x="672" y="220" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#5E6A60">BANKED · HIFO · 9 LOTS</text>
+    <text x="1228" y="222" text-anchor="end" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="700" font-size="24" fill="#1E7A46">($24.53)</text>
+    <line x1="1130" y1="228" x2="1230" y2="228" stroke="#1C2620" stroke-width="1.5"/>
+    <line x1="1130" y1="232" x2="1230" y2="232" stroke="#1C2620" stroke-width="1.5"/>
   </g>
-  <g class="beam" opacity="0.05"><rect x="0" y="-40" width="160" height="400" fill="url(#beamGrad)"/></g>
-
-  <!-- ===== left: brand (all visible at t=0 — frame-0 poster) ===== -->
-  <g transform="translate(56,36) scale(0.135)">
-    <rect x="32" y="32" width="448" height="448" rx="100" fill="#1B2129"/>
-    <rect x="34" y="34" width="444" height="444" rx="98" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="6"/>
-    <rect x="96" y="144" width="136" height="36" rx="18" fill="none" stroke="#5E6B78" stroke-width="6" stroke-dasharray="10 12"/>
-    <rect x="96" y="200" width="136" height="36" rx="18" fill="#9AA7B4"/>
-    <rect x="96" y="256" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.82"/>
-    <rect x="96" y="312" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.64"/>
-    <rect x="96" y="368" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.46"/>
-    <rect x="258" y="116" width="28" height="316" rx="14" fill="url(#walled)"/>
-    <rect x="312" y="144" width="136" height="36" rx="18" fill="url(#banked)"/>
-  </g>
-
-  <g transform="translate(56,178)">
-    <path id="wm1" d="M16.8 0L5.1 0L5.1 -56.7L16.8 -56.7L16.8 -33.8L41.5 -33.8L41.5 -56.7L53.1 -56.7L53.1 0L41.5 0L41.5 -24.2L16.8 -24.2L16.8 0M75 0.8L75 0.8Q71 0.8 67.8 -0.6Q64.6 -2 62.7 -4.9Q60.9 -7.7 60.9 -11.9L60.9 -11.9Q60.9 -15.5 62.2 -17.9Q63.5 -20.3 65.8 -21.7Q68 -23.2 70.9 -23.9Q73.8 -24.7 76.9 -25L76.9 -25Q80.6 -25.4 82.9 -25.7Q85.2 -26 86.2 -26.7Q87.3 -27.4 87.3 -28.8L87.3 -28.8L87.3 -29Q87.3 -30.8 86.5 -32.1Q85.7 -33.3 84.2 -34Q82.7 -34.7 80.6 -34.7L80.6 -34.7Q78.4 -34.7 76.7 -34Q75.1 -33.3 74.1 -32.2Q73 -31.1 72.6 -29.7L72.6 -29.7L62.1 -31.5Q63.2 -35.2 65.7 -37.8Q68.3 -40.4 72.1 -41.7Q75.9 -43.1 80.6 -43.1L80.6 -43.1Q84.1 -43.1 87.3 -42.3Q90.5 -41.5 93.1 -39.8Q95.7 -38 97.2 -35.3Q98.7 -32.5 98.7 -28.7L98.7 -28.7L98.7 0L87.9 0L87.9 -5.9L87.5 -5.9Q86.5 -3.9 84.7 -2.4Q83 -0.9 80.6 0Q78.2 0.8 75 0.8M78.3 -7.2L78.3 -7.2Q81 -7.2 83 -8.3Q85 -9.3 86.2 -11.2Q87.3 -13 87.3 -15.2L87.3 -15.2L87.3 -19.8Q86.8 -19.5 85.8 -19.2Q84.8 -18.9 83.5 -18.6Q82.3 -18.4 81 -18.2Q79.8 -18 78.9 -17.9L78.9 -17.9Q76.8 -17.6 75.2 -16.9Q73.6 -16.2 72.7 -15.1Q71.8 -14 71.8 -12.2L71.8 -12.2Q71.8 -10.6 72.7 -9.5Q73.5 -8.3 75 -7.8Q76.4 -7.2 78.3 -7.2M119.9 0L108.4 0L108.4 -42.6L119.5 -42.6L119.5 -35.2L119.9 -35.2Q121.1 -39.1 123.9 -41.1Q126.6 -43.2 130.2 -43.2L130.2 -43.2Q131.1 -43.2 132.1 -43.1Q133.1 -43 133.9 -42.8L133.9 -42.8L133.9 -32.6Q133.1 -32.8 131.7 -33Q130.3 -33.1 129 -33.1L129 -33.1Q126.4 -33.1 124.3 -32Q122.2 -30.9 121 -28.9Q119.9 -26.9 119.9 -24.2L119.9 -24.2L119.9 0M165.2 0L152.2 0L136.5 -42.6L148.6 -42.6L155.8 -20.5Q157.1 -16.3 158.1 -12.1L158.1 -12.1Q158.4 -10.5 158.8 -8.8L158.8 -8.8Q159.2 -10.5 159.6 -12.1L159.6 -12.1Q160.5 -16.3 161.8 -20.5L161.8 -20.5L168.9 -42.6L180.9 -42.6L165.2 0M206.2 0.8L206.2 0.8Q199.7 0.8 195 -1.8Q190.2 -4.5 187.7 -9.4Q185.2 -14.3 185.2 -21.1L185.2 -21.1Q185.2 -27.7 187.7 -32.6Q190.2 -37.6 194.8 -40.3Q199.4 -43.1 205.6 -43.1L205.6 -43.1Q209.8 -43.1 213.4 -41.8Q217.1 -40.4 219.8 -37.8Q222.5 -35.1 224.1 -31Q225.6 -27 225.6 -21.5L225.6 -21.5L225.6 -18.3L196.5 -18.3Q196.6 -15.1 197.7 -12.8L197.7 -12.8Q199 -10.3 201.2 -9Q203.4 -7.8 206.4 -7.8L206.4 -7.8Q208.4 -7.8 210 -8.3Q211.7 -8.9 212.8 -10Q214 -11.2 214.6 -12.8L214.6 -12.8L225 -10.9Q223.9 -7.4 221.4 -4.7Q218.8 -2.1 215 -0.6Q211.2 0.8 206.2 0.8M196.6 -25.5L196.6 -25.5L214.6 -25.5Q214.4 -27.6 213.7 -29.4L213.7 -29.4Q212.7 -31.8 210.7 -33.2Q208.7 -34.5 205.7 -34.5L205.7 -34.5Q202.8 -34.5 200.7 -33.1Q198.6 -31.8 197.6 -29.4L197.6 -29.4Q196.8 -27.7 196.6 -25.5M250.3 0.8L250.3 0.8Q245.2 0.8 241.2 -0.6Q237.3 -2.1 234.8 -4.9Q232.2 -7.7 231.5 -11.7L231.5 -11.7L242.2 -13.5Q243 -10.5 245.1 -9Q247.2 -7.5 250.7 -7.5L250.7 -7.5Q254 -7.5 255.8 -8.8Q257.7 -10 257.7 -11.9L257.7 -11.9Q257.7 -13.6 256.4 -14.7Q255 -15.7 252.2 -16.3L252.2 -16.3L244.9 -17.8Q238.7 -19.1 235.7 -22.1Q232.6 -25.1 232.6 -29.9L232.6 -29.9Q232.6 -34 234.9 -37Q237.1 -39.9 241.1 -41.5Q245.1 -43.1 250.5 -43.1L250.5 -43.1Q255.6 -43.1 259.3 -41.7Q262.9 -40.3 265.2 -37.8Q267.5 -35.2 268.3 -31.8L268.3 -31.8L258.1 -30Q257.5 -32.1 255.7 -33.5Q253.8 -34.9 250.7 -34.9L250.7 -34.9Q247.9 -34.9 246 -33.7Q244.1 -32.6 244.1 -30.6L244.1 -30.6Q244.1 -29 245.3 -27.9Q246.5 -26.8 249.5 -26.2L249.5 -26.2L257.2 -24.6Q263.4 -23.4 266.4 -20.5Q269.4 -17.7 269.4 -13.1L269.4 -13.1Q269.4 -9 266.9 -5.8Q264.5 -2.7 260.2 -0.9Q255.9 0.8 250.3 0.8M290.3 -42.6L298.3 -42.6L298.3 -33.9L290.3 -33.9L290.3 -12.5Q290.3 -10.4 291.2 -9.5Q292.1 -8.5 294.2 -8.5L294.2 -8.5Q294.8 -8.5 296 -8.7Q297.2 -8.8 297.8 -9L297.8 -9L299.4 -0.4Q297.5 0.2 295.6 0.4Q293.8 0.6 292 0.6L292 0.6Q285.6 0.6 282.3 -2.5Q278.9 -5.6 278.9 -11.5L278.9 -11.5L278.9 -33.9L273 -33.9L273 -42.6L278.9 -42.6L278.9 -52.7L290.3 -52.7L290.3 -42.6" fill="url(#wmGrad)"/>
-    <path d="M29.1 0L5.1 0L5.1 -56.7L27.7 -56.7Q33.9 -56.7 38.1 -54.9Q42.2 -53 44.3 -49.7Q46.4 -46.4 46.4 -42.2L46.4 -42.2Q46.4 -38.8 45.1 -36.3Q43.7 -33.8 41.4 -32.2Q39.1 -30.7 36.2 -30L36.2 -30L36.2 -29.4Q39.4 -29.3 42.2 -27.6Q45.1 -25.9 46.8 -22.9Q48.6 -19.8 48.6 -15.7L48.6 -15.7Q48.6 -11.2 46.4 -7.6Q44.2 -4.1 39.9 -2Q35.5 0 29.1 0L29.1 0M16.8 -24.9L16.8 -9.6L26.8 -9.6Q31.9 -9.6 34.3 -11.5Q36.6 -13.5 36.6 -16.8L36.6 -16.8Q36.6 -19.2 35.5 -21Q34.3 -22.9 32.2 -23.9Q30 -24.9 27.1 -24.9L27.1 -24.9L16.8 -24.9M16.8 -47.3L16.8 -32.9L25.9 -32.9Q28.4 -32.9 30.4 -33.8Q32.4 -34.7 33.5 -36.4Q34.6 -38 34.6 -40.3L34.6 -40.3Q34.6 -43.4 32.4 -45.3Q30.2 -47.3 26.2 -47.3L26.2 -47.3L16.8 -47.3M75.5 0.8L75.5 0.8Q69.1 0.8 64.4 -1.9Q59.8 -4.7 57.2 -9.6Q54.7 -14.5 54.7 -21.1L54.7 -21.1Q54.7 -27.7 57.2 -32.7Q59.8 -37.6 64.4 -40.4Q69.1 -43.1 75.5 -43.1L75.5 -43.1Q82 -43.1 86.6 -40.4Q91.3 -37.6 93.8 -32.7Q96.4 -27.7 96.4 -21.1L96.4 -21.1Q96.4 -14.5 93.8 -9.6Q91.3 -4.7 86.6 -1.9Q82 0.8 75.5 0.8M75.5 -8.2L75.5 -8.2Q78.6 -8.2 80.6 -9.8Q82.7 -11.5 83.7 -14.5Q84.7 -17.4 84.7 -21.1L84.7 -21.1Q84.7 -24.9 83.7 -27.8Q82.7 -30.8 80.6 -32.4Q78.6 -34.1 75.5 -34.1L75.5 -34.1Q72.5 -34.1 70.4 -32.4Q68.4 -30.8 67.4 -27.8Q66.3 -24.9 66.3 -21.1L66.3 -21.1Q66.3 -17.4 67.4 -14.5Q68.4 -11.5 70.4 -9.8Q72.5 -8.2 75.5 -8.2M117.5 -42.6L125.5 -42.6L125.5 -33.9L117.5 -33.9L117.5 -12.5Q117.5 -10.4 118.4 -9.5Q119.3 -8.5 121.4 -8.5L121.4 -8.5Q122 -8.5 123.2 -8.7Q124.4 -8.8 125 -9L125 -9L126.6 -0.4Q124.7 0.2 122.8 0.4Q121 0.6 119.2 0.6L119.2 0.6Q112.8 0.6 109.5 -2.5Q106.1 -5.6 106.1 -11.5L106.1 -11.5L106.1 -33.9L100.2 -33.9L100.2 -42.6L106.1 -42.6L106.1 -52.7L117.5 -52.7L117.5 -42.6" transform="translate(306.8,0)" fill="#EAF0F6"/>
-    <g clip-path="url(#wmclip)">
-      <g transform="skewX(-18)">
-        <rect x="0" y="-70" width="72" height="90" fill="url(#shine)" opacity="0.55">
-          <animateTransform attributeName="transform" type="translate" dur="8s" repeatCount="indefinite"
-                            calcMode="linear" values="-200 0;-200 0;460 0;460 0" keyTimes="0;0.04;0.30;1"/>
-        </rect>
+  <g data-story="beat-3" opacity="0" transform="translate(900,252)">
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.5;0.53;1" dur="8s" repeatCount="indefinite"/>
+    <g transform="rotate(-6)">
+      <g>
+        <animateTransform attributeName="transform" type="scale" values="1.7;1.7;1;1" keyTimes="0;0.5;0.55;1" dur="8s" repeatCount="indefinite"/>
+        <rect x="-140" y="-22" width="280" height="44" rx="6" fill="#F3D38B" stroke="#B86E00" stroke-width="5"/>
+        <text x="0" y="-1" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" font-weight="800" letter-spacing="2.5" fill="#1C2620">WALLED</text>
+        <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#1C2620">UNTIL 15 OCT 2026</text>
       </g>
     </g>
   </g>
-
-  <text x="56" y="214" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="17" fill="#9AA7B4">Autonomous tax-loss harvesting for tokenized equities —</text>
-  <text x="56" y="237" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="17" fill="#9AA7B4">bounded by a mandate it physically cannot exceed.</text>
-  <text class="metric" x="56" y="268" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" font-weight="600" fill="#2ED573">~54.1k vs ~420.3k gas · 64-lot HIFO · ~8× on Stylus</text>
-  <text x="56" y="293" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12.5" fill="#9AA7B4" opacity="0.85">Stylus · Rust/WASM · Solidity · Foundry · Robinhood Chain · Next.js</text>
-
-  <!-- ===== right: the product story (steady-state scenery visible at t=0) ===== -->
-  <!-- the ledger: 64 lots, ranked, highest basis on top -->
-  <text x="600" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#9AA7B4" letter-spacing="1">TaxLotLedger · 64 lots · HIFO</text>
-  <g fill="#9AA7B4">
-    <rect x="600" y="68" width="150" height="12" rx="6" opacity="0.95"/>
-    <rect x="600" y="88" width="150" height="12" rx="6" opacity="0.85"/>
-    <rect x="600" y="108" width="150" height="12" rx="6" opacity="0.75"/>
-    <rect x="600" y="128" width="150" height="12" rx="6" opacity="0.6"/>
-    <rect x="600" y="148" width="150" height="12" rx="6" opacity="0.48"/>
-    <rect x="600" y="168" width="150" height="12" rx="6" opacity="0.38"/>
-    <rect x="600" y="188" width="150" height="12" rx="6" opacity="0.28"/>
-    <rect x="600" y="208" width="150" height="12" rx="6" opacity="0.2"/>
-  </g>
-  <text x="600" y="242" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">basis $380–$455 · 10 sh/lot</text>
-  <!-- the rail from the ledger to wIVV, and the dashed placeholder where the wall will stand -->
-  <line x1="756" y1="74" x2="1124" y2="74" stroke="#3A4450" stroke-width="2"/>
-  <path d="M1118 68 L1128 74 L1118 80" fill="none" stroke="#3A4450" stroke-width="2"/>
-  <!-- placeholder + label are brand layer (visible at t=0); they yield to the amber wall while it stands -->
-  <line x1="990" y1="40" x2="990" y2="200" stroke="#5E6B78" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round">
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="1;1;0;0;1;1" keyTimes="0;0.42;0.50;0.93;0.97;1"/>
-  </line>
-  <text x="990" y="222" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">WashSaleGuard
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="1;1;0;0;1;1" keyTimes="0;0.46;0.50;0.93;0.97;1"/>
-  </text>
-  <!-- wIVV node -->
-  <rect x="1132" y="46" width="92" height="56" rx="12" fill="#1B2129" stroke="rgba(255,255,255,0.12)"/>
-  <text x="1178" y="70" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="600" fill="#EAF0F6">wIVV</text>
-  <rect x="1160" y="78" width="36" height="14" rx="3" fill="#7C4DEB"/>
-  <text x="1178" y="89" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" font-weight="600" fill="#ffffff" letter-spacing="1">MOCK</text>
-  <text x="1178" y="120" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#5E6B78">stay invested</text>
-
-  <!-- ===== story layer (fades to 0 by 97% — loop seam) ===== -->
-  <!-- beat 2: the mark drops — chip lands, the nine highest-basis lots light up -->
-  <g opacity="0" data-story="beat-2">
-    <rect x="600" y="252" width="176" height="24" rx="12" fill="#1B2129" stroke="#9AA7B4"/>
-    <text x="688" y="268" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#EAF0F6">mark ↓ $412.30 · 9 lots</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.10;0.14;0.93;0.97;1"/>
-  </g>
-  <g fill="#2ED573" opacity="0" data-story="beat-2">
-    <rect x="600" y="68" width="150" height="12" rx="6"/>
-    <rect x="600" y="88" width="150" height="12" rx="6" opacity="0.85"/>
-    <rect x="600" y="108" width="150" height="12" rx="6" opacity="0.7"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0.35;0.35;0;0" keyTimes="0;0.15;0.22;0.30;0.40;0.93;0.97;1"/>
-  </g>
-  <!-- beat 3: the nine lots leave the ledger along the rail, green, out past the wall's line -->
-  <rect x="700" y="68" width="50" height="12" rx="6" fill="url(#banked)" opacity="0" data-story="beat-3" filter="url(#packetGlow)">
-    <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" path="M0 0 L380 0" keyPoints="0;0;1;1" keyTimes="0;0.28;0.46;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.26;0.29;0.46;0.50;1"/>
-  </rect>
-  <line x1="756" y1="74" x2="1124" y2="74" stroke="#2ED573" stroke-width="2" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" opacity="0" data-story="beat-3">
-    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.28;0.46;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.8;0.8;0;0" keyTimes="0;0.27;0.30;0.93;0.97;1"/>
-  </line>
-  <!-- beat 3: the way back goes amber — the wall draws in behind the lots that left -->
-  <!-- NOTE: the wall is a <rect>, never a vertical <line> — a zero-width bounding box makes both a
-       gradient stroke and a blur filter region collapse to nothing (caught by measured frame QA). -->
-  <rect x="983" y="40" width="14" height="0" rx="7" fill="url(#walled)" opacity="0" data-story="beat-3">
-    <animate attributeName="height" dur="8s" repeatCount="indefinite" values="0;0;160;160" keyTimes="0;0.42;0.50;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.41;0.43;0.93;0.97;1"/>
-  </rect>
-  <rect x="981" y="40" width="18" height="160" rx="9" fill="#FFB020" opacity="0" data-story="beat-3" filter="url(#wallGlow)">
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.7;0.35;0.8;0.4;0.6;0;0" keyTimes="0;0.44;0.52;0.62;0.70;0.82;0.90;0.96;1"/>
-  </rect>
-  <g opacity="0" data-story="beat-3">
-    <text x="990" y="222" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FFB020">window 30 days</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.48;0.52;0.93;0.97;1"/>
-  </g>
-  <!-- beat 3: the banked label pops as the lots arrive -->
-  <g class="pop-bank" opacity="0" data-story="beat-3">
-    <rect x="800" y="86" width="160" height="26" rx="13" fill="#123B24" stroke="#2ED573"/>
-    <text x="880" y="103" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#2ED573">−$3,140.00 banked</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.47;0.50;0.93;0.97;1"/>
-  </g>
-  <!-- beat 4: a rebuy heads back from wIVV toward the ledger and is refused at the wall -->
-  <g opacity="0" data-story="beat-4">
-    <text x="1178" y="160" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#9AA7B4">rebuy wVOO</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.55;0.58;0.93;0.97;1"/>
-  </g>
-  <circle cx="1132" cy="140" r="7" fill="#9AA7B4" opacity="0" data-story="beat-4" filter="url(#packetGlow)">
-    <animateMotion dur="8s" repeatCount="indefinite" calcMode="linear" path="M0 0 L-128 0" keyPoints="0;0;1;1" keyTimes="0;0.57;0.66;1"/>
-    <animate attributeName="fill" dur="8s" repeatCount="indefinite" values="#9AA7B4;#9AA7B4;#FFB020;#FFB020" keyTimes="0;0.65;0.67;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.56;0.59;0.93;0.97;1"/>
-  </circle>
-  <line x1="1132" y1="140" x2="1004" y2="140" stroke="#9AA7B4" stroke-width="2" stroke-dasharray="5 5" pathLength="100" stroke-dashoffset="100" opacity="0" data-story="beat-4">
-    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.57;0.66;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.7;0.7;0;0" keyTimes="0;0.56;0.59;0.93;0.97;1"/>
-  </line>
-  <g opacity="0" data-story="beat-4" stroke="#FFB020" stroke-width="3" stroke-linecap="round">
-    <line x1="998" y1="134" x2="1010" y2="146"/>
-    <line x1="1010" y1="134" x2="998" y2="146"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;0.2;1;1;0;0" keyTimes="0;0.66;0.675;0.69;0.705;0.93;0.97;1"/>
-  </g>
-  <g class="pop-block" opacity="0" data-story="beat-4">
-    <rect x="790" y="127" width="190" height="26" rx="13" fill="#3A2C0A" stroke="#FFB020"/>
-    <text x="885" y="144" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FFB020" letter-spacing="0.5">BLOCKED · WashSaleViolation</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.66;0.69;0.93;0.97;1"/>
-  </g>
-  <!-- beat 4 echo: the rogue off-map attempt (wVOO → wTSLA) is refused and the bond is cut -->
-  <line x1="756" y1="182" x2="978" y2="182" stroke="#FF4757" stroke-width="2" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" opacity="0" data-story="beat-4">
-    <animate attributeName="stroke-dashoffset" dur="8s" repeatCount="indefinite" values="100;100;0;0" keyTimes="0;0.72;0.78;1"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;0.6;0.6;0;0;0" keyTimes="0;0.71;0.73;0.77;0.79;0.97;1"/>
-  </line>
-  <!-- the rogue line stops at the wall (x=997) and retracts as the chip lands, so the chip never sits on a line -->
-  <g opacity="0" data-story="beat-4" stroke="#FF4757" stroke-width="3" stroke-linecap="round">
-    <line x1="984" y1="176" x2="996" y2="188"/>
-    <line x1="996" y1="176" x2="984" y2="188"/>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.77;0.785;0.93;0.97;1"/>
-  </g>
-  <g class="pop-slash" opacity="0" data-story="beat-4">
-    <rect x="770" y="168" width="200" height="26" rx="13" fill="#3A1216" stroke="#FF4757"/>
-    <text x="870" y="185" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" font-weight="600" fill="#FF4757" letter-spacing="0.5">SLASHED · bond −$2,640.00</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.76;0.79;0.93;0.97;1"/>
-  </g>
-  <g opacity="0" data-story="beat-4">
-    <text x="1124" y="204" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#FF4757">rogue wVOO → wTSLA (off-map)</text>
-    <animate attributeName="opacity" dur="8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.72;0.75;0.93;0.97;1"/>
-  </g>
+</g>
 </svg>

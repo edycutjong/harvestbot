@@ -1,40 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img"
-     aria-label="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days">
-  <!-- The mark: a ranked ledger of lots (left), its top slice cut away and banked green (right),
-       and the amber wash-sale wall standing where the slice used to sit. At 16px it is three shapes:
-       the grey stack, the amber wall, the green slice. The plate makes it self-sufficient on
-       GitHub light AND dark (green on white alone is 1.9:1). -->
-  <defs>
-    <linearGradient id="hb-banked" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%"   stop-color="var(--primary, #2ED573)"/>
-      <stop offset="100%" stop-color="var(--color-success, #22C55E)"/>
-    </linearGradient>
-    <linearGradient id="hb-walled" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="var(--accent, #FFB020)"/>
-      <stop offset="100%" stop-color="var(--color-warning, #F59E0B)"/>
-    </linearGradient>
-    <filter id="hb-glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="10" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-
-  <!-- plate (dual-background safety) -->
-  <rect x="32" y="32" width="448" height="448" rx="100" fill="var(--plate, #12161B)"/>
-  <rect x="34" y="34" width="444" height="444" rx="98" fill="none"
-        stroke="rgba(255,255,255,0.16)" stroke-width="4"/>
-
-  <!-- the ledger: four lots still open, ranked; the top slot is vacant (dashed) -->
-  <rect x="96" y="144" width="136" height="36" rx="18" fill="none"
-        stroke="var(--text-low, #5E6B78)" stroke-width="4" stroke-dasharray="10 12"/>
-  <rect x="96" y="200" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)"/>
-  <rect x="96" y="256" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.82"/>
-  <rect x="96" y="312" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.64"/>
-  <rect x="96" y="368" width="136" height="36" rx="18" fill="var(--text-mid, #9AA7B4)" opacity="0.46"/>
-
-  <!-- the wash-sale wall: amber, full height of the ledger, the way back is shut -->
-  <rect x="258" y="116" width="28" height="316" rx="14" fill="url(#hb-walled)"/>
-
-  <!-- the banked slice: the nine highest-basis lots, out past the wall, green -->
-  <rect x="312" y="144" width="136" height="36" rx="18" fill="url(#hb-banked)" filter="url(#hb-glow)"/>
+     aria-label="HarvestBot: a ledger page whose highest-basis lots are struck through in green ink, with an amber hold stamp walling the rebuy">
+  <!-- The mark (2026-09-27): a columnar-pad page. Lot lines in graphite; the two top
+       lines (highest basis, HIFO) struck through with one green-ink rule = banked; an amber rubber
+       stamp set at -6 degrees across the lower line = walled. At 16px it is three shapes: the paper
+       plate, the green strike, the amber stamp. The ink border holds the plate on GitHub light AND dark. -->
+  <rect x="28" y="28" width="456" height="456" rx="92" fill="#F1F3E6" stroke="#1C2620" stroke-width="14"/>
+  <!-- the pad's red double margin rule (structure, not state) -->
+  <line x1="118" y1="42" x2="118" y2="470" stroke="#C9564B" stroke-width="6"/>
+  <line x1="132" y1="42" x2="132" y2="470" stroke="#C9564B" stroke-width="6"/>
+  <!-- the pad's green row ruling -->
+  <line x1="42" y1="188" x2="470" y2="188" stroke="#B8C9B3" stroke-width="6"/>
+  <line x1="42" y1="268" x2="470" y2="268" stroke="#B8C9B3" stroke-width="6"/>
+  <line x1="42" y1="348" x2="470" y2="348" stroke="#B8C9B3" stroke-width="6"/>
+  <!-- lot entries in graphite (open, unbooked) -->
+  <rect x="168" y="120" width="226" height="46" rx="8" fill="#6B6F68"/>
+  <rect x="168" y="200" width="186" height="46" rx="8" fill="#6B6F68"/>
+  <rect x="168" y="284" width="206" height="38" rx="8" fill="#6B6F68" opacity="0.7"/>
+  <!-- the ledger strike: one green-ink rule through the two highest-basis lines = banked -->
+  <line x1="146" y1="143" x2="440" y2="143" stroke="#1E7A46" stroke-width="18" stroke-linecap="round"/>
+  <line x1="146" y1="223" x2="400" y2="223" stroke="#1E7A46" stroke-width="18" stroke-linecap="round"/>
+  <!-- the amber hold stamp, -6 degrees, across the rebuy line = walled -->
+  <g transform="rotate(-6 300 380)">
+    <rect x="170" y="330" width="262" height="104" rx="12" fill="#F3D38B" stroke="#B86E00" stroke-width="16"/>
+    <rect x="202" y="364" width="198" height="14" rx="4" fill="#1C2620"/>
+    <rect x="202" y="392" width="128" height="12" rx="4" fill="#1C2620" opacity="0.75"/>
+  </g>
 </svg>

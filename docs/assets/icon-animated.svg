@@ -1,73 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img"
-     aria-label="HarvestBot — nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days">
-<!-- STORYBOARD (dur 6s — must equal this file's single master dur)
-  0-10%   steady state: full mark visible — plate, ranked ledger with its vacant top slot, amber wall, green banked slice (poster rule satisfied)
-  10-25%  trigger:      the mark drops — a pulse ring fires in the vacant slot, the loss is spotted            data-story="beat-2"
-  25-55%  mechanism:    nine high-basis lots leave the ledger green as banked loss; the way back goes amber, walled for 30 days   data-story="beat-3"
-  55-80%  resolution:   a rebuy packet heads back toward the ledger, meets the wall and is refused — the wall glow-breathes amber; the walled state persists   data-story="beat-4"
-  80-100% breathe + seam fade (all story opacity is 0 by 96%)
+     aria-label="HarvestBot: on a ledger page the two highest-basis lot lines are struck through in green ink, then an amber hold stamp lands across the rebuy line and stays">
+<!-- STORYBOARD (dur 6s, this file's single master dur)
+  0-12%   steady state: paper plate, red double margin, green ruling, three graphite lot bars. Poster-complete.
+  12-40%  trigger: the harvest confirms; the top lot line, then the second, are struck in green ink.   data-story="beat-2"
+  40-55%  mechanism: Nine high-basis lots struck through in green ink; an amber stamp walls the way back until 15 Oct.   data-story="beat-3"
+  55-94%  resolution: strikes and stamp persist (held state).   data-story="beat-4"
+  94-100% seam: story layer fades; loop restarts on the poster.
 -->
-  <style>
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-  </style>
-  <defs>
-    <linearGradient id="banked" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%"   stop-color="#2ED573"/>
-      <stop offset="100%" stop-color="#22C55E"/>
-    </linearGradient>
-    <linearGradient id="walled" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#FFB020"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="14"/>
-    </filter>
-  </defs>
-
-  <!-- ===== brand layer: fully visible at t=0 (frame-0 poster) ===== -->
-  <rect x="32" y="32" width="448" height="448" rx="100" fill="#12161B"/>
-  <rect x="34" y="34" width="444" height="444" rx="98" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="4"/>
-  <!-- the ledger: vacant top slot + four open lots -->
-  <rect x="96" y="144" width="136" height="36" rx="18" fill="none" stroke="#5E6B78" stroke-width="4" stroke-dasharray="10 12"/>
-  <rect x="96" y="200" width="136" height="36" rx="18" fill="#9AA7B4"/>
-  <rect x="96" y="256" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.82"/>
-  <rect x="96" y="312" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.64"/>
-  <rect x="96" y="368" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0.46"/>
-  <!-- the wash-sale wall -->
-  <rect x="258" y="116" width="28" height="316" rx="14" fill="url(#walled)"/>
-  <!-- the banked slice: pops when the story slice lands on it -->
-  <rect x="312" y="144" width="136" height="36" rx="18" fill="url(#banked)">
-    <animate attributeName="y" dur="6s" repeatCount="indefinite" values="144;144;138;144;144" keyTimes="0;0.50;0.54;0.60;1"/>
-    <animate attributeName="height" dur="6s" repeatCount="indefinite" values="36;36;48;36;36" keyTimes="0;0.50;0.54;0.60;1"/>
-  </rect>
-
-  <!-- ===== story layer (fades to 0 by 96% — loop seam) ===== -->
-  <!-- beat 2: the mark drops — pulse ring in the vacant slot -->
-  <circle cx="164" cy="162" r="10" fill="none" stroke="#9AA7B4" stroke-width="6" opacity="0" data-story="beat-2">
-    <animate attributeName="r" dur="6s" repeatCount="indefinite" values="10;10;70;70" keyTimes="0;0.10;0.24;1"/>
-    <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;0.9;0;0" keyTimes="0;0.10;0.13;0.25;1"/>
-  </circle>
-  <!-- beat 3: the nine lots leave the ledger, grey → green, out past the wall -->
-  <rect x="96" y="144" width="136" height="36" rx="18" fill="#9AA7B4" opacity="0" data-story="beat-3">
-    <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" path="M0 0 L216 0" keyPoints="0;0;1;1" keyTimes="0;0.30;0.50;1"/>
-    <animate attributeName="fill" dur="6s" repeatCount="indefinite" values="#9AA7B4;#9AA7B4;#2ED573;#2ED573" keyTimes="0;0.32;0.46;1"/>
-    <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.25;0.29;0.50;0.54;1"/>
-  </rect>
-  <!-- beat 3→4: the way back goes amber — the wall glow rises as the slice passes and breathes through the resolution -->
-  <rect x="258" y="116" width="28" height="316" rx="14" fill="#FFB020" opacity="0" data-story="beat-3" filter="url(#soft)">
-    <animate attributeName="opacity" dur="6s" repeatCount="indefinite"
-             values="0;0;0.75;0.45;0.9;0.5;0.8;0;0" keyTimes="0;0.40;0.48;0.60;0.68;0.80;0.90;0.96;1"/>
-  </rect>
-  <!-- beat 4: a rebuy packet heads back toward the ledger and is refused at the wall -->
-  <circle cx="380" cy="256" r="18" fill="#9AA7B4" opacity="0" data-story="beat-4">
-    <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" path="M0 0 L-76 0" keyPoints="0;0;1;1" keyTimes="0;0.56;0.66;1"/>
-    <animate attributeName="fill" dur="6s" repeatCount="indefinite" values="#9AA7B4;#9AA7B4;#FFB020;#FFB020" keyTimes="0;0.64;0.67;1"/>
-    <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.54;0.58;0.78;0.84;1"/>
-  </circle>
-  <!-- beat 4: the refusal — an amber cross flashes where the packet stopped -->
-  <g opacity="0" data-story="beat-4" stroke="#FFB020" stroke-width="8" stroke-linecap="round">
-    <line x1="290" y1="242" x2="318" y2="270"/>
-    <line x1="318" y1="242" x2="290" y2="270"/>
-    <animate attributeName="opacity" dur="6s" repeatCount="indefinite" values="0;0;1;0.2;1;1;0;0" keyTimes="0;0.66;0.68;0.70;0.72;0.90;0.96;1"/>
+<style>
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect x="28" y="28" width="456" height="456" rx="92" fill="#F1F3E6" stroke="#1C2620" stroke-width="14"/>
+<line x1="118" y1="42" x2="118" y2="470" stroke="#C9564B" stroke-width="6"/>
+<line x1="132" y1="42" x2="132" y2="470" stroke="#C9564B" stroke-width="6"/>
+<line x1="42" y1="188" x2="470" y2="188" stroke="#B8C9B3" stroke-width="6"/>
+<line x1="42" y1="268" x2="470" y2="268" stroke="#B8C9B3" stroke-width="6"/>
+<line x1="42" y1="348" x2="470" y2="348" stroke="#B8C9B3" stroke-width="6"/>
+<rect x="168" y="120" width="226" height="46" rx="8" fill="#6B6F68"/>
+<rect x="168" y="200" width="186" height="46" rx="8" fill="#6B6F68"/>
+<rect x="168" y="284" width="206" height="38" rx="8" fill="#6B6F68" opacity="0.7"/>
+<g>
+  <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.94;0.985;1" dur="6s" repeatCount="indefinite"/>
+  <line data-story="beat-2" x1="146" y1="143" x2="440" y2="143" stroke="#1E7A46" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.12;0.24;1" dur="6s" repeatCount="indefinite"/></line>
+  <line data-story="beat-2" x1="146" y1="223" x2="400" y2="223" stroke="#1E7A46" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"><animate attributeName="stroke-dashoffset" values="100;100;0;0" keyTimes="0;0.26;0.38;1" dur="6s" repeatCount="indefinite"/></line>
+  <g data-story="beat-3" opacity="0" transform="translate(301,382)">
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.42;0.46;1" dur="6s" repeatCount="indefinite"/>
+    <g transform="rotate(-6)">
+      <g>
+        <animateTransform attributeName="transform" type="scale" values="1.6;1.6;1;1" keyTimes="0;0.42;0.5;1" dur="6s" repeatCount="indefinite"/>
+        <rect x="-131" y="-52" width="262" height="104" rx="12" fill="#F3D38B" stroke="#B86E00" stroke-width="16"/>
+        <rect x="-99" y="-18" width="198" height="14" rx="4" fill="#1C2620"/>
+        <rect x="-99" y="10" width="128" height="12" rx="4" fill="#1C2620" opacity="0.75"/>
+      </g>
+    </g>
   </g>
+</g>
 </svg>
