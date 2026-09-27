@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judge HarvestBot in 30 seconds — receipts, contracts, reproduce</title>
+<meta name="description" content="The judge's path for HarvestBot: five clicks, three on-chain beats, every deployed address on Robinhood Chain testnet, the reproduce commands, and the honest limits.">
+<meta name="author" content="Edy Cu">
+<meta name="theme-color" content="#F1F3E6">
+<link rel="canonical" href="https://harvestbot.edycu.dev/judge/">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<!-- OG image: bump ?v= whenever og-image.png is regenerated -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HarvestBot">
+<meta property="og:url" content="https://harvestbot.edycu.dev/judge/">
+<meta property="og:title" content="Judge HarvestBot in 30 seconds">
+<meta property="og:description" content="Five clicks, no wallet: the harvest, the refused rebuy, the slash — on Robinhood Chain testnet 46630. Every address, every reproduce command, every limit.">
+<meta property="og:image" content="https://harvestbot.edycu.dev/assets/og-image.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HarvestBot: nine high-basis lots struck through in green ink; an amber stamp walls the rebuy until 15 Oct 2026.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Judge HarvestBot in 30 seconds">
+<meta name="twitter:description" content="Five clicks, no wallet: the harvest, the refused rebuy, the slash — on Robinhood Chain testnet 46630. Every address, every reproduce command, every limit.">
+<meta name="twitter:image" content="https://harvestbot.edycu.dev/assets/og-image.png?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rpc.testnet.chain.robinhood.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #F1F3E6;
+  --paper-2: #E6EBD6;
+  --ink:     #1C2620;
+  --muted:   #5E6A60;
+  --rule:    #B8C9B3;
+  --margin:  #C9564B;
+  --link:    #1F4E9C;
+  --before:  #6B6F68;
+  --after:   #1E7A46;
+  --wall:    #B86E00;
+  --wall-fill: #F3D38B;
+  --slash:   #B3261E;
+  --mock:    #6A4FB0;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data:    "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+</style>
+<link rel="stylesheet" href="../assets/ledger.css">
+<style>
+.wrap { padding-left: calc(var(--gut) + 24px); padding-right: var(--gut); max-width: 1400px; margin: 0 auto; }
+.head { padding-top: 56px; padding-bottom: 8px; }
+.head h1 { font: 400 clamp(40px, 5.2vw, 76px)/1.02 var(--font-display); letter-spacing: -.02em; margin: 14px 0 18px; max-width: 15em; text-wrap: balance; }
+.head h1 em { font-style: italic; color: var(--after); }
+.pitch { max-width: 60ch; font-size: 19px; margin: 0 0 26px; }
+.pitch b { font-weight: 600; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.jsec { padding-top: 72px; padding-bottom: 8px; }
+.jsec .sec-h { font-size: clamp(30px, 3.6vw, 48px); }
+
+/* the status line (same contract as /verify) */
+.status { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border: 1.5px solid var(--ink); background: var(--bg); }
+.status .meta { font: 400 13px/1.5 var(--font-data); color: var(--muted); }
+.status[data-state="fallback"] { border-color: var(--wall); background: var(--wall-fill); }
+
+/* ---------- the 30-second path: a ledger you strike as you go ---------- */
+.path { list-style: none; margin: 26px 0 0; padding: 0; border-top: 1.5px solid var(--ink); counter-reset: step; }
+.path li { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 6px 16px; align-items: start;
+  padding: 16px 4px 16px 0; border-bottom: 1px solid var(--rule); counter-increment: step; }
+.path li:nth-child(5) { border-bottom: 3.5px double var(--ink); }
+.path .n { font: italic 400 30px/1 var(--font-display); color: var(--muted); padding-top: 2px; }
+.path .n::before { content: counter(step); }
+.path h3 { font: 400 23px/1.25 var(--font-display); margin: 0 0 4px; position: relative; display: inline; }
+.path h3 em { font-style: italic; }
+.path p { margin: 6px 0 0; max-width: 72ch; }
+.path .go { font: 500 13.5px/1.5 var(--font-data); display: inline-block; margin-top: 6px; overflow-wrap: anywhere; }
+.tick { display: inline-flex; align-items: center; gap: 8px; font: 600 11.5px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); cursor: pointer; user-select: none; padding: 8px 10px; border: 1px solid var(--rule); background: var(--bg);
+  transition: color .18s, border-color .18s, background .18s, transform .15s var(--ease); white-space: nowrap; }
+.tick:hover { color: var(--after); border-color: var(--after); background: var(--paper-2); }
+.tick:active { transform: scale(.96); }
+.tick input { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; margin: 0; border: 1.5px solid currentColor; border-radius: 2px;
+  display: grid; place-content: center; cursor: pointer; background: var(--bg); }
+.tick input::after { content: ""; width: 8px; height: 4px; border: solid var(--bg); border-width: 0 0 2px 2px; transform: rotate(-45deg) translate(1px, -1px); opacity: 0; }
+.tick input:checked { background: var(--after); border-color: var(--after); }
+.tick input:checked::after { opacity: 1; }
+.tick input:focus-visible { outline: 2.5px solid var(--link); outline-offset: 3px; }
+.path li .strike { position: absolute; left: 44px; right: 0; top: 33px; height: 2px; background: var(--after); transform: scaleX(0); transform-origin: left center;
+  transition: transform .42s var(--ease); pointer-events: none; }
+.path li.done .strike { transform: scaleX(1); }
+.path li.done .n { color: var(--after); }
+.path li.done .tick { color: var(--after); border-color: var(--after); }
+.tally { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
+.tally .t { font: italic 500 26px/1.1 var(--font-display); color: var(--after); }
+.tally .t span { font-family: var(--font-data); font-style: normal; font-size: 20px; }
+.tally .muted { font-size: 14.5px; }
+
+/* ---------- beats ---------- */
+.beats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 28px; border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); }
+.bt { padding: 22px 22px 24px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; background: var(--bg);
+  transition: background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease); }
+.bt:hover { background: var(--paper-2); transform: translateY(-3px); box-shadow: 0 14px 26px -22px rgba(28,38,32,.6); position: relative; z-index: 1; }
+.bt h3 { font: 400 28px/1.15 var(--font-display); margin: 8px 0 8px; letter-spacing: -.01em; }
+.bt h3 em { font-style: italic; }
+.bt.b1 h3 em { color: var(--after); } .bt.b2 h3 em { color: var(--wall); font-weight: 600; } .bt.b3 h3 em { color: var(--slash); }
+.bt p { margin: 0 0 12px; }
+.bt ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.bt li { padding: 8px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; }
+.bt li a { font: 500 13.5px/1.5 var(--font-data); overflow-wrap: anywhere; }
+.bt li .rd { display: block; font: 400 12.5px/1.45 var(--font-data); color: var(--muted); margin-top: 2px; }
+.bt li .rd b { font-weight: 600; }
+.bt li .rd .ok { color: var(--after); } .bt li .rd .rv { color: var(--ink); background: var(--wall-fill); box-shadow: inset 0 0 0 1px var(--wall); padding: 0 4px; }
+.src { display: inline-block; margin-left: 6px; font: 600 11px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; padding: 3px 5px 2px; border: 1px solid currentColor; border-radius: 2px; vertical-align: .1em; }
+.src.live { color: var(--after); } .src.rec { color: var(--ink); background: var(--wall-fill); border-color: var(--wall); } .src.now { color: var(--link); }
+.after-beats { margin-top: 16px; font-size: 15px; color: var(--muted); max-width: 70ch; }
+
+/* ---------- contracts ---------- */
+.groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 48px; margin-top: 30px; }
+.col { display: grid; gap: 36px; align-content: start; min-width: 0; }
+.grp { min-width: 0; }
+.grp.wide { grid-column: 1 / -1; }
+.grp h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font: 400 26px/1.2 var(--font-display); margin: 0 0 6px; padding-bottom: 8px; border-bottom: 1.5px solid var(--ink); }
+.grp h3 .label { font-size: 11px; }
+.grp.retired h3 { color: var(--muted); }
+.addr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 0 12px; border-bottom: 1px solid var(--rule); align-items: center; }
+.addr .nm { font: 500 16px/1.35 var(--font-body); }
+.addr .nm small { display: block; font: 400 13.5px/1.45 var(--font-body); color: var(--muted); margin-top: 2px; }
+.addr .nm small a { font-family: var(--font-data); font-size: 12.5px; }
+.addr .hx { grid-column: 1 / -1; font: 500 14px/1.45 var(--font-data); overflow-wrap: anywhere; color: var(--ink); }
+.addr .act { display: flex; gap: 8px; align-items: center; grid-row: 1; grid-column: 2; }
+.addr .ex { font: 600 12px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; padding: 7px 8px 6px; border: 1px solid transparent; border-radius: 2px;
+  transition: border-color .18s, background .18s, color .18s; }
+.addr .ex:hover { border-color: var(--link); background: var(--paper-2); }
+.grp.retired .addr .hx { color: var(--before); text-decoration: line-through; text-decoration-color: var(--before); text-decoration-thickness: 1.5px; }
+.srcnote { margin-top: 18px; font-size: 14.5px; color: var(--muted); max-width: 72ch; }
+
+/* ---------- reproduce ---------- */
+.repro { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 28px; }
+.cmd { background: var(--ink); color: var(--bg); border-radius: 6px; overflow: hidden; min-width: 0; box-shadow: 0 24px 50px -36px rgba(28,38,32,.8); }
+.cmd.wide { grid-column: 1 / -1; }
+.cmd-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px 8px 14px; border-bottom: 1px solid #3A4540; font: 500 12px/1.4 var(--font-data); color: var(--rule); }
+.cmd pre { margin: 0; padding: 16px 16px 18px; font: 400 13px/1.7 var(--font-data); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+.cmd .c { color: var(--wall-fill); }
+.cmd .ok { color: var(--rule); font-weight: 600; }
+.cmd .dim { color: #A9B3A6; }
+.cmd .copy { color: var(--wall-fill); border-color: #7A6A3F; }
+.cmd .copy:hover { background: var(--wall-fill); color: var(--ink); border-color: var(--wall-fill); }
+.cmd .copy[data-done] { color: var(--rule); border-color: var(--rule); background: none; }
+.livecall { margin-top: 14px; padding: 12px 16px; border: 1.5px solid var(--ink); font-size: 15px; }
+.livecall code { font-size: 14px; }
+
+/* ---------- receipt block ---------- */
+.rtab { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 15.5px; }
+.rtab th { text-align: left; vertical-align: top; width: 190px; padding: 12px 16px 12px 0; font: 600 11.5px/1.5 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.rtab td { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.rtab tr:last-child th, .rtab tr:last-child td { border-bottom: 3.5px double var(--ink); }
+.rtab .fig { font: italic 500 22px/1.2 var(--font-display); color: var(--after); }
+
+/* ---------- criteria ---------- */
+.crit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-top: 28px; border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); }
+.cr { padding: 24px 24px 26px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; }
+.cr .label i { font-style: normal; color: var(--ink); margin-right: 8px; }
+.cr h3 { font: 400 27px/1.15 var(--font-display); margin: 8px 0 12px; letter-spacing: -.01em; }
+.cr h3 em { font-style: italic; }
+.cr ul { margin: 0; padding: 0; list-style: none; }
+.cr li { position: relative; padding: 8px 0 8px 22px; border-top: 1px solid var(--rule); }
+.cr li::before { content: ""; position: absolute; left: 2px; top: 19px; width: 10px; height: 2px; background: var(--after); }
+.cr li a { overflow-wrap: anywhere; }
+
+/* ---------- honest limits (verbatim) ---------- */
+.limits { margin: 26px 0 0; padding: 0; list-style: none; border-top: 3.5px double var(--ink); max-width: 980px; }
+.limits li { padding: 14px 0 14px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; }
+.limits li > span { font: italic 400 22px/1.2 var(--font-display); color: var(--muted); }
+.limits b { font-weight: 600; }
+.verb { font-size: 14.5px; color: var(--muted); margin-top: 14px; }
+
+/* ---------- links ---------- */
+.linkgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 26px; border-top: 1.5px solid var(--ink); border-left: 1px solid var(--rule); }
+.lk { display: block; padding: 18px 18px 20px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink); min-width: 0;
+  transition: background .22s var(--ease), transform .22s var(--ease), box-shadow .22s var(--ease); }
+.lk:hover { background: var(--paper-2); transform: translateY(-3px); box-shadow: 0 14px 26px -22px rgba(28,38,32,.6); position: relative; z-index: 1; }
+.lk b { display: block; font: 400 24px/1.2 var(--font-display); }
+.lk span { display: block; margin-top: 6px; font: 500 12.5px/1.45 var(--font-data); color: var(--link); overflow-wrap: anywhere; }
+.lk small { display: block; margin-top: 6px; font-size: 14px; color: var(--muted); }
+.nav-links a[aria-current="page"] { color: var(--after); font-weight: 600; }
+.nav-links a[aria-current="page"]:hover { background-size: 100% 2px; }
+.endpad { padding-bottom: 96px; }
+
+@media (max-width: 1080px) {
+  .beats { grid-template-columns: minmax(0, 1fr); }
+  .linkgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .groups, .repro, .crit { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .path li { grid-template-columns: 30px minmax(0, 1fr); }
+  .path li .tick { grid-column: 2; justify-self: start; }
+  .path li .strike { left: 30px; }
+  .path .n { font-size: 24px; }
+  .path h3 { font-size: 20px; }
+  .rtab th { display: block; width: auto; border-bottom: 0; padding: 12px 0 0; }
+  .rtab td { display: block; padding: 4px 0 12px; }
+  .rtab tr:last-child th { border-bottom: 0; }
+  .linkgrid { grid-template-columns: minmax(0, 1fr); }
+  .addr .act { grid-row: auto; grid-column: 1 / -1; }
+  .nav-links { gap: 12px; }
+  .status { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { .path li .strike { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <a class="brand" href="../" aria-label="HarvestBot home"><img src="../assets/icon.svg" alt="" width="30" height="30">HarvestBot</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a class="hide-sm" href="../#loop">The loop</a>
+    <a href="../verify/">Verify</a>
+    <a href="./" aria-current="page">Judge</a>
+    <a class="hide-sm" href="../deck/">Deck</a>
+    <a class="btn sm hide-sm" href="https://github.com/edycutjong/harvestbot">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+<section class="wrap head" aria-labelledby="h1">
+  <div class="label">For judges · 30 seconds, no setup · Robinhood Chain testnet 46630</div>
+  <h1 id="h1">Five clicks. <em>No wallet.</em> Every claim on a line you can check.</h1>
+  <p class="pitch"><b>HarvestBot lets an autonomous agent harvest tax losses on Robinhood tokenized equities, bounded by an onchain mandate it physically cannot exceed, and gets it slashed when it lies.</b></p>
+  <div class="ctas">
+    <a class="btn ink" href="../verify/">Verify live in your browser <svg class="arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+    <a class="btn" href="#contracts">Every address</a>
+    <a class="btn" href="#reproduce">Reproduce</a>
+    <a class="btn" href="#criteria">By criterion</a>
+  </div>
+  <div class="status" id="status" data-state="idle" role="status" aria-live="polite">
+    <span class="live" id="st-live" data-state="idle"><i></i><span id="st-text">Reading chain 46630 from your browser…</span></span>
+    <span class="meta" id="st-meta">rpc.testnet.chain.robinhood.com · 1 batch · no wallet</span>
+  </div>
+</section>
+
+<section class="wrap jsec" id="path" aria-labelledby="path-h">
+  <div class="label">Click these, in order · strike each line as you go</div>
+  <h2 class="sec-h" id="path-h">The 30-second path.</h2>
+  <ol class="path" id="checklist">
+    <li data-step="1"><span class="n" aria-hidden="true"></span>
+      <div><h3><em>The harvest happened.</em></h3>
+        <p>Agent-signed, router-gated, HIFO recomputed by the Stylus ledger, 9 lots, real AMZN → real NFLX.</p>
+        <a class="go" data-tick="1" href="https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123">0x689c4d34…6123 on the explorer ↗</a></div>
+      <label class="tick"><input type="checkbox" aria-label="Step 1 checked"> checked</label><span class="strike" aria-hidden="true"></span></li>
+    <li data-step="2"><span class="n" aria-hidden="true"></span>
+      <div><h3><em>The chain refused the rebuy.</em></h3>
+        <p>Status 0, <code>WashSaleViolation</code>. Same agent, same key, 40 seconds later.</p>
+        <a class="go" data-tick="2" href="https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10">0xd486468e…cf10 on the explorer ↗</a></div>
+      <label class="tick"><input type="checkbox" aria-label="Step 2 checked"> checked</label><span class="strike" aria-hidden="true"></span></li>
+    <li data-step="3"><span class="n" aria-hidden="true"></span>
+      <div><h3><em>The rogue trade got the agent slashed.</em></h3>
+        <p><code>Slashed(agent, mandate, 200000000, 20000000, 180000000, …)</code>, called by a third-party key. The same bond refuses stale proof: the expired beat-2 envelope reverts <code>EnvelopeNotLive</code>.</p>
+        <a class="go" data-tick="3" href="https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb">0x6b896b6e…7dcb on the explorer ↗</a></div>
+      <label class="tick"><input type="checkbox" aria-label="Step 3 checked"> checked</label><span class="strike" aria-hidden="true"></span></li>
+    <li data-step="4"><span class="n" aria-hidden="true"></span>
+      <div><h3><em>The Stylus ledger is real WASM on Robinhood Chain.</em></h3>
+        <p><code>ArbWasm.stylusVersion() = 3</code> on chain 46630; deployed and activated in one <code>cargo stylus deploy</code> tx, <a href="https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed">0x5cc682a7…77ed ↗</a>.</p>
+        <a class="go" data-tick="4" href="https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21">0xEff7…5a21 on the explorer ↗</a></div>
+      <label class="tick"><input type="checkbox" aria-label="Step 4 checked"> checked</label><span class="strike" aria-hidden="true"></span></li>
+    <li data-step="5"><span class="n" aria-hidden="true"></span>
+      <div><h3><em>The numbers.</em></h3>
+        <p>Stylus vs Solidity <code>computeHarvest</code> on the same chain, same inputs, identical outputs: <b>2.87× less L2 gas at 64 lots, 3.1× at 128</b>, with the WASM program uncached (worst case).</p>
+        <a class="go" data-tick="5" href="https://github.com/edycutjong/harvestbot/blob/main/bench/RESULTS.md">bench/RESULTS.md ↗</a></div>
+      <label class="tick"><input type="checkbox" aria-label="Step 5 checked"> checked</label><span class="strike" aria-hidden="true"></span></li>
+  </ol>
+  <div class="tally"><span class="t" id="tally"><span>0</span> of 5 struck</span><span class="muted">Zero clicks into code: <a href="../verify/">/verify</a> reads these receipts from chain 46630 live, no wallet.</span></div>
+</section>
+
+<section class="wrap jsec" id="beats" aria-labelledby="beats-h">
+  <div class="label">The one flow · every hash an explorer link · status read live where it is cheap</div>
+  <h2 class="sec-h" id="beats-h">Harvest, <em>refuse</em>, slash.</h2>
+  <div class="beats">
+    <article class="bt b1">
+      <div class="label">Beat 1 · harvest</div>
+      <h3>Nine lots <em>banked</em>.</h3>
+      <p>Sell 0.638501 AMZN, HIFO lots 63 → 55, rotate into NFLX. The mandate recomputed the picks on the Stylus ledger and realized <b>−$24.531251</b>.</p>
+      <ul>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123">harvest 0x689c4d34…6123 ↗</a><span class="rd" data-f="b1"><span class="ok">success</span> · block 119,852,570 · 1,096,548 gas <span class="src rec">receipt</span></span></li>
+      </ul>
+    </article>
+    <article class="bt b2">
+      <div class="label">Beat 2 · blocked rebuy</div>
+      <h3>The rebuy, <em>refused</em>.</h3>
+      <p>NFLX → AMZN, 40 seconds later. Reverted <code>WashSaleViolation(owner, AMZN, AMZN, 1792060681)</code>: walled until 15 Oct 2026.</p>
+      <ul>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10">rebuy 0xd486468e…cf10 ↗</a><span class="rd" data-f="b2"><span class="rv">reverted</span> · block 119,852,786 <span class="src rec">receipt</span></span></li>
+        <li>Asked now: <code>assertBuyAllowed(owner, AMZN)</code><span class="rd" data-f="b2now">read on load</span></li>
+      </ul>
+    </article>
+    <article class="bt b3">
+      <div class="label">Beat 3 · slashed</div>
+      <h3>The rogue trade, <em>slashed</em>.</h3>
+      <p>AMZN → PLTR was never a sanctioned substitute: reverted <code>OffMapSubstitute</code>. A third-party key, <code>0x0Fec…28e2</code>, used the signed envelope as proof. Bond <b>1,000 → 800 mUSDC</b>.</p>
+      <ul>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8">attempt 0xd8b6e577…94c8 ↗</a><span class="rd" data-f="b3a"><span class="rv">reverted</span> · block 125,092,578 <span class="src rec">receipt</span></span></li>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb">challenge 0x6b896b6e…7dcb ↗</a><span class="rd" data-f="b3s"><span class="ok">success</span> · block 125,092,624 · 151053 gas <span class="src rec">receipt</span></span></li>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51">stale beat-2 envelope 0x673f8459…ed51 ↗</a><span class="rd"><span class="rv">reverted</span> <code>EnvelopeNotLive</code> · block 125093006 <span class="src rec">receipt</span></span></li>
+        <li><a href="https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049">executed beat-1 envelope 0xbbf04002…c049 ↗</a><span class="rd"><span class="rv">reverted</span> <code>EnvelopeNotLive</code> · block 125093035 <span class="src rec">receipt</span></span></li>
+      </ul>
+    </article>
+  </div>
+  <p class="after-beats">Tags: <span class="src live">live</span> read from the RPC in your browser just now · <span class="src rec">receipt</span> from the committed <code>receipts/46630.json</code>. The decoded events (lot ids, slash split, live bond balance) are on <a href="../verify/">/verify</a>.</p>
+</section>
+
+<section class="wrap jsec" id="contracts" aria-labelledby="ct-h">
+  <div class="label">Deployed on chain 46630 · deployments/46630.json + deployments/46630-bench.json</div>
+  <h2 class="sec-h" id="ct-h">Every address, in full, one click from the explorer.</h2>
+  <div class="groups" id="groups">
+    <div class="col">
+    <div class="grp">
+      <h3>Stylus <span class="label">Rust → WASM</span></h3>
+      <div class="addr" data-key="ledger"><div class="nm">TaxLotLedger<small>the HIFO engine the mandate checks against · <a href="https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed">deploy + activation tx ↗</a></small></div><code class="hx">0xEff7B46049fC677F58264e0ebb19dF1a39195a21</code></div>
+      <div class="addr" data-key="bench.stylus"><div class="nm">Bench ledger · Stylus<small>benchmark twin, seeded 8 → 128 lots</small></div><code class="hx">0x1a337c6d48bc0d19f913d16074d362d065564f86</code></div>
+    </div>
+    <div class="grp">
+      <h3>MOCK <span class="chip mock">labeled in name and symbol</span></h3>
+      <div class="addr" data-key="oracle"><div class="nm">MockOracle<small>the mark: AMZN $412.30</small></div><code class="hx">0xBaDD49e6f6665Bdc90AE21EC2AAA22fD8cf52598</code></div>
+      <div class="addr" data-key="swap"><div class="nm">MockSwap<small>fixed-rate venue at the oracle mark</small></div><code class="hx">0xFd7f7A2beE5F1DC47A59691bF023948567969E6a</code></div>
+      <div class="addr" data-key="usdc"><div class="nm">MockUSDC<small>the bond's collateral</small></div><code class="hx">0x0E8A996DBD141352fA10940ae8045C323dC03f89</code></div>
+    </div>
+    </div>
+    <div class="col">
+    <div class="grp">
+      <h3>Solidity <span class="label">0.8.28 · OpenZeppelin 5.4</span></h3>
+      <div class="addr" data-key="mandate"><div class="nm">HarvestMandate<small>owner custody; re-validates every decision</small></div><code class="hx">0x15FDF1F8A537ea7e660C9867b3e5e66B0996a6E2</code></div>
+      <div class="addr" data-key="router"><div class="nm">ExecutionRouter<small>1 target · 1 selector · value 0</small></div><code class="hx">0x2a121714bEA2B69154521aEba9C5039C500c19aE</code></div>
+      <div class="addr" data-key="guard"><div class="nm">WashSaleGuard<small>walls the rebuy for 30 days</small></div><code class="hx">0x1A98594aA8dC627b34b586756833bbe508B0A29C</code></div>
+      <div class="addr" data-key="subMap"><div class="nm">SubstituteMap<small>owner-curated pairs</small></div><code class="hx">0x1e8Df64A7B17490dcDd4E03E695Cb1E766A37CfE</code></div>
+      <div class="addr" data-key="bond"><div class="nm">AgentBond · hardened V2<small>redeployed 2026-09-27 · <a href="https://explorer.testnet.chain.robinhood.com/tx/0x295a72bf1352dcedb03442d86b39ba0f7cbe0877a354553a3fde72172bce69ef">deploy tx ↗</a></small></div><code class="hx">0xBA9257cbE8Aff6c5FD091295a175DB904931e273</code></div>
+      <div class="addr" data-key="bench.solidity"><div class="nm">Bench ledger · Solidity<small>the control: same ABI, same integer semantics</small></div><code class="hx">0xa220D5B0b6E944266acd76288678e91a6BcfAAca</code></div>
+    </div>
+    <div class="grp">
+      <h3>Real assets · keys <span class="chip real">faucet stock tokens</span></h3>
+      <div class="addr" data-key="assetSell"><div class="nm">AMZN Stock Token<small>sold in beat 1</small></div><code class="hx">0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02</code></div>
+      <div class="addr" data-key="assetBuy"><div class="nm">NFLX Stock Token<small>the sanctioned substitute</small></div><code class="hx">0x3b8262A63d25f0477c4DDE23F83cfe22Cb768C93</code></div>
+      <div class="addr" data-key="assetOffmap"><div class="nm">PLTR Stock Token<small>off the map: beat 3</small></div><code class="hx">0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0</code></div>
+      <div class="addr" data-key="owner"><div class="nm">Owner (Maya) · deployer</div><code class="hx">0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b</code></div>
+      <div class="addr" data-key="agent"><div class="nm">Agent session key<small>can call exactly one function through the router</small></div><code class="hx">0xF783e954a1827bD33d210Ed2d21120aC1511457E</code></div>
+    </div>
+    </div>
+    <div class="grp wide retired">
+      <h3>Retired · AgentBond V1 <span class="label">pre-fix build · not read by any live surface</span></h3>
+      <div class="addr" data-key="bondV1.address"><div class="nm">AgentBond V1<small>retired 2026-09-27 — challenge() accepted executed/expired envelopes; agent could withdraw while active. Holds the historical beat-3 slash.</small></div><code class="hx">0x822fAC45a881801955b3130076A58790bBb40736</code></div>
+    </div>
+  </div>
+  <p class="srcnote">Copy puts the full checksummed address on your clipboard, exactly as committed in <code>deployments/46630.json</code>. The beat-3 challenger <code>0x0Feca08dECA807b8adF412b3DCA608eDEb4428e2</code> is recorded in <code>receipts/46630.json</code>.</p>
+</section>
+
+<section class="wrap jsec" id="reproduce" aria-labelledby="rp-h">
+  <div class="label">Reproduce the judged path · real, no flags · DEMO.md → Reproduce</div>
+  <h2 class="sec-h" id="rp-h">Three commands. Two need no network; one needs <em>no wallet</em>.</h2>
+  <div class="repro">
+    <figure class="cmd" style="margin:0"><div class="cmd-bar"><span>contracts/ · offline</span><button class="copy" type="button" data-copy="cd contracts &amp;&amp; forge test">Copy</button></div>
+<pre><span class="c">$</span> cd contracts &amp;&amp; forge test
+<span class="dim">Ran 8 test suites</span>
+<span class="ok">81 tests passed</span>, 0 failed, 0 skipped (81 total tests)
+<span class="dim"># incl. the -3,140.00 scenario and 3 fuzz properties</span></pre></figure>
+    <figure class="cmd" style="margin:0"><div class="cmd-bar"><span>stylus/ledger/ · offline</span><button class="copy" type="button" data-copy="cd stylus/ledger &amp;&amp; cargo test">Copy</button></div>
+<pre><span class="c">$</span> cd stylus/ledger &amp;&amp; cargo test
+<span class="ok">6 native tests</span> on the WASM engine
+<span class="dim"># same pinned scenario: exactly −$3,140.000000</span></pre></figure>
+    <figure class="cmd wide" style="margin:0"><div class="cmd-bar"><span>live · read-only · no wallet</span><button class="copy" type="button" id="copy-cast">Copy</button></div>
+<pre id="cast-cmd"><span class="c">$</span> cast call 0xEff7B46049fC677F58264e0ebb19dF1a39195a21 \
+  'computeHarvest(address,address,uint256,uint256)(uint64[],int256)' \
+  0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b 0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02 638501157098660213 412300000 \
+  --rpc-url https://rpc.testnet.chain.robinhood.com
+[55, 54, 53, 52, 51, 50, 49, 48, 47]
+-18321704 <span class="dim">[-1.832e7]</span></pre></figure>
+  </div>
+  <p class="livecall" id="livecall">The ledger answers with the next nine: beat 1 already sold lots 63–56 and part of 55. Beat 1's own picks and −24531251 are in its <code>HarvestReport</code> event. <span id="cast-live"></span></p>
+</section>
+
+<section class="wrap jsec" id="receipt" aria-labelledby="rb-h">
+  <div class="label">Receipt block · JUDGE.md</div>
+  <h2 class="sec-h" id="rb-h">The totals, <em>carried down</em>.</h2>
+  <table class="rtab">
+    <tbody>
+      <tr><th scope="row">Tests</th><td><span class="fig">81 + 6</span> — 81 Foundry (100&nbsp;% line · 100&nbsp;% function · 98.3&nbsp;% statement · 89.2&nbsp;% branch on <code>src/</code>, 3 fuzz properties) + 6 Stylus native</td></tr>
+      <tr><th scope="row">Static analysis</th><td><span class="fig">0 · 0</span> — Slither: 0 high, 0 medium — <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/SLITHER.md">docs/SLITHER.md</a> triages all 10 remaining (Low / Info / Optimization)</td></tr>
+      <tr><th scope="row">Deployed</th><td>6 system contracts (1 Stylus + 5 Solidity) + 3 labeled MOCKs + 2 bench ledgers on Robinhood Chain testnet — <a href="https://github.com/edycutjong/harvestbot/tree/main/deployments">deployments/</a></td></tr>
+      <tr><th scope="row">Real-run cost</th><td>whole demo incl. deploy &lt; 0.002 ETH</td></tr>
+      <tr><th scope="row">Pinned scenario</th><td>64 lots × 10 sh, $380→$455, mark $412.30 → <span class="fig">exactly −$3,140.000000</span> on both engines</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="wrap jsec" id="criteria" aria-labelledby="cr-h">
+  <div class="label">The four judging criteria · evidence, not adjectives</div>
+  <h2 class="sec-h" id="cr-h">One box per line of the <em>scoresheet</em>.</h2>
+  <div class="crit">
+    <article class="cr">
+      <div class="label"><i>I</i>Smart contract quality</div>
+      <h3>Best practices, efficient, <em>minimal vulns</em>.</h3>
+      <ul>
+        <li>81 Foundry tests: 100&nbsp;% line · 100&nbsp;% function · 98.3&nbsp;% statement · 89.2&nbsp;% branch on <code>src/</code>; 3 fuzz properties; 6 Stylus native. <a href="https://github.com/edycutjong/harvestbot/tree/main/contracts/test">contracts/test ↗</a></li>
+        <li>Slither 0 high · 0 medium; every remaining finding triaged. <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/SLITHER.md">docs/SLITHER.md ↗</a></li>
+        <li>Least privilege: the agent key reaches one target, one selector, value 0, with an expiry and a daily rate limit. No path exists from the agent key to a withdrawal.</li>
+        <li>An audit hardened <code>AgentBond</code> (live-envelope-only challenges, no bond exit while the agent key is active; 8 regression tests), redeployed and proven on chain: two <code>EnvelopeNotLive</code> reverts. <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/ARCHITECTURE.md#deployed-build-vs-source">ARCHITECTURE.md ↗</a></li>
+      </ul>
+    </article>
+    <article class="cr">
+      <div class="label"><i>II</i>Product-Market Fit</div>
+      <h3>A service people already <em>pay for</em>, missing on chain.</h3>
+      <ul>
+        <li>Maya is down $3,140 on paper and does nothing: banking it means picking which of 64 tax lots to sell, then policing a 30-day wash-sale calendar.</li>
+        <li>Wealthfront and Betterment sell exactly this service ("direct indexing") for 0.25&nbsp;%/yr. On chain, none of the plumbing exists.</li>
+        <li>The assets are Robinhood's own testnet Stock Tokens — AMZN, NFLX, PLTR from the official faucet — on the chain that issues them. <a href="#contracts">addresses ↓</a></li>
+      </ul>
+    </article>
+    <article class="cr">
+      <div class="label"><i>III</i>Innovation &amp; Creativity</div>
+      <h3>The agent's own signature is <em>the evidence</em>.</h3>
+      <ul>
+        <li>A tax-lot HIFO ledger in Rust on Arbitrum Stylus: 2.87× less L2 gas at 64 lots, 3.1× at 128, identical <code>lotIds</code> and <code>realizedLoss</code> at every size. <a href="https://github.com/edycutjong/harvestbot/blob/main/bench/RESULTS.md">bench/RESULTS.md ↗</a></li>
+        <li>Anyone holding an envelope the mandate must reject can slash it: 20&nbsp;% of the bond, a tenth of that as bounty. Beat 3 was challenged by a key that is neither owner nor agent.</li>
+        <li>Arbitrum precompiles as a capability probe: <code>ArbWasm.stylusVersion() = 3</code> answered "is WASM live on this Orbit chain?" in one RPC call. <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/DX-REPORT.md">DX-REPORT.md ↗</a></li>
+      </ul>
+    </article>
+    <article class="cr">
+      <div class="label"><i>IV</i>Real Problem Solving</div>
+      <h3>The rule is enforced by a <em>revert</em>, not a reminder.</h3>
+      <ul>
+        <li>The rebuy inside the window reverted on chain: <code>WashSaleViolation(owner, AMZN, AMZN, 1792060681)</code>. <a href="https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10">beat 2 ↗</a></li>
+        <li>The mandate re-verifies signature, nonce, deadline, substitute map, wash-sale window, HIFO selection and realized loss at the oracle mark before anything moves.</li>
+        <li>Seven invariants (INV-1 custody … INV-7 determinism) each have a named test. <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md ↗</a></li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="wrap jsec" id="limits" aria-labelledby="lm-h">
+  <div class="label">Honest limitations · verbatim from JUDGE.md</div>
+  <h2 class="sec-h" id="lm-h">What it is not, <em>before you ask</em>.</h2>
+  <ol class="limits">
+    <li><span>i</span><div><b>Testnet only.</b> Robinhood Chain mainnet exists; we did not deploy there (gas budget + unaudited code).</div></li>
+    <li><span>ii</span><div><b>The oracle mark, the swap venue and the bond's USDC are MOCK contracts</b>, labeled in name and symbol. There is no AMM for Stock Tokens on the testnet. The assets themselves are real faucet tokens.</div></li>
+    <li><span>iii</span><div><b>The "substantially identical" map is owner-curated</b>, not an oracle judgment — a wrong map is an owner risk. Map and oracle changes are not timelocked yet.</div></li>
+    <li><span>iv</span><div><b>Wash-sale scope:</b> re-buys are walled for the 30 days <em>after</em> a harvest; the 30-day look-back before the sale is not enforced yet.</div></li>
+    <li><span>v</span><div><b><code>AgentBond</code> was redeployed on 2026-09-27</b> with an audit hardening (live-envelope-only challenges, no bond exit while the agent key is active; 8 regression tests) and beat 3 was re-run against it. The pre-fix V1 (<code>0x822f…0736</code>) is retired and holds only the first run's slash — details and the rest of the known limits in <a href="https://github.com/edycutjong/harvestbot/blob/main/docs/ARCHITECTURE.md#known-limitations-by-design-or-deferred"><code>docs/ARCHITECTURE.md</code></a>.</div></li>
+    <li><span>vi</span><div><b>The agent is <code>rule-v1</code></b> (deterministic HIFO + first allowed substitute). No LLM in the loop; the rationale hash commits to a plain-text rationale string. We say "agent", not "AI".</div></li>
+    <li><span>vii</span><div><b>The bench is worst-case for Stylus</b>: Robinhood testnet has no ArbOS cache manager yet, so every call pays the WASM init floor. The spec had guessed ~8×; the chain says 2.9×–3.1× — we report the chain.</div></li>
+  </ol>
+</section>
+
+<section class="wrap jsec endpad" id="links" aria-labelledby="lk-h">
+  <div class="label">Everything else</div>
+  <h2 class="sec-h" id="lk-h">Where to <em>look next</em>.</h2>
+  <div class="linkgrid">
+    <a class="lk" href="../verify/"><b>Verify</b><span>harvestbot.edycu.dev/verify</span><small>your browser asks the chain; no wallet, no server</small></a>
+    <a class="lk" href="https://github.com/edycutjong/harvestbot"><b>Repository</b><span>github.com/edycutjong/harvestbot</span><small>contracts, Stylus ledger, receipts, MIT</small></a>
+    <a class="lk" href="../deck/"><b>Pitch deck</b><span>harvestbot.edycu.dev/deck</span><small>12 slides · ←/→ · N for notes</small></a>
+    <a class="lk" href="https://github.com/edycutjong/harvestbot/blob/main/DEMO.md"><b>DEMO.md</b><span>the three beats + Reproduce</span><small>hashes, blocks, gas, the killer number</small></a>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <span>HarvestBot · MIT © 2026 Edy Cu · testnet only</span>
+  <nav aria-label="Footer"><a href="../">Home</a><a href="../verify/">Verify</a><a href="../deck/">Deck</a><a href="https://github.com/edycutjong/harvestbot">GitHub</a><a href="https://explorer.testnet.chain.robinhood.com">Explorer ↗</a></nav>
+</footer>
+
+<script src="../assets/chain.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var fmt = function (n) { return Number(n).toLocaleString("en-US"); };
+
+  /* ---- addresses: copy buttons + explorer links, built from the committed text ---- */
+  Array.prototype.forEach.call(document.querySelectorAll(".addr"), function (row) {
+    var a = row.querySelector(".hx").textContent.trim();
+    var act = document.createElement("div"); act.className = "act";
+    act.innerHTML = '<button class="copy" type="button">Copy</button><a class="ex" href="' + HB.addrUrl(a) + '">Explorer ↗</a>';
+    act.querySelector(".copy").setAttribute("data-copy", a);
+    act.querySelector(".copy").setAttribute("aria-label", "Copy " + row.querySelector(".nm").firstChild.textContent.trim() + " address");
+    row.appendChild(act);
+  });
+  $("#copy-cast").setAttribute("data-copy", $("#cast-cmd").textContent.split("\n").slice(0, 4).join("\n").replace(/^\$ /, ""));
+
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.top = "-1000px"; document.body.appendChild(ta); ta.select();
+    var ok = false; try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta); return ok;
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-copy]") : null; if (!b) return;
+    var text = b.getAttribute("data-copy");
+    function done(ok) {
+      var label = b.textContent; b.textContent = ok ? "Copied" : "Select + copy"; if (ok) b.setAttribute("data-done", "");
+      setTimeout(function () { b.textContent = label === "Copied" ? "Copy" : label; b.removeAttribute("data-done"); }, 1600);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(legacyCopy(text)); });
+    else done(legacyCopy(text));
+  });
+
+  /* ---- the 30-second path: strike a line when checked or when its link is opened ---- */
+  var KEY = "hb-judge-path", saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+  var items = Array.prototype.slice.call(document.querySelectorAll("#checklist li"));
+  function tally() {
+    var n = items.filter(function (li) { return li.classList.contains("done"); }).length;
+    $("#tally").innerHTML = "<span>" + n + "</span> of 5 struck" + (n === 5 ? " — banked." : "");
+  }
+  function mark(li, on) {
+    li.classList.toggle("done", on); li.querySelector("input").checked = on;
+    saved[li.getAttribute("data-step")] = on ? 1 : 0;
+    try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* private mode: fine */ }
+    tally();
+  }
+  items.forEach(function (li) {
+    var box = li.querySelector("input");
+    if (saved[li.getAttribute("data-step")]) { li.classList.add("done"); box.checked = true; }
+    box.addEventListener("change", function () { mark(li, box.checked); });
+    li.querySelector("a.go").addEventListener("click", function () { mark(li, true); });
+  });
+  tally();
+
+  /* ---- live: one batch from chain.js, same as /verify ---- */
+  function tag(live) { return live ? ' <span class="src live">live</span>' : ' <span class="src rec">receipt</span>'; }
+  function st(s) { return s === 1 ? '<span class="ok">success</span>' : '<span class="rv">reverted</span>'; }
+  function line(f, r, live, showGas) {
+    var el = document.querySelector('[data-f="' + f + '"]'); if (!el || !r) return;
+    el.innerHTML = st(r.status) + " · block " + fmt(r.block) + (showGas && r.gas ? " · " + fmt(r.gas) + " gas" : "") + tag(live);
+  }
+  HB.read().then(function (o) {
+    var L = o.live;
+    $("#status").dataset.state = L ? "live" : "fallback"; $("#st-live").dataset.state = L ? "live" : "fallback";
+    if (L) {
+      $("#st-text").innerHTML = "Live · the beats below re-read at block <b>" + fmt(o.head) + "</b>";
+      $("#st-meta").textContent = "chainId " + o.chainId + " · " + o.at.toLocaleTimeString() + " · 1 batch, no wallet";
+    } else {
+      $("#st-text").innerHTML = "RPC unreachable — showing the <b>committed receipts</b> (receipts/46630.json)";
+      $("#st-meta").textContent = o.error;
+    }
+    line("b1", o.beat1, L, true); line("b2", o.beat2, L, false); line("b3a", o.beat3a, L, false); line("b3s", o.beat3s, L, true);
+    var now = document.querySelector('[data-f="b2now"]');
+    if (o.rebuyNow && o.rebuyNow.reverts) now.innerHTML = '<span class="rv">reverts</span> WashSaleViolation · window ends ' + o.rebuyNow.windowEnd + ' <span class="src now">now</span>';
+    else if (o.rebuyNow) now.innerHTML = 'does not revert — the 30-day window has closed <span class="src now">now</span>';
+    else now.innerHTML = "not read (offline)" + tag(false);
+    if (L && o.nextHarvest) {
+      var same = o.nextHarvest.lotIds.join(",") === "55,54,53,52,51,50,49,48,47";
+      $("#cast-live").innerHTML = "Your browser just asked the same question: <code>[" + o.nextHarvest.lotIds.join(", ") + "] · " + o.nextHarvest.realizedLoss + "</code>" +
+        ' <span class="src now">now</span>' + (same ? "" : " (the ledger has moved since the recorded run)");
+    }
+  });
+})();
+</script>
+</body>
+</html>
