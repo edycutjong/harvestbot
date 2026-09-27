@@ -1,8 +1,9 @@
 # Slither triage — HarvestBot contracts
 
 `slither . --filter-paths "lib/|test/|script/" --exclude-dependencies` on `contracts/` (solc 0.8.28,
-Slither 0.11.5). Raw output: `docs/slither.json`. **0 High · 0 Medium · 9 findings total** (6 Low,
-2 Informational, 1 Optimization). Every one is listed here with a decision — nothing is hidden.
+Slither 0.11.5). Raw output: `docs/slither.json`. **0 High · 0 Medium · 10 findings total** (7 Low,
+2 Informational, 1 Optimization) — re-run 2026-09-27 after the `AgentBond` hardening (the tenth is
+one more `timestamp` comparison: `challenge` now rejects expired envelopes). Every one is listed here with a decision — nothing is hidden.
 
 Two detectors are suppressed **inline, next to the code, with the reason in the comment** (grep
 `slither-disable-next-line`): `uninitialized-state` on `TaxLotLedger._lots` (a mapping of dynamic
@@ -19,6 +20,6 @@ explicitly rather than suppressed.
 | `missing-zero-check` | Low → **fixed** | `setMandate`, `setAgentKey`, `router_` | Added `ZeroAddress()` reverts + `MandateSet` events (commit "chore(slither)"). |
 | `events-access` | Low → **fixed** | `TaxLotLedger.setMandate` | `MandateSet` event added. |
 | `calls-loop` | Low | `HarvestMandate.aumUsd()` oracle read per asset | Bounded by the number of distinct assets ever held (≤ 5 on testnet); view-only. |
-| `timestamp` | Low | wash-sale window, router expiry, bond cooldown | The product **is** a 30-day timestamp rule. Sequencer timestamp drift on an Arbitrum chain is seconds, the window is 2,592,000 s. |
+| `timestamp` | Low | wash-sale window, router expiry, bond cooldown, envelope deadline in `AgentBond.challenge` | The product **is** a 30-day timestamp rule. Sequencer timestamp drift on an Arbitrum chain is seconds, the window is 2,592,000 s. |
 | `naming-convention` | Info | `WASH_SALE_WINDOW()`, `AMZN`-style test names | Interface mirrors the spec's constant-style getter on purpose. |
 | `cache-array-length` | Optimisation | HIFO scan loops | Cached where it matters (`n = lots.length` in `_computeHarvest`); the others are ≤ 5-element lists. |

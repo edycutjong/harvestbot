@@ -1,7 +1,7 @@
 # Architecture — as built
 
-Seven contracts on Robinhood Chain testnet (46630). One of them is Rust compiled to WASM (Stylus);
-six are Solidity 0.8.28. The owner and the agent are **different keys**; the agent's only path into the
+Six system contracts on Robinhood Chain testnet (46630) — one is Rust compiled to WASM (Stylus), five
+are Solidity 0.8.28 — plus three labeled MOCKs (oracle, swap venue, bond USDC). The owner and the agent are **different keys**; the agent's only path into the
 system is one function selector behind a router.
 
 ```mermaid
@@ -53,25 +53,59 @@ ticker of what the vault holds; it never moves value out. Tested: `test_INV1_*` 
 `stylus/ledger/src/lib.rs`. Storage: `lots[owner][asset]` (append-only `Lot[]`), cached open count and
 open quantity. `compute_harvest` copies all lots into memory once, then runs the O(n·k) HIFO selection
 (cross-multiplied basis-per-unit comparison, no division) and prorates the last lot. `realize` recomputes
-and reverts on any mismatch before mutating. `contracts/src/TaxLotLedger.sol` is the byte-for-byte
-semantic twin, used for the gas benchmark and as the fallback ledger on chains without Stylus.
+and reverts on any mismatch before mutating. `contracts/src/TaxLotLedger.sol` is the semantic
+twin (same ABI, same integer rounding, same tie-break: lowest lot id wins), used for the gas benchmark and as the fallback ledger on chains without Stylus.
 
 ## Slashing (INV-6)
 
 `AgentBond.challenge(mandate, envelope)` is permissionless. It recovers the signer through the mandate's
-own EIP-712 domain, checks the envelope against the substitute map and the wash-sale guard, and — if the
-mandate would have rejected it — slashes `S = min(B, L_owner + 0.2·B)` (`L_owner = 0` for a reverted
-attempt), pays `0.1·S` to the challenger and `0.9·S` to the owner, and resets the agent's withdrawal
-cooldown. The same proof cannot be used twice.
+own EIP-712 domain and accepts only a **live** envelope — addressed to the mandate's owner, nonce unused,
+deadline not passed — so an executed or expired envelope can never be re-read against today's map and
+windows to slash an honest agent. It then checks the substitute map and the wash-sale guard (only the
+guard's own `WashSaleViolation` counts) and — if the mandate would reject it — slashes
+`S = min(B, L_owner + 0.2·B)` (`L_owner = 0` for a reverted attempt), pays `0.1·S` to the challenger and
+`0.9·S` to the owner, and resets the agent's withdrawal cooldown. The same proof cannot be used twice.
+An agent can withdraw only after the cooldown **and** after the owner has rotated its key out of the
+mandate; a staked bond backs one mandate at a time.
 
 ## What is MOCK
 
 `MockOracle` (marks), `MockSwap` (fixed-rate venue at the oracle marks, no fee), `MockUSDC` (bond
-token). All three say MOCK in their name/symbol. `MockStockToken` exists only for Foundry tests and
-the Sepolia bench mirror — on Robinhood Chain the assets are the faucet's Stock Tokens.
+token). All three say MOCK in their name/symbol. `MockStockToken` exists only for Foundry tests — on
+Robinhood Chain the assets are the faucet's Stock Tokens (the bench ledgers use synthetic asset keys and
+never touch a token).
 
 ## Storage & data
 
 - On chain: everything above. No server, no database.
 - In repo: `deployments/<chainId>.json` (addresses), `receipts/<chainId>.json` (beat tx hashes +
   numbers), `receipts/envelopes/*.hex` (the signed envelopes, incl. the rogue one), `bench/results.json`.
+
+## Deployed build vs. source
+
+Everything on chain 46630 was deployed from commit `4fca49e`. A 2026-09-27 audit hardened
+`AgentBond` in source (commit `478019e`, 7 regression tests in `Bond.t.sol`): live-envelope-only
+challenges, `WashSaleViolation`-only offence (b), and no bond exit while the agent key is active. The
+**deployed** `AgentBond` (`0x822f…0736`) is the pre-hardening build; every other deployed contract is
+unchanged in source. The three beats are unaffected — the beat-3 envelope was live (unused nonce,
+deadline ahead) when it was challenged, so the hardened contract accepts the same proof.
+
+## Known limitations (by design or deferred)
+
+- **Wash-sale look-back is not enforced.** The guard walls re-buys for 30 days *after* a harvest. The IRS
+  rule also disallows a loss when a substantially identical security was bought in the 30 days *before*
+  the sale; the mandate does not yet check the sold asset's recent acquisitions (the ledger records
+  `acquiredAt` per lot, so the check is a v2 read, not a new data model). Window arithmetic is in
+  seconds (`2,592,000`), not calendar days.
+- **Owner-side levers are not timelocked.** The owner curates `SubstituteMap` and sets the MOCK oracle
+  marks. An owner could un-sanction a pair right before a live envelope lands and then challenge it.
+  A production deploy puts map and oracle changes behind a timelock (or a real price feed).
+- **The mandate does not read the bond.** Bonding is an economic layer beside the mandate: the bond is
+  sized `max(1,000 USDC, 5 % AUM)` at stake time and is not re-checked as AUM grows, and
+  `proposeHarvest` does not require a live bond.
+- **No minimum-out on the rotation.** The MOCK venue fills at the oracle mark; a real venue needs a
+  `minOut` bound in the envelope.
+- **`maxSellQty` is the exact quantity sold**, not an upper bound (the name is kept for ABI stability).
+- **Extreme-value arithmetic.** Solidity reverts on overflow; the Stylus engine uses `U256` and saturates
+  the `U256 → I256` cast. The two agree for every realistic lot size and price (engine equivalence is
+  checked at 8–128 lots in `bench/results.json`), not at values near 2²⁵⁶.

@@ -14,7 +14,7 @@
   ![Robinhood Chain](https://img.shields.io/badge/Robinhood_Chain-testnet_46630-00C805?style=flat)
   ![Stylus](https://img.shields.io/badge/Arbitrum_Stylus-Rust→WASM-12AAFF?style=flat&logo=rust&logoColor=white)
   ![Solidity](https://img.shields.io/badge/Solidity-0.8.28-363636?style=flat&logo=solidity&logoColor=white)
-  ![Foundry](https://img.shields.io/badge/Foundry-1.5-orange?style=flat)
+  ![Foundry](https://img.shields.io/badge/Foundry-forge-orange?style=flat)
   ![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.4-4E5EE4?style=flat)
   [![CI](https://github.com/edycutjong/harvestbot/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/harvestbot/actions/workflows/ci.yml)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -28,18 +28,18 @@ Every row is on chain **46630 (Robinhood Chain testnet)** and every hash is a li
 
 | | |
 |---|---|
-| **Tests** | **73** Foundry (`forge test`) — 100 % line · 100 % function · 98.4 % statement coverage on `src/`, 3 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
+| **Tests** | **80** Foundry (`forge test`) — 100 % line · 100 % function · 98.3 % statement · 89.2 % branch coverage on `src/` (`make coverage`), 3 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
 | **Static analysis** | Slither **0 high · 0 medium** — every remaining finding triaged in [`docs/SLITHER.md`](docs/SLITHER.md) · `forge fmt` · `cargo clippy -D warnings` |
 | **Killer number** | 64-lot HIFO harvest: **Solidity 1,456,905 gas → Stylus 507,993 gas — 2.87× less L2 compute** (3.1× at 128 lots; grows with portfolio size), same chain, same inputs, identical output ([bench](bench/RESULTS.md)) |
 | **Beat 1 · HARVEST** | [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123) — agent-signed, router-gated, HIFO recomputed on the Stylus ledger, **−$24.531251** realized on 9 lots, real AMZN → real NFLX |
 | **Beat 2 · BLOCKED REBUY** | [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10) — **reverted on chain**, `WashSaleViolation` |
-| **Beat 3 · SLASHED** | attempt [`0x7dca0680…0bf6`](https://explorer.testnet.chain.robinhood.com/tx/0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6) reverted `OffMapSubstitute` → challenge [`0xcceb12a7…6493`](https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493) — bond **1,000 → 800 mUSDC** |
+| **Beat 3 · SLASHED** | attempt [`0x7dca0680…0bf6`](https://explorer.testnet.chain.robinhood.com/tx/0x7dca068071e91ca95b992d62eb3096ec465b8bae8fd939f1baf426902d990bf6) reverted `OffMapSubstitute` → challenge [`0xcceb12a7…6493`](https://explorer.testnet.chain.robinhood.com/tx/0xcceb12a766ef6c8f4e861f9c7ac6f30cb495044f5032cec3fec4127c87066493) — bond **1,000 → 800 mUSDC** (this run's challenger was the owner's key; `challenge` is permissionless and tested with a third party) |
 
 | Contract | Address | Kind |
 |---|---|---|
 | `TaxLotLedger` | [`0xEff7…5a21`](https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21) | **Stylus (Rust → WASM)** — [deploy](https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed) |
 | `HarvestMandate` | [`0x15FD…a6E2`](https://explorer.testnet.chain.robinhood.com/address/0x15FDF1F8A537ea7e660C9867b3e5e66B0996a6E2) | Solidity |
-| `AgentBond` | [`0x822f…0736`](https://explorer.testnet.chain.robinhood.com/address/0x822fAC45a881801955b3130076A58790bBb40736) | Solidity |
+| `AgentBond` | [`0x822f…0736`](https://explorer.testnet.chain.robinhood.com/address/0x822fAC45a881801955b3130076A58790bBb40736) | Solidity — deployed build predates the 2026-09-27 hardening in source ([details](docs/ARCHITECTURE.md#deployed-build-vs-source)) |
 | `ExecutionRouter` | [`0x2a12…19aE`](https://explorer.testnet.chain.robinhood.com/address/0x2a121714bEA2B69154521aEba9C5039C500c19aE) | Solidity |
 | `WashSaleGuard` | [`0x1A98…A29C`](https://explorer.testnet.chain.robinhood.com/address/0x1A98594aA8dC627b34b586756833bbe508B0A29C) | Solidity |
 | `SubstituteMap` | [`0x1e8D…7CfE`](https://explorer.testnet.chain.robinhood.com/address/0x1e8Df64A7B17490dcDd4E03E695Cb1E766A37CfE) | Solidity |
@@ -96,16 +96,17 @@ Seven invariants (INV-1 custody … INV-7 determinism) each have a named test �
 
 ## 🏆 Why only Arbitrum + Robinhood Chain
 
-- **`cargo stylus deploy` → WASM contract on Robinhood Chain.** The ledger is not Solidity. `ArbWasm.stylusVersion() = 3` on chain 46630; deploy + activation txs above. Remove Stylus and the HIFO scan costs 2.87× more L2 gas at 64 lots, 3.1× at 128 — measured on chain 46630 with the program *uncached* (the testnet has no ArbOS cache manager yet), so these are worst-case Stylus numbers.
+- **`cargo stylus deploy` → WASM contract on Robinhood Chain.** The ledger is not Solidity. `ArbWasm.stylusVersion() = 3` on chain 46630; the deploy tx above is the single `cargo stylus deploy` transaction. Remove Stylus and the HIFO scan costs 2.87× more L2 gas at 64 lots, 3.1× at 128 — measured on chain 46630 with the program *uncached* (the testnet has no ArbOS cache manager yet), so these are worst-case Stylus numbers.
 - **Robinhood Stock Tokens are the asset.** The mandate holds `0x5884…9E02` (AMZN) and `0x3b82…8C93` (NFLX) from the official faucet — a tokenized-equity tax ledger only makes sense on the chain that issues tokenized equities.
 - **Arbitrum precompiles as a capability probe.** `cast call 0x…71 'stylusVersion()'` answered the "is WASM live on this Orbit chain?" question in one RPC call, before any code was written ([DX report](docs/DX-REPORT.md)).
 - **Honest limitation:** there is no Stock-Token AMM on the testnet, so the rotation executes through a labeled MOCK fixed-rate venue at the oracle mark. The tokens are real; the venue is not.
+- **Scope of the wash-sale rule:** the contract walls re-buys for the 30 days *after* a harvest; the IRS look-back (a purchase in the 30 days *before* the loss sale) is not yet enforced. This and the other known limits are listed in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#known-limitations-by-design-or-deferred).
 
 ## 🚀 Run it
 
 ```bash
 git clone --recurse-submodules https://github.com/edycutjong/harvestbot && cd harvestbot
-cd contracts && forge test                     # 73 tests, incl. exactly −$3,140.000000 on the seed scenario
+cd contracts && forge test                     # 80 tests, incl. exactly −$3,140.000000 on the seed scenario
 cd ../stylus/ledger && cargo test              # 6 native tests on the WASM engine
 
 # live, read-only, no wallet — ask the deployed Stylus ledger for Maya's HIFO picks
@@ -113,6 +114,8 @@ cast call 0xEff7B46049fC677F58264e0ebb19dF1a39195a21 \
   'computeHarvest(address,address,uint256,uint256)(uint64[],int256)' \
   0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b 0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02 638501157098660213 412300000 \
   --rpc-url https://rpc.testnet.chain.robinhood.com
+# → the NEXT nine HIFO lots, [55, 54, …, 47]: beat 1 already sold lots 63–56 and part of 55 —
+#   its own picks [63, …, 55] and −24531251 are in that tx's HarvestReport event
 ```
 
 Your own deploy (testnet key + faucet ETH, see [`.env.example`](.env.example)): `forge script script/Deploy.s.sol` → `cargo stylus deploy` → `scripts/seed.sh` → `scripts/beats.sh` → `python3 scripts/bench.py`.
@@ -132,7 +135,7 @@ Your own deploy (testnet key + faucet ETH, see [`.env.example`](.env.example)): 
 ## 📁 Layout
 
 ```
-contracts/      Foundry — src/ (6 contracts + 4 labeled mocks), test/ (73), script/ (Deploy, Seed, Envelope)
+contracts/      Foundry — src/ (6 contracts + 4 labeled mocks), test/ (80), script/ (Deploy, Seed, Envelope)
 stylus/ledger/  Rust — the Stylus TaxLotLedger (+ stylus/spike, the day-0 activation receipt)
 scripts/        seed.sh · beats.sh · bench.py · check_submission_readiness.py   (cast-driven: forge cannot simulate WASM)
 deployments/    46630.json (the system) · 46630-bench.json (bench ledgers)
