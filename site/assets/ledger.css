@@ -38,7 +38,7 @@ code, .mono { font-family: var(--font-data); font-size: .88em; overflow-wrap: an
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: 14.5px; }
 .nav-links a:not(.btn) { color: var(--ink); text-decoration: none; background: linear-gradient(var(--after), var(--after)) 0 58% / 0 2px no-repeat; transition: background-size .28s var(--ease), color .18s; }
 .nav-links a:not(.btn):hover { background-size: 100% 2px; color: var(--after); }
-@media (max-width: 860px) { .nav-links a.hide-sm { display: none; } }
+@media (max-width: 860px) { .nav-links a.hide-sm { display: none !important; } }
 
 /* ---------- buttons ---------- */
 .btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; min-height: 46px; border: 1.5px solid var(--ink);
@@ -98,7 +98,7 @@ code, .mono { font-family: var(--font-data); font-size: .88em; overflow-wrap: an
 .sec { padding: 96px var(--gut) 96px calc(var(--gut) + 24px); max-width: 1400px; margin: 0 auto; }
 .sec-h { font: 400 clamp(34px, 4.2vw, 58px)/1.04 var(--font-display); letter-spacing: -.02em; margin: 12px 0 18px; max-width: 18em; text-wrap: balance; }
 .sec-h em { font-style: italic; }
-.lede { max-width: 38em; color: var(--ink); font-size: 18px; }
+.lede { max-width: 64ch; color: var(--ink); font-size: 18px; }
 .muted { color: var(--muted); }
 .hr { border: 0; border-top: 1.5px solid var(--ink); margin: 0 var(--gut) 0 calc(var(--gut) + 24px); }
 
@@ -111,7 +111,7 @@ code, .mono { font-family: var(--font-data); font-size: .88em; overflow-wrap: an
 .faq summary:hover { color: var(--after); transform: translateX(8px); }
 .faq summary:hover::after { color: var(--after); }
 .faq details[open] summary::after { transform: rotate(45deg); }
-.faq details > div { padding: 0 4px 22px; max-width: 46em; color: var(--ink); }
+.faq details > div { padding: 0 4px 22px; max-width: 64ch; color: var(--ink); }
 
 /* ---------- footer ---------- */
 .foot { padding: 40px var(--gut) 56px calc(var(--gut) + 24px); border-top: 1.5px solid var(--ink); display: flex; flex-wrap: wrap; gap: 18px 36px;
@@ -125,6 +125,13 @@ code, .mono { font-family: var(--font-data); font-size: .88em; overflow-wrap: an
 .copy:hover { background: var(--link); color: var(--bg); border-color: var(--link); }
 .copy:active { transform: scale(.96); }
 .copy[data-done] { color: var(--after); border-color: var(--after); background: none; }
+
+/* touch: every control reaches a 44px target */
+@media (pointer: coarse) {
+  .btn.sm, .copy { min-height: 44px; }
+  .brand, .nav-links a:not(.btn) { display: inline-flex; align-items: center; min-height: 44px; }
+  .foot nav a, .entry .tx, .txlink, .sheet-foot a { display: inline-block; padding: 12px 0; max-width: 100%; overflow-wrap: anywhere; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; scroll-behavior: auto !important; }
