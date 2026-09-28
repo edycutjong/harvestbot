@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""HarvestBot benchmark — Stylus vs Solidity TaxLotLedger on the SAME chain, SAME inputs.
+"""HarvestBot benchmark — Stylus vs two Solidity TaxLotLedgers on the SAME chain, SAME inputs.
 
-For each lot count N in SIZES: seed N lots (qty 10 shares, basis ramp $380→$455) on both ledgers
+Engines (deployments/46630-bench.json):
+  solidity         — the shipped Solidity twin (re-reads lots[i] from storage on every HIFO pass)
+  solidity_memcopy — contracts/src/bench/TaxLotLedgerMemCopy.sol: one storage→memory pass, then
+                     every pass over memory — the structure of the Rust ledger. The FAIR baseline.
+  stylus           — the production Stylus (Rust → WASM) ledger
+
+For each lot count N in SIZES: seed N lots (qty 10 shares, basis ramp $380→$455) on every ledger
 under a distinct (owner, asset) key, then measure `computeHarvest` for the 9-lot HIFO harvest:
-  gas      — eth_estimateGas (deterministic; what a tx would consume for this view's compute)
+  gas      — NodeInterface.gasEstimateComponents (Arbitrum's own total / L1-calldata split)
   latency  — wall-clock of eth_call, N_RUNS samples → p50 / p95
 Writes bench/results.json + bench/RESULTS.md. Nothing is simulated: every number is an RPC answer.
 
@@ -24,7 +30,21 @@ SIZES = [int(x) for x in os.environ.get("SIZES", "8,16,32,64,128").split(",")]
 N_RUNS = int(os.environ.get("N_RUNS", "50"))
 USD, SHARE, MARK, LOT_QTY = 10**6, 10**18, 412_300_000, 10 * 10**18
 WRITER = D["writer"]
-LEDGERS = {"solidity": D["solidity"], "stylus": D["stylus"]}
+LEDGERS = {"solidity": D["solidity"]}
+if "solidityMemCopy" in D:
+    LEDGERS["solidity_memcopy"] = D["solidityMemCopy"]
+LEDGERS["stylus"] = D["stylus"]
+
+
+def ratios(r):
+    """Solidity ÷ Stylus: `ratio*` vs the shipped twin, `ratio*Fair` vs the memory-copy ledger."""
+    s, y = r["solidity"], r["stylus"]
+    r["ratio"] = round(s["gas"] / y["gas"], 2)
+    r["ratioL2"] = round(s["gasL2"] / y["gasL2"], 2)
+    if "solidity_memcopy" in r:
+        m = r["solidity_memcopy"]
+        r["ratioFair"] = round(m["gas"] / y["gas"], 2)
+        r["ratioL2Fair"] = round(m["gasL2"] / y["gasL2"], 2)
 
 
 def cast(*args, timeout=120, retries=5):
@@ -63,16 +83,48 @@ def asset_for(n):  # synthetic asset key per size — the ledger never touches t
 
 
 def nonce():
-    return uint(cast("nonce", WRITER))
+    return max(
+        uint(cast("nonce", WRITER)), uint(cast("nonce", WRITER, "--block", "pending"))
+    )
+
+
+def book_ok(addr, n):
+    """The seeded book must be exactly the ramp, in order — a dropped tx mid-seed shifts every later lot."""
+    r = cast(
+        "call",
+        addr,
+        "getOpenLots(address,address)(uint64[],uint256[],uint256[],uint256[])",
+        WRITER,
+        asset_for(n),
+        "--json",
+    )
+    ids, qty, bas, _ = json.loads(r.stdout)
+    return len(ids) == n and all(
+        int(qty[i]) == LOT_QTY and int(bas[i]) == basis(i, n) for i in range(n)
+    )
+
+
+def lot_count(addr, a):
+    return uint(cast("call", addr, "lotCount(address,address)(uint256)", WRITER, a))
 
 
 def seed(kind, addr, n):
+    """Idempotent and sequential: lot i is sent only once the ledger holds exactly i lots, and each
+    recordLot waits for its receipt. The public RPC is load-balanced and its nodes lag or drop
+    responses, so a failed send is re-checked against lotCount and retried with the SAME nonce — a
+    stale nonce or count must never append a lot twice or out of order."""
     a = asset_for(n)
-    have = uint(cast("call", addr, "lotCount(address,address)(uint256)", WRITER, a))
-    if have >= n:
-        return
-    nn = nonce()
-    for i in range(have, n):
+    i, nn, tries = lot_count(addr, a), None, 0
+    while i < n:
+        for _ in range(60):  # wait out a lagging node
+            if lot_count(addr, a) >= i:
+                break
+            time.sleep(1)
+        have = lot_count(addr, a)
+        if have > i:
+            i, nn = have, None
+            continue
+        nn = nonce() if nn is None else nn
         r = cast(
             "send",
             addr,
@@ -85,22 +137,27 @@ def seed(kind, addr, n):
             PK,
             "--nonce",
             str(nn),
-            "--async",
+            timeout=180,
         )
-        if r.returncode != 0:
-            print(kind, n, "recordLot failed:", r.stderr[:200])
+        if r.returncode == 0 and "status               1" in r.stdout:
+            i, nn, tries = i + 1, None, 0
+            continue
+        for _ in range(60):  # the tx may have landed even though the response was lost
+            if lot_count(addr, a) > i:
+                break
+            time.sleep(1)
+        if lot_count(addr, a) > i:
+            i, nn, tries = i + 1, None, 0
+            continue
+        if "nonce too low" in r.stderr:
+            nn = None  # stale nonce from a lagging node: nothing of ours is pending at it
+        tries += 1
+        if tries > 10:
+            print(kind, n, i, "recordLot failed:", r.stderr[:200])
             sys.exit(1)
-        nn += 1
-    # wait for the last one
-    for _ in range(120):
-        if (
-            uint(cast("call", addr, "lotCount(address,address)(uint256)", WRITER, a))
-            >= n
-        ):
-            return
-        time.sleep(1)
-    print("seed timeout")
-    sys.exit(1)
+    if not book_ok(addr, n):
+        print(kind, n, "seeded book is not the ramp in order — use a fresh ledger")
+        sys.exit(1)
 
 
 def sell_qty(
@@ -179,9 +236,9 @@ if "--components-only" in sys.argv:
     for n, r in results["results"].items():
         for kind, addr in LEDGERS.items():
             g, l1, l2 = components(addr, int(n))
-            r[kind].update({"gas": g, "gasL1": l1, "gasL2": l2})
-        r["ratio"] = round(r["solidity"]["gas"] / r["stylus"]["gas"], 2)
-        r["ratioL2"] = round(r["solidity"]["gasL2"] / r["stylus"]["gasL2"], 2)
+            if kind in r:
+                r[kind].update({"gas": g, "gasL1": l1, "gasL2": l2})
+        ratios(r)
     SIZES = [int(k) for k in results["results"]]
 else:
     results = {
@@ -191,9 +248,14 @@ else:
         "sizes": SIZES,
         "runs": N_RUNS,
         "markPrice": MARK,
-        "note": "gas = eth_estimateGas of computeHarvest (HIFO over all open lots, 9 picks); latency = eth_call wall-clock incl. network",
+        "note": "gas = NodeInterface.gasEstimateComponents of computeHarvest (HIFO over all open lots, up to 9 picks); gasL2 = total - L1 calldata; latency = eth_call wall-clock incl. network; ratio* = shipped Solidity / Stylus, ratio*Fair = memory-copy Solidity / Stylus",
         "results": {},
     }
+    if os.path.exists("bench/results.json"):
+        # keep the provenance of the numbers already published on the video / OG images / X thread
+        prev = json.load(open("bench/results.json"))
+        if "firstPublished" in prev:
+            results["firstPublished"] = prev["firstPublished"]
     for n in SIZES:
         for kind, addr in LEDGERS.items():
             print(f"seed {kind:8s} n={n:3d} ...", end=" ", flush=True)
@@ -204,40 +266,61 @@ else:
             print(
                 f"gas={m['gas']:>8,} (L2 {m['gasL2']:,})  p50={m['p50_ms']}ms  p95={m['p95_ms']}ms  loss={m['realizedLoss']}"
             )
-        s, y = (
-            results["results"][str(n)]["solidity"],
-            results["results"][str(n)]["stylus"],
-        )
-        assert s["lotIds"] == y["lotIds"] and s["realizedLoss"] == y["realizedLoss"], (
-            "engines disagree!"
-        )
-        results["results"][str(n)]["ratio"] = round(s["gas"] / y["gas"], 2)
-        results["results"][str(n)]["ratioL2"] = round(s["gasL2"] / y["gasL2"], 2)
+        r = results["results"][str(n)]
+        outs = {(r[k]["lotIds"], r[k]["realizedLoss"]) for k in LEDGERS}
+        assert len(outs) == 1, f"engines disagree at n={n}: {outs}"
+        ratios(r)
         os.makedirs("bench", exist_ok=True)
         json.dump(results, open("bench/results.json", "w"), indent=2)  # partial save
 
 os.makedirs("bench", exist_ok=True)
 json.dump(results, open("bench/results.json", "w"), indent=2)
+FAIR = "solidity_memcopy" in LEDGERS
 lines = [
     "# Benchmark — Stylus vs Solidity `computeHarvest` (HIFO, up to 9 picks — 4 at 8 lots)",
     "",
-    f"Chain {D['chainId']} (Robinhood Chain testnet) · Solidity `{LEDGERS['solidity']}` · Stylus `{LEDGERS['stylus']}` · mark $412.30 · {N_RUNS} eth_call samples per cell",
+    f"Chain {D['chainId']} (Robinhood Chain testnet) · Solidity (shipped twin) `{LEDGERS['solidity']}`"
+    + (f" · Solidity (memory-copy) `{LEDGERS['solidity_memcopy']}`" if FAIR else "")
+    + f" · Stylus `{LEDGERS['stylus']}` · mark $412.30 · {N_RUNS} eth_call samples per cell",
     "",
-    "| Open lots | Solidity gas (L2 compute) | Stylus gas (L2 compute) | **Solidity ÷ Stylus (L2)** | total incl. L1 calldata | Sol p50 / p95 (ms) | Stylus p50 / p95 (ms) | Identical output |",
-    "|---|---|---|---|---|---|---|---|",
 ]
-for n in SIZES:
-    r = results["results"][str(n)]
-    s, y = r["solidity"], r["stylus"]
-    lines.append(
-        f"| {n} | {s['gasL2']:,} | {y['gasL2']:,} | **{r['ratioL2']}×** | {s['gas']:,} / {y['gas']:,} ({r['ratio']}×) | {s['p50_ms']} / {s['p95_ms']} | {y['p50_ms']} / {y['p95_ms']} | ✅ lots {s['lotIds']} loss {s['realizedLoss']} |"
-    )
+if FAIR:
+    lines += [
+        "**Two baselines, two ratios.** The *shipped twin* (`contracts/src/TaxLotLedger.sol`) re-reads `lots[i]` from storage on every HIFO selection pass; the Rust ledger copies the lots to memory once. The *memory-copy* ledger (`contracts/src/bench/TaxLotLedgerMemCopy.sol`, benchmark only, differential-tested to return identical output) gives Solidity the same structure — so **Solidity (memory-copy) ÷ Stylus is the fair engine-to-engine figure**. Solidity (shipped) ÷ Stylus is what we first published (2.87× at 64 lots); about 41% of that ratio (2.87× → 1.69×) was our Solidity baseline re-reading storage, not the engine.",
+        "",
+        "| Open lots | Solidity shipped (L2) | Solidity memory-copy (L2) | Stylus (L2) | **Fair: memory-copy ÷ Stylus** | As first published: shipped ÷ Stylus | total incl. L1 (shipped / memcopy / Stylus) | p50 / p95 ms (shipped · memcopy · Stylus) | Identical output (all three) |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for n in SIZES:
+        r = results["results"][str(n)]
+        s, m, y = r["solidity"], r["solidity_memcopy"], r["stylus"]
+        lines.append(
+            f"| {n} | {s['gasL2']:,} | {m['gasL2']:,} | {y['gasL2']:,} | **{r['ratioL2Fair']}×** | {r['ratioL2']}× | {s['gas']:,} / {m['gas']:,} / {y['gas']:,} | {s['p50_ms']}/{s['p95_ms']} · {m['p50_ms']}/{m['p95_ms']} · {y['p50_ms']}/{y['p95_ms']} | ✅ lots {s['lotIds']} loss {s['realizedLoss']} |"
+        )
+else:
+    lines += [
+        "| Open lots | Solidity gas (L2 compute) | Stylus gas (L2 compute) | **Solidity ÷ Stylus (L2)** | total incl. L1 calldata | Sol p50 / p95 (ms) | Stylus p50 / p95 (ms) | Identical output |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for n in SIZES:
+        r = results["results"][str(n)]
+        s, y = r["solidity"], r["stylus"]
+        lines.append(
+            f"| {n} | {s['gasL2']:,} | {y['gasL2']:,} | **{r['ratioL2']}×** | {s['gas']:,} / {y['gas']:,} ({r['ratio']}×) | {s['p50_ms']} / {s['p95_ms']} | {y['p50_ms']} / {y['p95_ms']} | ✅ lots {s['lotIds']} loss {s['realizedLoss']} |"
+        )
+FP = results.get("firstPublished")
+if FP:
+    fp64 = FP["results"]["64"]
+    lines += [
+        "",
+        f"**Provenance.** The first published run ({FP['date']}) measured the shipped twin vs Stylus at 64 lots as {fp64['solidity']:,} vs {fp64['stylus']:,} L2 gas ({fp64['ratioL2']}×) — the numbers on the demo video, OG images and X thread. The table above is the re-run in which all three engines were measured together; L2 gas estimates drift by a few dozen gas between runs, the ratios do not.",
+    ]
 lines += [
     "",
-    "Reproduce: `RPC=... PRIVATE_KEY=... python3 scripts/bench.py` (seeds are idempotent; ~500 recordLot txs on first run; `--components-only` refreshes the gas split without re-seeding).",
-    "Gas is Arbitrum's own `NodeInterface.gasEstimateComponents` for the view call: **L2 compute** is what the two engines actually differ on; the L1 calldata share (identical calldata, ~14k) is shown in the total. Latency is `eth_call` wall-clock through the public RPC and is network-bound, not engine-bound.",
+    "Reproduce: `RPC=... PRIVATE_KEY=... python3 scripts/bench.py` (seeds are idempotent — a ledger that already holds N lots under the size key is not re-seeded; ~750 recordLot txs on a fresh set of ledgers; `--components-only` refreshes the gas split without re-seeding).",
+    "Gas is Arbitrum's own `NodeInterface.gasEstimateComponents` for the view call: **L2 compute** is what the engines actually differ on; the L1 calldata share (identical calldata, ~14k) is shown in the total. Latency is `eth_call` wall-clock through the public RPC and is network-bound, not engine-bound.",
     "",
-    "**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor (visible at 8 lots, where the two are near parity). Both engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). Caching the program (`cargo stylus cache bid`) would remove the init floor, but this testnet has no ArbOS cache manager (`ArbWasmCache.allCacheManagers()` returns `[]` on chain 46630), so these are worst-case Stylus numbers.",
+    "**Reading the numbers honestly.** The Stylus program is *uncached* on this testnet, so every call pays a WASM initialisation floor — at 8 lots the memory-copy Solidity ledger is cheaper than Stylus. All engines pay the same cold `SLOAD` per lot; Stylus wins only on the comparison loop, so the ratio grows with portfolio size — the shape a tax-lot ledger actually has (Maya's 64 lots become hundreds over years of purchases). Caching the program (`cargo stylus cache bid`) would remove the init floor, but this testnet has no ArbOS cache manager (`ArbWasmCache.allCacheManagers()` returns `[]` on chain 46630), so these are worst-case Stylus numbers.",
 ]
 open("bench/RESULTS.md", "w").write("\n".join(lines) + "\n")
 print("\n".join(lines))

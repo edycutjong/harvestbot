@@ -77,7 +77,8 @@ ok("README references the live txs + ledger")
 if os.path.exists("bench/results.json"):
     b = json.load(open("bench/results.json"))
     for n, r in b["results"].items():
-        if r["solidity"]["lotIds"] != r["stylus"]["lotIds"]:
+        engines = [k for k in ("solidity", "solidity_memcopy", "stylus") if k in r]
+        if len({(r[k]["lotIds"], r[k]["realizedLoss"]) for k in engines}) != 1:
             fail(f"bench n={n}: engines disagree")
     if "64" in b["results"]:
         r64 = b["results"]["64"]
@@ -85,8 +86,21 @@ if os.path.exists("bench/results.json"):
         ok(f"bench 64 lots: Solidity/Stylus L2 = {ratio}x")
         if str(ratio) not in readme:
             fail("README killer number does not match bench/results.json (ratioL2)")
-        if f"{r64['solidity'].get('gasL2', r64['solidity']['gas']):,}" not in readme:
+        published = b.get("firstPublished", {}).get("results", {}).get("64", {})
+        sol64 = {
+            r64["solidity"].get("gasL2", r64["solidity"]["gas"]),
+            published.get("solidity"),
+        }
+        if not any(g and f"{g:,}" in readme for g in sol64):
             fail("README 64-lot Solidity gas does not match the bench")
+        if "ratioL2Fair" in r64:
+            fair = r64["ratioL2Fair"]
+            ok(f"bench 64 lots: fair memory-copy Solidity/Stylus L2 = {fair}x")
+            for f in ["README.md", "JUDGE.md", "DEMO.md", "site/judge/index.html"]:
+                if f"{fair}×" not in open(f).read():
+                    fail(
+                        f"{f} does not disclose the fair ratio {fair}× next to the headline"
+                    )
 else:
     fail("bench/results.json missing")
 

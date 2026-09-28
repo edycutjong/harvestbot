@@ -2,5 +2,12 @@
   "chainId": 46630,
   "solidity": "0xa220D5B0b6E944266acd76288678e91a6BcfAAca",
   "stylus": "0x1a337c6d48bc0d19f913d16074d362d065564f86",
-  "writer": "0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b"
+  "writer": "0x72cd3cB98A5d9B830b386EeBA7B2340132Ba557b",
+  "solidityMemCopy": "0x982405addD7cF595453dBBe241BB39C99aa1bb24",
+  "solidityMemCopyDeployTx": "0x203894ce2e2f0aa7988d6ccabc13cf2621ba1c1b030f18144bfdbf334a11a3bb",
+  "note": "solidity = shipped TaxLotLedger (re-reads storage every HIFO pass); solidityMemCopy = contracts/src/bench/TaxLotLedgerMemCopy.sol (one storage->memory pass, the Rust structure; deployed 2026-09-28, benchmark only); stylus = the production Stylus ledger program",
+  "retired": {
+    "0x9B1d0841295c69DBEe52Edc094273c55c75a3781": "first memory-copy deploy (2026-09-28); one async recordLot in its 128-lot seed was dropped, shifting that book \u2014 replaced by a fresh deploy seeded sequentially; not used in bench/"
+  },
+  "solidityMemCopySetMandateTx": "0x3c33354899a5afa925d2571a3d4ad813ca4fff40c14dd4b3af2a7b118c85dfac"
 }
