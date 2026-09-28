@@ -24,15 +24,15 @@
 <script>
 /* Speaker notes live here, outside the slides, so the ≤40-words-per-slide gate measures only what is on screen. Press N. */
 window.NOTES = [
-  "Title. One sentence: an agent harvests tax losses on Robinhood tokenized stocks, and the chain bounds it. The terminal card is a real run from 27 Sep 2026: 81 Foundry tests, and the deployed Stylus ledger answering live.",
+  "Title. One sentence: an agent harvests tax losses on Robinhood tokenized stocks, and the chain bounds it. The terminal card is a real run from 28 Sep 2026: 91 Foundry tests, and the deployed Stylus ledger answering live.",
   "Maya. The emotional hook from the spec. 64 lots, 30-day wash-sale rule; direct-indexing services sell exactly this for 0.25 percent a year. The 3,140 is the deterministic seed scenario, proven by forge test, not an on-chain amount.",
   "What is missing on chain. Robinhood put the asset on chain; nobody put the accounting there. Three gaps, and each maps to a contract in the next slides.",
   "The whole product is one loop. Agent signs, contracts recompute, execute or revert. Three real transactions on chain 46630, one agent key, different from the owner key.",
   "Frozen slide. These are the real lot ids from the LotsRealized log of beat 1. Faucet scale: 0.078125 AMZN per lot, so the loss is 24.53 dollars. Same code, 10-share lots, gives exactly 3,140.",
   "Beat 2. Forty seconds after the harvest, the same agent tries to buy AMZN back. The WashSaleGuard reverts with the window end: 15 October 2026. Scope: the 30 days after a sale; the look-back is not enforced yet.",
   "Beat 3. The agent signs a rotation into PLTR, which the substitute map never sanctioned. It reverts, and the signature itself is the evidence: challenge slashes 20 percent. The challenger was a third-party key, neither owner nor agent: challenge is permissionless.",
-  "Why Stylus. HIFO over 64 lots is a compute loop, and WASM is cheaper per instruction. Measured with NodeInterface on chain 46630. Uncached program, so worst case. We guessed 8x in the spec; the chain says 2.87, and we report the chain.",
-  "Contract quality is criterion one. 81 Foundry tests, 6 Stylus native, 3 fuzz properties, Slither with zero high and zero medium; the rest triaged in docs/SLITHER.md.",
+  "Why Stylus. HIFO over 64 lots is a compute loop, and WASM is cheaper per instruction. Measured with NodeInterface on chain 46630. Uncached program, so worst case. We guessed 8x in the spec; the chain said 2.87 against our straightforward Solidity twin. Correction, 28 September: that twin re-reads storage on every pass. Against Solidity written the Rust way, memory copy once, the fair figure is 1.69 at 64 lots and 1.79 at 128, and at 8 lots Solidity wins. We report both.",
+  "Contract quality is criterion one. 91 Foundry tests, 6 Stylus native, 5 fuzz properties, Slither with zero high and zero medium; the rest triaged in docs/SLITHER.md.",
   "Why only here. The assets are Robinhood's faucet Stock Tokens; the ledger is a Stylus program on Robinhood Chain; the reserved Robinhood slot is what we target.",
   "Honest limits, verbatim from JUDGE.md. Judges read disclosed limits as competence.",
   "Close. Scan the code: the verify page reads all of this from the RPC in your browser, no wallet."
@@ -134,6 +134,7 @@ table.ledger { width: 100%; border-collapse: collapse; font: 400 31px/1 var(--fo
 .bar span { padding-left: calc(100% + 12px); white-space: nowrap; font: 500 25px var(--font-data); }
 .bar.sol { background: repeating-linear-gradient(135deg, var(--before) 0 3px, color-mix(in srgb, var(--before) 70%, var(--bg)) 3px 7px); }
 .bar.sty { background: var(--after); }
+.bar.mem, .lg .s3 { background: color-mix(in srgb, var(--before) 42%, var(--bg)); }
 
 /* receipts grid */
 .rec { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 80px; border-top: 3px solid var(--ink); border-bottom: 6px double var(--ink); }
@@ -178,6 +179,7 @@ body.show-notes .notes { transform: none; }
     linear-gradient(to right, transparent 92px, var(--margin) 92px, var(--margin) 95px, transparent 95px, transparent 102px, var(--margin) 102px, var(--margin) 105px, transparent 105px),
     repeating-linear-gradient(to bottom, transparent 0 53px, var(--paper-2) 53px 54px); }
   .bar.sol { background: repeating-linear-gradient(135deg, var(--before) 0 3px, var(--paper-2) 3px 7px); }
+  .bar.mem, .lg .s3 { background: var(--rule); }
   .lg .s1 { background: repeating-linear-gradient(135deg, var(--before) 0 3px, var(--paper-2) 3px 7px); }
   .bar-row.key { background: var(--paper-2); }
   .navbtn { background: var(--ink); opacity: .6; }
@@ -219,10 +221,10 @@ body.show-notes .notes { transform: none; }
 HarvestBot</div>
       <h1>The ledger that books your losses — and <em class="hl">refuses the rebuy.</em></h1>
     </div>
-    <div class="term" role="img" aria-label="Terminal: forge test, 81 passed; cast call to the Stylus ledger">
-      <div class="tbar"><span>zsh — harvestbot</span><span>real run · 27 Sep 2026</span></div>
+    <div class="term" role="img" aria-label="Terminal: forge test, 91 passed; cast call to the Stylus ledger">
+      <div class="tbar"><span>zsh — harvestbot</span><span>real run · 28 Sep 2026</span></div>
 <pre><span class="c">$</span> forge test
-<span class="ok">81 tests passed</span>, 0 failed
+<span class="ok">91 tests passed</span>, 0 failed
 <span class="c">$</span> cast call 0xEff7…5a21 computeHarvest…
 [55, 54, 53, 52, 51, 50, 49, 48, 47]
 -18321704</pre>
@@ -308,14 +310,14 @@ HarvestBot</div>
     <div>
       <div class="lab">Stylus vs Solidity · L2 gas</div>
       <div class="bignum">2.87×</div>
-      <p style="margin-top:20px">less at 64 lots. 3.1× at 128. Uncached: worst case.</p>
+      <p style="margin-top:20px">less than our straightforward Solidity twin at 64 lots. <b>Fair figure: 1.69×</b> vs Solidity written the Rust way.</p>
     </div>
-    <div class="bars" role="img" aria-label="64 lots: Solidity 1,456,905, Stylus 507,993">
-      <div class="bar-row"><div class="k">16<small>1.96×</small></div><div><div class="bar sol" style="width:10.22%"><span>352,195</span></div><div class="bar sty" style="width:5.22%"><span>180,017</span></div></div></div>
-      <div class="bar-row"><div class="k">32<small>2.49×</small></div><div><div class="bar sol" style="width:20.90%"><span>720,431</span></div><div class="bar sty" style="width:8.38%"><span>289,013</span></div></div></div>
-      <div class="bar-row key"><div class="k">64<small>2.87×</small></div><div><div class="bar sol" style="width:42.27%"><span>1,456,905</span></div><div class="bar sty" style="width:14.74%"><span>507,993</span></div></div></div>
-      <div class="bar-row"><div class="k">128<small>3.1×</small></div><div><div class="bar sol" style="width:85%"><span>2,929,938</span></div><div class="bar sty" style="width:27.44%"><span>945,989</span></div></div></div>
-      <div class="lg"><span><i class="s1"></i>Solidity</span><span><i class="s2"></i>Stylus</span></div>
+    <div class="bars" role="img" aria-label="64 lots: Solidity twin 1,456,905, Solidity memory-copy 857,559, Stylus 507,993">
+      <div class="bar-row"><div class="k">16<small>1.29×</small></div><div><div class="bar sol" style="width:10.22%"><span>352,195</span></div><div class="bar mem" style="width:6.71%"><span>231,323</span></div><div class="bar sty" style="width:5.22%"><span>180,017</span></div></div></div>
+      <div class="bar-row"><div class="k">32<small>1.52×</small></div><div><div class="bar sol" style="width:20.90%"><span>720,431</span></div><div class="bar mem" style="width:12.76%"><span>440,005</span></div><div class="bar sty" style="width:8.38%"><span>289,013</span></div></div></div>
+      <div class="bar-row key"><div class="k">64<small>1.69×</small></div><div><div class="bar sol" style="width:42.27%"><span>1,456,905</span></div><div class="bar mem" style="width:24.88%"><span>857,559</span></div><div class="bar sty" style="width:14.74%"><span>507,993</span></div></div></div>
+      <div class="bar-row"><div class="k">128<small>1.79×</small></div><div><div class="bar sol" style="width:85%"><span>2,929,938</span></div><div class="bar mem" style="width:49.14%"><span>1,693,678</span></div><div class="bar sty" style="width:27.44%"><span>945,989</span></div></div></div>
+      <div class="lg"><span><i class="s1"></i>Solidity twin</span><span><i class="s3"></i>memory-copy</span><span><i class="s2"></i>Stylus</span><span>fair ratio left</span></div>
     </div>
   </div>
   <div class="foot"><span>bench/RESULTS.md · NodeInterface.gasEstimateComponents</span><span>HarvestBot · 08/12</span></div>
@@ -325,7 +327,7 @@ HarvestBot</div>
   <div class="lab">Smart-contract quality, measured</div>
   <h2>Checked before a judge <em>opens it</em>.</h2>
   <div class="rec">
-    <div><div class="n">81</div><div class="l">Foundry tests</div></div>
+    <div><div class="n">91</div><div class="l">Foundry tests</div></div>
     <div><div class="n">6</div><div class="l">Stylus native tests</div></div>
     <div><div class="n">0 · 0</div><div class="l">Slither high · medium</div></div>
     <div><div class="n g">100%</div><div class="l">line coverage on src/</div></div>
@@ -349,7 +351,7 @@ HarvestBot</div>
   <div class="quotes">
     <blockquote>“The oracle mark, the swap venue and the bond's USDC are MOCK contracts”</blockquote>
     <blockquote>“Re-buys are walled for the 30 days after a harvest”</blockquote>
-    <blockquote>“The spec had guessed ~8×; the chain says 2.9×–3.1×”</blockquote>
+    <blockquote>“We first reported 2.87× as the Stylus advantage. About 41 % of that ratio was our Solidity baseline”</blockquote>
   </div>
   <div class="foot"><span>verbatim</span><span>HarvestBot · 11/12</span></div>
 </section>

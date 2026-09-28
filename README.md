@@ -37,9 +37,9 @@ Check it live, no wallet: [site](https://harvestbot.edycu.dev) · [/verify](http
 
 | | |
 |---|---|
-| **Tests** | **81** Foundry (`forge test`) — 100 % line · 100 % function · 98.3 % statement · 89.2 % branch coverage on `src/` (`make coverage`), 3 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
+| **Tests** | **91** Foundry (`forge test`) — 100 % line · 100 % function · 98.3 % statement · 89.2 % branch coverage on `src/` product contracts (`make coverage`; the bench-only memory-copy ledger is 100 % line-covered on its own), 5 fuzz properties, regression tests named for the defect they pin · **6** Stylus native (`cargo test`) |
 | **Static analysis** | Slither **0 high · 0 medium** — every remaining finding triaged in [`docs/SLITHER.md`](docs/SLITHER.md) · `forge fmt` · `cargo clippy -D warnings` |
-| **Killer number** | 64-lot HIFO harvest: **Solidity 1,456,905 gas → Stylus 507,993 gas — 2.87× less L2 compute** (3.1× at 128 lots; grows with portfolio size), same chain, same inputs, identical output ([bench](bench/RESULTS.md)) |
+| **Killer number** | 64-lot HIFO harvest: **Stylus 1.69× less L2 compute than a memory-optimized Solidity ledger — the fair engine-to-engine figure** (857,559 → 507,979 gas; 1.79× at 128 lots, 0.86× at 8 where uncached Stylus loses). Against the straightforward Solidity twin we shipped: 1,456,905 → 507,993, **2.87×** (3.1× at 128) — the number we first published, ~41 % of it our baseline re-reading storage. Same chain, same inputs, identical output across all three ([bench](bench/RESULTS.md)) |
 | **Beat 1 · HARVEST** | [`0x689c4d34…6123`](https://explorer.testnet.chain.robinhood.com/tx/0x689c4d345c492c08ef06aed9341de941cb131835cce52886d700207925f26123) — agent-signed, router-gated, HIFO recomputed on the Stylus ledger, **−$24.531251** realized on 9 lots, real AMZN → real NFLX |
 | **Beat 2 · BLOCKED REBUY** | [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10) — **reverted on chain**, `WashSaleViolation` |
 | **Beat 3 · SLASHED** | attempt [`0xd8b6e577…94c8`](https://explorer.testnet.chain.robinhood.com/tx/0xd8b6e5779f53a1cc157a9962c8546e0e5bdef3cc1e62f441458a19359c5994c8) reverted `OffMapSubstitute` → challenge [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb) — bond **1,000 → 800 mUSDC**, challenged by a third-party key (`0x0Fec…28e2`, neither owner nor agent). The hardened bond also refuses stale proof: the expired beat-2 envelope ([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51)) and the already-executed beat-1 envelope ([`0xbbf04002…c049`](https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049)) both revert `EnvelopeNotLive` |
@@ -65,7 +65,7 @@ In December, Maya sees her tokenized-equity position down $3,140 on paper and do
 
 **HarvestBot** is that plumbing, with the agent bounded by contracts instead of by trust:
 
-- 📒 **Onchain HIFO tax-lot ledger** — a Stylus (WASM) contract records every lot, selects the highest-basis lots for a sale, prorates the last one, and computes the realized loss deterministically. The compute-heavy part lives in Rust because that is where WASM beats EVM opcodes — 2.87× less L2 gas at 64 lots, measured, not asserted ([bench](bench/RESULTS.md)).
+- 📒 **Onchain HIFO tax-lot ledger** — a Stylus (WASM) contract records every lot, selects the highest-basis lots for a sale, prorates the last one, and computes the realized loss deterministically. The compute-heavy part lives in Rust because that is where WASM beats EVM opcodes — 1.69× less L2 gas at 64 lots than a memory-optimized Solidity ledger (2.87× vs our straightforward Solidity twin), measured, not asserted ([bench](bench/RESULTS.md)).
 - 🧱 **Contract-enforced wash-sale rule** — after a harvest, any rebuy of the same or a substantially-identical asset **reverts** for 30 days. The agent cannot route around it; the chain says no.
 - 🔐 **A mandate the agent cannot exceed** — the agent's key can call exactly one function through a router; the mandate re-verifies signature, nonce, deadline, substitute map, wash-sale window, HIFO selection *and* realized loss at the oracle mark before anything moves. No path exists from the agent key to a withdrawal.
 - ⚖️ **A slashable bond** — anyone holding an envelope the agent signed that the mandate must reject can slash it: 20 % of the bond, 10 % of that to the challenger, the rest to the owner. Being wrong costs the agent more than it can ever gain.
@@ -105,7 +105,7 @@ Seven invariants (INV-1 custody … INV-7 determinism) each have a named test �
 
 ## 🏆 Why only Arbitrum + Robinhood Chain
 
-- **`cargo stylus deploy` → WASM contract on Robinhood Chain.** The ledger is not Solidity. `ArbWasm.stylusVersion() = 3` on chain 46630; the deploy tx above is the single `cargo stylus deploy` transaction. Remove Stylus and the HIFO scan costs 2.87× more L2 gas at 64 lots, 3.1× at 128 — measured on chain 46630 with the program *uncached* (the testnet has no ArbOS cache manager yet), so these are worst-case Stylus numbers.
+- **`cargo stylus deploy` → WASM contract on Robinhood Chain.** The ledger is not Solidity. `ArbWasm.stylusVersion() = 3` on chain 46630; the deploy tx above is the single `cargo stylus deploy` transaction. Remove Stylus and the HIFO scan costs 1.69× more L2 gas at 64 lots (1.79× at 128) on the best Solidity we wrote for it — a memory-copy ledger with the Rust structure — and 2.87× (3.1×) on the straightforward twin we first benchmarked. Measured on chain 46630 with the program *uncached* (the testnet has no ArbOS cache manager yet), so these are worst-case Stylus numbers.
 - **Robinhood Stock Tokens are the asset.** The mandate holds `0x5884…9E02` (AMZN) and `0x3b82…8C93` (NFLX) from the official faucet — a tokenized-equity tax ledger only makes sense on the chain that issues tokenized equities.
 - **Arbitrum precompiles as a capability probe.** `cast call 0x…71 'stylusVersion()'` answered the "is WASM live on this Orbit chain?" question in one RPC call, before any code was written ([DX report](docs/DX-REPORT.md)).
 - **Honest limitation:** there is no Stock-Token AMM on the testnet, so the rotation executes through a labeled MOCK fixed-rate venue at the oracle mark. The tokens are real; the venue is not.
@@ -115,7 +115,7 @@ Seven invariants (INV-1 custody … INV-7 determinism) each have a named test �
 
 ```bash
 git clone --recurse-submodules https://github.com/edycutjong/harvestbot && cd harvestbot
-cd contracts && forge test                     # 81 tests, incl. exactly −$3,140.000000 on the seed scenario
+cd contracts && forge test                     # 91 tests, incl. exactly −$3,140.000000 on the seed scenario
 cd ../stylus/ledger && cargo test              # 6 native tests on the WASM engine
 
 # live, read-only, no wallet — ask the deployed Stylus ledger for Maya's HIFO picks
@@ -137,17 +137,17 @@ Your own deploy (testnet key + faucet ETH, see [`.env.example`](.env.example)): 
 |---|---|---|
 | Three beats end-to-end | `Mandate.t.sol`, `Bond.t.sol` | the demo, deterministically |
 | Invariants INV-1…INV-6 | `Mandate.t.sol`, `Router.t.sol`, `WashSale.t.sol` | custody, loss integrity, wash-sale monotonicity, on-map, authenticity, bond dominance |
-| Fuzz properties | `testFuzz_*` (3) | HIFO never worse than lowest-basis-first · window is exactly 30 days for any timestamps · breach is negative-EV for any bond |
+| Fuzz properties | `testFuzz_*` (5) | HIFO never worse than lowest-basis-first · window is exactly 30 days for any timestamps · breach is negative-EV for any bond · memory-copy and shipped Solidity ledgers pick identical lots and losses on random books, before and after `realize` |
 | Regressions named for the defect | e.g. `test_reenabling_a_disabled_pair_does_not_duplicate_it_in_substitutesOf` | found and fixed during the build |
-| Engine equivalence | `bench/results.json` (`lotIds` + `realizedLoss` identical at every size) | INV-7 |
+| Engine equivalence | `bench/results.json` (`lotIds` + `realizedLoss` identical across all three engines at every size) · `MemCopy.t.sol` (differential, 8–128 lots + fuzz) | INV-7 |
 
 ## 📁 Layout
 
 ```
-contracts/      Foundry — src/ (6 contracts + 4 labeled mocks), test/ (81), script/ (Deploy, Seed, Envelope)
+contracts/      Foundry — src/ (6 contracts + 4 labeled mocks + bench/ memory-copy ledger), test/ (91), script/ (Deploy, Seed, Envelope)
 stylus/ledger/  Rust — the Stylus TaxLotLedger (+ stylus/spike, the day-0 activation receipt)
 scripts/        seed.sh · beats.sh · bench.py · check_submission_readiness.py   (cast-driven: forge cannot simulate WASM)
-deployments/    46630.json (the system) · 46630-bench.json (bench ledgers)
+deployments/    46630.json (the system) · 46630-bench.json (3 bench ledgers)
 receipts/       46630.json (the three beats) · envelopes/*.hex (the signed decisions, incl. the rogue one)
 bench/          results.json · RESULTS.md
 docs/           ARCHITECTURE.md · DX-REPORT.md · SLITHER.md · assets/

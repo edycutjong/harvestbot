@@ -34,7 +34,7 @@
 <text x="80" y="185" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="19" fill="#1C2620">and refuses the rebuy for 30 days.</text>
 <text x="80" y="232" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" font-weight="700" fill="#1E7A46">2.87× less L2 gas at 64 lots</text>
 <text x="80" y="256" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#5E6A60">Stylus 507,993 vs Solidity 1,456,905</text>
-<text x="80" y="290" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#5E6A60">chain 46630 · Rust → WASM · 81 + 6 tests</text>
+<text x="80" y="290" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#5E6A60">chain 46630 · Rust → WASM · 91 + 6 tests</text>
 
 <!-- the ledger sheet -->
 <rect x="630" y="26" width="620" height="268" rx="4" fill="#F7F8EF" stroke="#1C2620" stroke-width="1.5"/>

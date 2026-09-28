@@ -11,15 +11,15 @@ Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.de
 2. **The chain refused the rebuy** — [`0xd486468e…cf10`](https://explorer.testnet.chain.robinhood.com/tx/0xd486468ea84c6d419b28401386ce832483f809f96a35ea94e9c4a92037fecf10): status 0, `WashSaleViolation`. Same agent, same key, 40 seconds later.
 3. **The rogue trade got the agent slashed** — [`0x6b896b6e…7dcb`](https://explorer.testnet.chain.robinhood.com/tx/0x6b896b6e5aa1895b8084c1000997fcb4daa219de24f2d0219e8debfdc51e7dcb): `Slashed(agent, mandate, 200000000, 20000000, 180000000, …)`, called by a third-party key. The same bond refuses stale proof: the expired beat-2 envelope ([`0x673f8459…ed51`](https://explorer.testnet.chain.robinhood.com/tx/0x673f8459a6a8205e318676cda4e25ec3c728c4d22ee44ca3d682ce8e9d5eed51)) and the executed beat-1 envelope ([`0xbbf04002…c049`](https://explorer.testnet.chain.robinhood.com/tx/0xbbf040023fa28d8f446756452d3738426ca1e56dfa49b3f92f641c58c3bbc049)) both revert `EnvelopeNotLive`.
 4. **The Stylus ledger is real WASM on Robinhood Chain** — [`0xEff7…5a21`](https://explorer.testnet.chain.robinhood.com/address/0xEff7B46049fC677F58264e0ebb19dF1a39195a21) (`ArbWasm.stylusVersion() = 3` on chain 46630; deployed and activated in one `cargo stylus deploy` tx, [`0x5cc682a7…77ed`](https://explorer.testnet.chain.robinhood.com/tx/0x5cc682a744a69537987990b58c7884313c315fa7cf22998986b4fbe0dac177ed)).
-5. **The numbers** — [`bench/RESULTS.md`](bench/RESULTS.md): Stylus vs Solidity `computeHarvest` on the same chain, same inputs, identical outputs — **2.87× less L2 gas at 64 lots, 3.1× at 128**, with the WASM program uncached (worst case).
+5. **The numbers** — [`bench/RESULTS.md`](bench/RESULTS.md): Stylus vs Solidity `computeHarvest` on the same chain, same inputs, identical outputs, WASM program uncached (worst case). **Fair engine-to-engine figure: 1.69× less L2 gas at 64 lots, 1.79× at 128**, against a memory-optimized Solidity ledger. Against the straightforward Solidity twin we shipped: 2.87× / 3.1× — the number we first published (see the correction below).
 
 ## Receipt block
 
 | | |
 |---|---|
-| Tests | 81 Foundry (100 % line · 100 % function · 98.3 % statement · 89.2 % branch on `src/`, 3 fuzz properties) + 6 Stylus native |
+| Tests | 91 Foundry (100 % line · 100 % function · 98.3 % statement · 89.2 % branch on `src/` product contracts, 5 fuzz properties) + 6 Stylus native |
 | Static analysis | Slither: 0 high, 0 medium — `docs/SLITHER.md` triages all 10 remaining (Low / Info / Optimization) |
-| Deployed | 6 system contracts (1 Stylus + 5 Solidity) + 3 labeled MOCKs + 2 bench ledgers on Robinhood Chain testnet — `deployments/` |
+| Deployed | 6 system contracts (1 Stylus + 5 Solidity) + 3 labeled MOCKs + 3 bench ledgers on Robinhood Chain testnet — `deployments/` |
 | Real-run cost | whole demo incl. deploy < 0.002 ETH |
 | Pinned scenario | 64 lots × 10 sh, $380→$455, mark $412.30 → **exactly −$3,140.000000** on both engines |
 
@@ -42,7 +42,8 @@ Zero clicks into code: [harvestbot.edycu.dev/verify](https://harvestbot.edycu.de
   known limits in `docs/ARCHITECTURE.md`.
 - **The agent is `rule-v1`** (deterministic HIFO + first allowed substitute). No LLM in the loop; the
   rationale hash commits to a plain-text rationale string. We say "agent", not "AI".
-- **The bench is worst-case for Stylus**: Robinhood testnet has no ArbOS cache manager yet, so every call pays the WASM init floor. The spec had guessed ~8×; the chain says 2.9×–3.1× — we report the chain.
+- **The bench is worst-case for Stylus**: Robinhood testnet has no ArbOS cache manager yet, so every call pays the WASM init floor. The spec had guessed ~8×; the chain says 2.9×–3.1× — we report the chain. (That was against the straightforward Solidity twin; the fair figure is 1.69×–1.79× — next line.)
+- **Correction (2026-09-28) — the Stylus ratio.** We first reported 2.87× as the Stylus advantage. About 41 % of that ratio was our Solidity baseline, not the engine: the shipped Solidity twin re-reads `lots[i]` from storage on every HIFO selection pass, while the Rust ledger copies the lots to memory once. A memory-copy Solidity ledger with the Rust structure (`contracts/src/bench/TaxLotLedgerMemCopy.sol`, identical output, differential-tested) measured on the same chain puts the fair engine-to-engine figure at **1.69× at 64 lots (1.79× at 128)** — and at 8 lots that Solidity ledger is *cheaper* than uncached Stylus (0.86×). The 2.87× stays true of the twin we shipped; it is not the engine gap. [`bench/RESULTS.md`](bench/RESULTS.md)
 
 ## Links
 

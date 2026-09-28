@@ -54,7 +54,11 @@ ticker of what the vault holds; it never moves value out. Tested: `test_INV1_*` 
 open quantity. `compute_harvest` copies all lots into memory once, then runs the O(n·k) HIFO selection
 (cross-multiplied basis-per-unit comparison, no division) and prorates the last lot. `realize` recomputes
 and reverts on any mismatch before mutating. `contracts/src/TaxLotLedger.sol` is the semantic
-twin (same ABI, same integer rounding, same tie-break: lowest lot id wins), used for the gas benchmark and as the fallback ledger on chains without Stylus.
+twin (same ABI, same integer rounding, same tie-break: lowest lot id wins), used for the gas benchmark and as the fallback ledger on chains without Stylus. The twin re-reads `lots[i]`
+from storage on every selection pass, so the bench also runs `contracts/src/bench/TaxLotLedgerMemCopy.sol`
+(benchmark only, differential-tested): the same HIFO with one storage→memory pass, the Rust structure. That
+memory-copy ledger is the fair baseline — Stylus is 1.69× cheaper than it at 64 lots, vs 2.87× against the
+twin (`bench/RESULTS.md`).
 
 ## Slashing (INV-6)
 

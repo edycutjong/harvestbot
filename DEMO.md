@@ -35,7 +35,7 @@ big number in the deterministic test — never the other way round.
 
 ```bash
 git clone --recurse-submodules <repo> && cd harvestbot
-cd contracts && forge test            # 81 tests, incl. the -3,140.00 scenario and 3 fuzz properties
+cd contracts && forge test            # 91 tests, incl. the -3,140.00 scenario and 5 fuzz properties
 cd ../stylus/ledger && cargo test     # 6 native tests on the WASM engine
 
 # live (read-only, no wallet): ask the deployed Stylus ledger for the HIFO selection
@@ -58,18 +58,23 @@ that got the agent slashed is committed at `receipts/envelopes/beat3-rogue.hex` 
 
 ## The killer number
 
-`python3 scripts/bench.py` — both ledgers deployed side by side on chain 46630 (`deployments/46630-bench.json`),
+`python3 scripts/bench.py` — three ledgers deployed side by side on chain 46630 (`deployments/46630-bench.json`),
 seeded with 8/16/32/64/128 lots, `computeHarvest` for the 9-lot HIFO harvest (4 lots at size 8) measured with Arbitrum's own
-`NodeInterface.gasEstimateComponents`:
+`NodeInterface.gasEstimateComponents`. **Two Solidity baselines:** the straightforward twin we shipped
+(`TaxLotLedger.sol`, re-reads `lots[i]` from storage on every selection pass) and a memory-copy ledger with the Rust
+structure (`contracts/src/bench/TaxLotLedgerMemCopy.sol`, benchmark only). **Memory-copy ÷ Stylus is the fair
+engine-to-engine figure.** Re-run 2026-09-28, all three engines in one run:
 
-| Open lots | Solidity L2 gas | Stylus L2 gas | ratio |
-|---|---|---|---|
-| 8 | 132,362 | 125,859 | 1.05× |
-| 16 | 352,195 | 180,017 | 1.96× |
-| 32 | 720,431 | 289,013 | 2.49× |
-| **64** | **1,456,905** | **507,993** | **2.87×** |
-| 128 | 2,929,938 | 945,989 | 3.1× |
+| Open lots | Solidity shipped L2 | Solidity memory-copy L2 | Stylus L2 | **fair ratio** | vs shipped twin |
+|---|---|---|---|---|---|
+| 8 | 132,363 | 108,713 | 125,807 | **0.86×** | 1.05× |
+| 16 | 352,160 | 231,323 | 179,982 | **1.29×** | 1.96× |
+| 32 | 720,396 | 440,005 | 288,999 | **1.52×** | 2.49× |
+| **64** | 1,456,891 | 857,559 | 507,979 | **1.69×** | 2.87× |
+| 128 | 2,929,924 | 1,693,678 | 945,964 | **1.79×** | 3.1× |
 
-Identical `lotIds` and `realizedLoss` at every size (the 64-lot row is Maya's exact −$3,140.000000). The
-program is uncached on this testnet (no ArbOS cache manager), so these are worst-case Stylus numbers.
+Identical `lotIds` and `realizedLoss` across all three at every size (the 64-lot row is Maya's exact −$3,140.000000).
+We first published 2.87× (1,456,905 → 507,993, 15 Sep run) as the Stylus advantage; ~41 % of that ratio was our
+Solidity baseline re-reading storage. At 8 lots the memory-copy ledger beats uncached Stylus (0.86×). The program is
+uncached on this testnet (no ArbOS cache manager), so these are worst-case Stylus numbers.
 Full table with latency percentiles: [`bench/RESULTS.md`](bench/RESULTS.md).
